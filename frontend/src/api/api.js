@@ -27,13 +27,13 @@ axios.interceptors.request.use(function (config) {
  * @响应拦截
  */
 axios.interceptors.response.use(response => {
-
+  
     if (response.status !== 200) {
         return Promise.reject(response)
     }
-    /**
-   * @code 登录过期 token验证失败 根据后端调 
-   */
+      /**
+     * @code 登录过期 token验证失败 根据后端调 
+     */
     if (response.data.code == UtilVar.code) {
         // router.push("/login")
     }
@@ -166,36 +166,3 @@ export const FILE = async (config = {}, body, params) => {
 }
 
 
-
-const apiUrl = 'http://www.pahealthsys.cn/device/deviceData/getDataByType';
-
-const requestData = {
-    current: 1, // 第几页
-    size: 10, // 每页多少条
-    startDate: '', // 开始日期，可以根据需要填写
-    endDate: '', // 结束日期，可以根据需要填写
-    type: 'temperature' // 数据类型
-};
-
-const requestOptions = {
-    method: 'POST',
-    headers: {
-        'Authorization': 'Bearer 83e60402-b255-4f7d-87ac-139c6564f250',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(requestData)
-};
-
-fetch(apiUrl, requestOptions)
-    .then(response => response.json())
-    .then(data => {
-        if (data.code === 0) {
-            const healthData = data.data.records;
-            console.log(healthData); // 在这里处理健康数据
-        } else {
-            console.error('请求失败:', data.msg);
-        }
-    })
-    .catch(error => {
-        console.error('请求失败:', error);
-    });
