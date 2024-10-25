@@ -1,6 +1,7 @@
 package com.keylab.healthproject.controller;
 
-import com.keylab.healthproject.common.R;
+
+import com.keylab.healthproject.common.Result;
 import com.keylab.healthproject.dao.Community;
 import com.keylab.healthproject.dao.EnvVal;
 import com.keylab.healthproject.dao.HealthData;
@@ -38,27 +39,27 @@ public class InsertDataController {
 
     // 批量插入 community 数据
     @PostMapping("/community")
-    public R<String> insert2Community(@RequestBody List<Community> list){
+    public Result insert2Community(@RequestBody List<Community> list){
         iCommunityService.saveBatch(list);
-        return R.success("success",null);
+        return Result.success();
     }
     // 批量插入 envVal 数据
     @PostMapping("/envVal")
-    public R<String> insert2EnvVal(@RequestBody List<EnvVal> list){
+    public Result insert2EnvVal(@RequestBody List<EnvVal> list){
         iEnvValService.saveBatch(list);
-        return R.success("success",null);
+        return Result.success();
     }
     // 批量插入 healthData 数据
     @PostMapping("/healthData")
-    public R<String> insert2HealthData(@RequestBody List<HealthData> list){
+    public Result insert2HealthData(@RequestBody List<HealthData> list){
         iHealthDataService.saveBatch(list);
-        return R.success("success",null);
+        return Result.success();
     }
     // 批量插入 hospital 数据
     @PostMapping("/hospital")
-    public R<String> insert2Hospital(@RequestBody List<Hospital> list){
+    public Result insert2Hospital(@RequestBody List<Hospital> list){
         iHospitalService.saveBatch(list);
-        return R.success("success",null);
+        return Result.success();
     }
 
     @GetMapping
