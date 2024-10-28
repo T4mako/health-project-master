@@ -93,6 +93,7 @@ export default {
   margin-left: 4rem;
   margin-bottom: 0.5rem;
   cursor: pointer;
+  border-radius: 10px;
 }
 
 .image-caption {
