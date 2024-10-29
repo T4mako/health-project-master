@@ -2,21 +2,12 @@ package com.keylab.healthproject.controller;
 
 
 import com.keylab.healthproject.common.Result;
-import com.keylab.healthproject.dao.Community;
-import com.keylab.healthproject.dao.EnvVal;
-import com.keylab.healthproject.dao.HealthData;
-import com.keylab.healthproject.dao.Hospital;
-import com.keylab.healthproject.service.ICommunityService;
-import com.keylab.healthproject.service.IEnvValService;
-import com.keylab.healthproject.service.IHealthDataService;
-import com.keylab.healthproject.service.IHospitalService;
+import com.keylab.healthproject.dao.*;
+import com.keylab.healthproject.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,6 +27,8 @@ public class InsertDataController {
     IHealthDataService iHealthDataService;
     @Autowired
     IHospitalService iHospitalService;
+    @Autowired
+    IPersonDataService iPersonDataService;
 
     // 批量插入 community 数据
     @PostMapping("/community")
@@ -62,9 +55,10 @@ public class InsertDataController {
         return Result.success();
     }
 
-    @GetMapping
-    public String test(){
-        return "success";
+    @GetMapping("/{id}")
+    public Result test2(@PathVariable Integer id){
+        PersonData byId = iPersonDataService.getById(id);
+        return Result.success(byId);
     }
 
 }
