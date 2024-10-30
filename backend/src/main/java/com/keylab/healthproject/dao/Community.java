@@ -9,7 +9,6 @@ import java.sql.Timestamp;
 
 @TableName("community")
 public class Community {
-
   private long id;
   private long depId;
   private String name;
