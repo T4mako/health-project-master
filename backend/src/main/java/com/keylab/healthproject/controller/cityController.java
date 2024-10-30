@@ -5,6 +5,7 @@ import com.keylab.healthproject.service.ICityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class cityController {
 
     //根据城市名查询对应人数
     @RequestMapping("/getNumByCityName")
-    public Result getNumByCityName(String cityName){
+    public Result getNumByCityName(@RequestParam String cityName){
         long num= indexService.getNumByCityName(cityName);
         return Result.success(num);
     }
