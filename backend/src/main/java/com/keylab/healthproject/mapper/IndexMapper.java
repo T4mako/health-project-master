@@ -15,4 +15,11 @@ public interface IndexMapper {
             "JOIN community c ON h.dept_id = c.dep_id " +
             "GROUP BY h.name")
     List<Map<String, Object>> getCityNameAndNum();
+
+    //根据城市id获取人口数量
+    @Select("SELECT SUM(CAST(total AS UNSIGNED)) AS total_sum " +
+            "FROM community " +
+            "WHERE dep_id = #{id}")
+    long getNumByCityId(Integer i);
+
 }

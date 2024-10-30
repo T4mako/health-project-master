@@ -12,8 +12,8 @@ import java.util.Map;
 
 @Validated
 @RestController
-@RequestMapping("/index")
-public class IndexController {
+@RequestMapping("/city")
+public class cityController {
     @Autowired
     private IIndexService indexService;
 
@@ -22,6 +22,13 @@ public class IndexController {
     public Result getCityNameAndNum(){
         List<Map<String, Object>> lisMap= indexService.getCityNameAndNum();
         return Result.success(lisMap);
+    }
+
+    //根据城市名查询对应人数
+    @RequestMapping("/getNumByCityName")
+    public Result getNumByCityName(String cityName){
+        long num= indexService.getNumByCityName(cityName);
+        return Result.success(num);
     }
 
 }
