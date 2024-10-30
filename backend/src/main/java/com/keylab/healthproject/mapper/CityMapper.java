@@ -23,7 +23,11 @@ public interface CityMapper {
     long getNumByCityId(Integer i);
 
     //获取男女人口数量
-    @Select("SELECT gender, COUNT(*) AS count FROM person_data GROUP BY gender")
+    @Select("SELECT " +
+            "SUM(CASE WHEN gender = '男' THEN 1 ELSE 0 END) AS 男, " +
+            "SUM(CASE WHEN gender = '女' THEN 1 ELSE 0 END) AS 女 " +
+            "FROM person_data " +
+            "WHERE gender IN ('男', '女')")
     List<Map<String, Object>> getSexCount();
 
     //根据城市id获取男女人口数量

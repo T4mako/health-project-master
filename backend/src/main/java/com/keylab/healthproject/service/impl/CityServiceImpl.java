@@ -37,22 +37,24 @@ public class CityServiceImpl implements ICityService {
     @Override
     public List<Map<String, Object>> getSexCount() {
         List<Map<String, Object>> list= cityMapper.getSexCount();
-        Map<String, Object> map=new HashMap<>();
-        //输出Mapper键值对
-        String gender1=list.get(0).get("gender").toString();
-        String gender2=list.get(1).get("gender").toString();
-        if(gender1.equals("男")){
-            Integer count1=Integer.parseInt(list.get(0).get("count").toString());//男
-            Integer count2=Integer.parseInt(list.get(1).get("count").toString());//女
-            Double ratio=(double)count1/(double)(count2);
-            map.put("ratio",ratio);
-        }else{
-            Integer count1=Integer.parseInt(list.get(1).get("count").toString());
-            Integer count2=Integer.parseInt(list.get(0).get("count").toString());
-            Double ratio=(double)count1/(double)(count2);
-            map.put("ratio",ratio);
+        Map<String, Object> data = list.get(0);
+        // 确保键存在，并直接使用 BigDecimal
+        BigDecimal maleCountBD = (BigDecimal) data.get("男");
+        BigDecimal femaleCountBD = (BigDecimal) data.get("女");
+        Integer maleCount = maleCountBD.intValue();
+        Integer femaleCount = femaleCountBD.intValue();
+        // 计算比例
+        Double ratio = 0.0;
+        if (femaleCount != 0) {
+            ratio = maleCount.doubleValue() / femaleCount.doubleValue();
         }
-        list.add(map);
+        // 将比例添加到结果中
+        Map<String, Object> ratioMap = new HashMap<>();
+        ratioMap.put("男", maleCount);
+        ratioMap.put("女", femaleCount);
+        ratioMap.put("ratio", ratio);
+        list.remove(0);
+        list.add(ratioMap);
         return list;
     }
 
