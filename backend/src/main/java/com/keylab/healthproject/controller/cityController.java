@@ -1,7 +1,7 @@
 package com.keylab.healthproject.controller;
 
 import com.keylab.healthproject.common.Result;
-import com.keylab.healthproject.service.IIndexService;
+import com.keylab.healthproject.service.ICityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +15,7 @@ import java.util.Map;
 @RequestMapping("/city")
 public class cityController {
     @Autowired
-    private IIndexService indexService;
+    private ICityService indexService;
 
     //查询所有城市对应名称及人数
     @RequestMapping("/getCityNameAndNum")
