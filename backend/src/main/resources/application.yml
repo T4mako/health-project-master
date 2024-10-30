@@ -3,3 +3,20 @@ server:
 spring:
   application:
     name: backend
+  datasource:
+    # MySQL 数据源
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/health_test?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 12345678
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  servlet:
+    multipart:
+      enabled: true
+
+mybatis-plus:
+  configuration:
+    #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
+    map-underscore-to-camel-case: true
