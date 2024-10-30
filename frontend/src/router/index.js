@@ -13,7 +13,12 @@ Vue.use(VueRouter);
 const routes = [
     {
         path: '/',
-        redirect: '/index',
+        redirect: '/homeIndex',
+    },
+    {
+        path: '/homeIndex',
+        name: 'HomeIndex',
+        component: () => import( '../views/HomeIndex.vue'),
     },
     {
         path: '/home',

@@ -9,44 +9,43 @@
   <div v-if="pageflag" class="right_center_wrap beautify-scroll-def" :class="{ 'overflow-y-auto': !sbtxSwiperFlag }" style="padding-top: 20px;">
     <component :is="components" :data="list" :class-option="defaultOption">
       <ul class="right_center ">
-        <li class="right_center_item" v-for="(item, i) in healthData" :key="i" v-on:click="toPeople(item)">
+        <li class="right_center_item" v-for="(item, i) in list" :key="i" v-on:click="toPeople(item.gatewayno)">
           <span class="orderNum">{{ i + 1 }}</span>
           <div class="inner_right">
             <div class="dibu"></div>
             <div class="flex">
               <div class="info">
                 <span class="labels ">姓名：</span>
-                <span class="contents zhuyao"> {{ item.researched_person_id }}</span>
+                <span class="contents zhuyao"> {{ item.gatewayno }}</span>
               </div>
               <div class="info">
-                <span class="labels"> 住址：</span>
-                <span class="contents ciyao" style="font-size:12px"> {{ item.family_user_id }}</span>
+                <span class="labels">性别：</span>
+                <span class="contents "> {{ item.terminalno }}</span>
+              </div>
+              <div class="info">
+                <span class="labels">年龄：</span>
+                <span class="contents warning"> {{ item.alertvalue | montionFilter }}</span>
               </div>
             </div>
 
 
-            <div class="flex">              
+            <div class="flex">
+
+              <div class="info">
+                <span class="labels"> 住址：</span>
+                <span class="contents ciyao" style="font-size:12px"> {{ item.provinceName }}/{{ item.cityName }}/{{ item.countyName }}</span>
+              </div>
               <div class="info time">
                 <span class="labels">时间：</span>
-                <span class="contents" style="font-size:12px"> {{ item.create_time }}</span>
+                <span class="contents" style="font-size:12px"> {{ item.createtime }}</span>
               </div>
 
             </div>
             <div class="flex">
 
               <div class="info">
-                <span class="labels">体温：</span>
-                <span class="contents ciyao" :class="{ warning: item.alertdetail }"> {{ item.temperature+"°C" || '无'
-                }}</span>
-              </div>
-              <div class="info">
-                <span class="labels">心率：</span>
-                <span class="contents ciyao" :class="{ warning: item.alertdetail }"> {{ item.heart_rate+"" || '无'
-                }}</span>
-              </div>
-              <div class="info">
-                <span class="labels">呼吸率：</span>
-                <span class="contents ciyao" :class="{ warning: item.alertdetail }"> {{ item.breath_rate || '无'
+                <span class="labels">身体状况：</span>
+                <span class="contents ciyao" :class="{ warning: item.alertdetail }"> {{ item.alertdetail || '无'
                 }}</span>
               </div>
             </div>
@@ -68,7 +67,6 @@ export default {
 
   data() {
     return {
-      healthData:[],
       list: [],
       pageflag: true,
       defaultOption: {
@@ -92,40 +90,7 @@ export default {
     }
   },
   created() {
-    this.getData();
-    const apiUrl = "http://www.pahealthsys.cn/device/deviceData/getDataByType";
-
-    const requestData = {
-      current: 1, // 第几页
-      size: 10, // 每页多少条
-      startDate: "", // 开始日期，可以根据需要填写
-      endDate: "", // 结束日期，可以根据需要填写
-      type: "temperature", // 数据类型
-    };
-
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer 83e60402-b255-4f7d-87ac-139c6564f250",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestData),
-    };
-
-    fetch(apiUrl, requestOptions)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.code === 0) {
-          const healthData = data.data.records;
-          console.log(healthData); // 在这里处理健康数据
-          this.healthData=healthData;
-        } else {
-          console.error("请求失败:", data.msg);
-        }
-      })
-      .catch((error) => {
-        console.error("请求失败:", error);
-      });
+    this.getData()
   },
 
   mounted() { },
@@ -148,8 +113,8 @@ export default {
       })
     },
     // 跳转到具体人
-    toPeople(item) {
-      this.$router.push({ path: `/people/${item.researched_person_id}`, query: { data: JSON.stringify(item) } });
+    toPeople(peopleName) {
+      this.$router.push({path:'/people/'+peopleName})
     }
   },
 };
