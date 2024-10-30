@@ -1,5 +1,6 @@
 package com.keylab.healthproject.service.impl;
 
+import com.keylab.healthproject.dao.HealthData;
 import com.keylab.healthproject.dao.PersonData;
 import com.keylab.healthproject.mapper.UserMapper;
 import com.keylab.healthproject.service.IUserService;
@@ -13,5 +14,10 @@ public class UserServiceImpl implements IUserService {
     @Override
     public PersonData getUserInfo(Long id) {
         return userMapper.getUserInfo(id);
+    }
+
+    @Override
+    public HealthData getUserHealthInfo(Long id) {
+        return userMapper.getUserHealthInfo(id);
     }
 }
