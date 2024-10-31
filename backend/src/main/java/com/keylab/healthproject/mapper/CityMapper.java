@@ -22,4 +22,20 @@ public interface CityMapper {
             "WHERE dep_id = #{id}")
     long getNumByCityId(Integer i);
 
+    //获取男女人口数量
+    @Select("SELECT " +
+            "SUM(CASE WHEN gender = '男' THEN 1 ELSE 0 END) AS 男, " +
+            "SUM(CASE WHEN gender = '女' THEN 1 ELSE 0 END) AS 女 " +
+            "FROM person_data " +
+            "WHERE gender IN ('男', '女')")
+    List<Map<String, Object>> getSexCount();
+
+    //根据城市id获取男女人口数量
+    @Select("SELECT " +
+            "SUM(CASE WHEN male IS NOT NULL THEN CAST(male AS UNSIGNED) ELSE 0 END) AS 男, " +
+            "SUM(CASE WHEN female IS NOT NULL THEN CAST(female AS UNSIGNED) ELSE 0 END) AS 女 " +
+            "FROM community " +
+            "WHERE dep_id = #{depId} " +
+            "GROUP BY dep_id")
+    List<Map<String, Object>> getSexCountByCity(Integer i);
 }
