@@ -3,12 +3,14 @@ server:
 spring:
   application:
     name: backend
+  config:
+    import: optional:file:.env[.properties]
   datasource:
     # MySQL 数据源
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/health_test?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
     username: root
-    password: 12345678
+    password: ${DB_PASSWORD}
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
