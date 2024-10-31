@@ -3,6 +3,8 @@ package com.keylab.healthproject.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.keylab.healthproject.dao.HealthData;
 
+import java.util.List;
+
 /**
  * <p>
  *  服务类
@@ -13,4 +15,5 @@ import com.keylab.healthproject.dao.HealthData;
  */
 public interface IHealthDataService extends IService<HealthData> {
 
+    List<HealthData> dayHData(long id);
 }
