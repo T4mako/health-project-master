@@ -40,18 +40,18 @@ public interface HealthDataMapper extends BaseMapper<HealthData> {
 
 
     @Select("SELECT\n" +
-            "hd.researched_person_id AS id, \n" +
-            "hd.${indicator} , \n" +
-            "hd.create_time,  \n" +
-            "pd.dept_name\n" +
+            "   hd.researched_person_id AS id, \n" +
+            "   hd.${indicator} , \n" +
+            "   hd.create_time,  \n" +
+            "   pd.dept_name\n" +
             "FROM \n" +
-            "health_data hd \n" +
+            "   health_data hd \n" +
             "RIGHT JOIN \n" +
-            "person_data pd ON hd.researched_person_id = pd.id\n" +
+            "   person_data pd ON hd.researched_person_id = pd.id\n" +
             "WHERE \n" +
-            "hd.create_time >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)\n" +
+            "   hd.create_time >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)\n" +
             "AND \n" +
-            "pd.dept_name in (\n" +
+            "   pd.dept_name in (\n" +
             "select name from community where dep_id  " +
             "in (select dep_id from community c,person_data p where p.dept_id = c.id and p.id = #{id}));")
     List<Map<String, Object>> selectAllProvinceCompareData(long id, String indicator);
