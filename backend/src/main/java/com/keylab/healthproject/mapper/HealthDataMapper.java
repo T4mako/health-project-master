@@ -19,15 +19,14 @@ import java.util.Map;
 @Mapper
 public interface HealthDataMapper extends BaseMapper<HealthData> {
 
-    @Select("select researched_person_id ,#{indicator},create_time from health_data hd " +
+    @Select("select researched_person_id ,${indicator},create_time from health_data hd " +
             "where create_time >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) ")
     List<Map<String, Object>> selectAllCompareData(String indicator);
 
     @Select("SELECT \n" +
             "    hd.researched_person_id AS id, \n" +
             "    hd.${indicator}, \n" +
-            "    hd.create_time, \n" +
-            "    pd.dept_name\n" +
+            "    hd.create_time \n" +
             "FROM \n" +
             "    health_data hd \n" +
             "RIGHT JOIN \n" +
@@ -42,8 +41,7 @@ public interface HealthDataMapper extends BaseMapper<HealthData> {
     @Select("SELECT\n" +
             "   hd.researched_person_id AS id, \n" +
             "   hd.${indicator} , \n" +
-            "   hd.create_time,  \n" +
-            "   pd.dept_name\n" +
+            "   hd.create_time  \n" +
             "FROM \n" +
             "   health_data hd \n" +
             "RIGHT JOIN \n" +
