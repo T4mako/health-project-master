@@ -22,16 +22,9 @@
         <li class="user_Overview-item" style="color: #e3b337">
             <div class="user_Overview_nums offline">
                 <dv-digital-flop :config="proportion" style="width:100%;height:100%;" />
-
             </div>
             <p>男女比例</p>
         </li>
-<!--        <li class="user_Overview-item" style="color: #f5023d">-->
-<!--            <div class="user_Overview_nums laramnum">-->
-<!--                <dv-digital-flop :config="laramnumconfig" style="width:100%;height:100%;" />-->
-<!--            </div>-->
-<!--            <p>告警次数</p>-->
-<!--        </li>-->
     </ul>
     <Reacquire v-else @onclick="getData" line-height="200px">
         重新获取
@@ -39,7 +32,9 @@
 </template>
 
 <script>
-import { currentGET } from 'api/modules'
+
+import axios from "axios";
+import {baseUrl} from "@/api/api";
 let style = {
     fontSize: 24
 }
@@ -53,17 +48,11 @@ export default {
     data() {
         return {
             options: {},
-            userOverview: {
-                alarmNum: 0,
-                offlineNum: 0,
-                onlineNum: 0,
-                totalNum: 0,
-            },
             pageflag: true,
             timer: null,
             // 男生数
             manNumber: {
-                number: [(4579072+6467170+6615501)/10000],
+                number: [],
                 content: '{nt}',
                 style: {
                     ...style,
@@ -72,7 +61,7 @@ export default {
                 },
             },
             womanNumber: {
-                number: [(4504718+6133404+6337406)/10000],
+                number: [],
                 content: '{nt}',
                 style: {
                     ...style,
@@ -81,7 +70,7 @@ export default {
                 },
             },
             proportion: {
-                number: [1],
+                number: [],
                 content: '{nt}',
                 style: {
                     ...style,
@@ -89,15 +78,7 @@ export default {
                     fill: "#e3b337",
                 },
             },
-            laramnumconfig: {
-                number: [0],
-                content: '{nt}',
-                style: {
-                    ...style,
-                    // stroke: "#f5023d",
-                    fill: "#f5023d",
-                },
-            }
+
 
         };
     },
@@ -107,58 +88,13 @@ export default {
         },
     },
     created() {
-        this.getData()
+       this.refreshData()
     },
     mounted() {
     },
     watch: {
-      province(newVal, oldVal) {
-        this.province = newVal;
-        if (newVal.indexOf("省") >= 0) {
-          const man = this.manNumber;
-          const woman = this.womanNumber;
-          const pro = this.proportion;
-          this.manNumber = {
-            ...man,
-            number: [1000]
-          }
-          this.womanNumber = {
-            ...woman,
-            number: [1000]
-          }
-          this.proportion = {
-            ...pro,
-            number: [1]
-          }
-        }else {
-          this.manNumber = {
-            number: [(4579072+6467170+6615501)/10000],
-                content: '{nt}',
-                style: {
-            ...style,
-                  // stroke: "#00fdfa",
-                  fill: "#00fdfa",
-            },
-          };
-          this.womanNumber = {
-            number: [(4504718+6133404+6337406)/10000],
-                content: '{nt}',
-                style: {
-            ...style,
-                  // stroke: "#07f7a8",
-                  fill: "#07f7a8",
-            },
-          };
-          this.proportion = {
-            number: [1],
-                content: '{nt}',
-                style: {
-            ...style,
-                  // stroke: "#e3b337",
-                  fill: "#e3b337",
-            },
-          };
-        }
+      province(newVal) {
+        this.getProvinceData(newVal);
       }
     },
     beforeDestroy() {
@@ -172,47 +108,81 @@ export default {
                 this.timer = null
             }
         },
-        getData() {
-            this.pageflag = true;
-            currentGET("big2").then((res) => {
-                if (!this.timer) {
-                    console.log("设备总览", res);
-                }
-                if (res.success) {
-                    // this.userOverview = res.data;
-                    // this.onlineconfig = {
-                    //     ...this.onlineconfig,
-                    //     number: [res.data.onlineNum]
-                    // }
-                    // this.config = {
-                    //     ...this.config,
-                    //     number: [res.data.totalNum]
-                    // }
-                    // this.offlineconfig = {
-                    //     ...this.offlineconfig,
-                    //     number: [res.data.offlineNum]
-                    // }
-                    // this.laramnumconfig = {
-                    //     ...this.laramnumconfig,
-                    //     number: [res.data.alarmNum]
-                    // }
-                    this.switper()
-                } else {
-                    this.pageflag = false;
-                    this.$Message.warning(res.msg);
-                }
-            });
-        },
-        //轮询
-        switper() {
-            if (this.timer) {
-                return
-            }
-            let looper = (a) => {
-                this.getData()
+      refreshData() {
+        // 刷新数据，重新获取性别数据
+        if (this.province) {
+          this.getProvinceData(this.province);
+        } else {
+          this.getData();
+        }
+      },
+      getData() {
+        this.pageflag = true;
+        axios.get(`${baseUrl}/city/getSexCount`).then(response => {
+          if (response.code === "200") {
+            const data = response.data[0];
+            // 更新男性人数
+            this.manNumber = {
+              ...this.manNumber,
+              number: [data.男]
             };
-            this.timer = setInterval(looper, this.$store.state.setting.echartsAutoTime);
-        },
+            // 更新女性人数
+            this.womanNumber = {
+              ...this.womanNumber,
+              number: [data.女]
+            };
+            // 更新男女比例
+            this.proportion = {
+              ...this.proportion,
+              number: [data.ratio]
+            };
+          } else {
+            this.pageflag = false;
+            this.$Message.warning(response.msg);
+          }
+        }).catch(error => {
+          console.error(error);
+          this.pageflag = false;
+          this.$Message.error('获取数据失败');
+        });
+      },
+      getProvinceData(provinceName) {
+        if (!provinceName) return;
+        // 根据省份/城市名称获取对应的男性、女性数量和比例数据
+        axios.get(`${baseUrl}/city/getSexCountByCity`, {
+              params: {
+                cityName: provinceName
+              }
+            })
+            .then(response => {
+              if (response.code === "200") {
+                const data = response.data[0]; // 直接使用 response.data
+                // 更新男性人数
+                this.manNumber = {
+                  ...this.manNumber,
+                  number: [data.男]
+                };
+                // 更新女性人数
+                this.womanNumber = {
+                  ...this.womanNumber,
+                  number: [data.女]
+                };
+                // 更新男女比例
+                this.proportion = {
+                  ...this.proportion,
+                  number: [data.ratio]
+                };
+              } else {
+                this.pageflag = false;
+                this.$Message.warning(response.msg);
+              }
+            })
+            .catch(error => {
+              console.error("获取省份数据失败", error);
+              this.pageflag = false;
+              this.$Message.error("获取省份数据失败");
+            });
+      },
     },
 };
 </script>
