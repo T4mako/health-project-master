@@ -30,7 +30,7 @@ public class cityController {
     //根据城市名查询对应人数
     @RequestMapping("/getNumByCityName")
     public Result getNumByCityName(@RequestParam String cityName){
-        if (StringUtils.isEmpty(cityName)){
+        if (cityName.equals("中国")){
             List<Map<String, Object>> lisMap= indexService.getCityNameAndNum();
             return Result.success(lisMap);
         }else{
@@ -51,10 +51,10 @@ public class cityController {
     // 根据城市名称，返回该城市的男女数量比例
     @RequestMapping("/getSexCountByCity")
     public Result getSexCountByCity(@RequestParam String cityName){
-        if(StringUtils.isEmpty(cityName)){
+        if(cityName.equals("中国")){
             List<Map<String, Object>> list= indexService.getSexCount();
             return Result.success(list);
-        }else {
+        }  else {
             List<Map<String, Object>> list= indexService.getSexCountByCity(cityName);
             if(list==null)
                 return Result.error(ResultCodeEnum.PARAM_ERROR);

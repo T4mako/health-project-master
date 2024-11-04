@@ -53,9 +53,12 @@ export default {
 
   },
   watch: {
-    // 当 province 属性变化时，调用 getProvinceData 从后端获取该省份的数据
     province(newVal) {
-      this.getProvinceData(newVal);
+      if (!newVal || newVal === "中国") {  // 当 province 为空或等于 "中国" 时，获取全国数据
+        this.getData();
+      } else {  // 当 province 有值且不等于 "中国" 时，获取该省份的数据
+        this.getProvinceData(newVal);
+      }
     }
 
   },
@@ -108,7 +111,6 @@ export default {
       axios.get(`${baseUrl}/city/getNumByCityName?cityName=${provinceName}`).then(response => {
             const data  = response.data;
             if (response.code === "200") {
-              // 更新 dataItems 为省份的数据
               this.dataItems = [{
                 value: data,
                 name: provinceName,

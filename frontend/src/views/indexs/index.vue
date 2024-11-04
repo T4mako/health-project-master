@@ -12,11 +12,7 @@
         <!-- <div class="item">实时监测</div> -->
 
       </div>
-<!--      <ItemWrap class="contetn_left-top contetn_lr-item" title="设备总览">-->
-<!--        <LeftTop/>-->
-<!--      </ItemWrap>-->
 
-<!--      各市人数-->
       <ItemWrap
           class="contetn_left-center contetn_lr-item"
           title="市人数(单位万)"
@@ -105,6 +101,7 @@ export default {
   methods: {
     childNeedChangeData(name) {
       this.province = name;
+      console.log(this.province);
     }
   },
 };

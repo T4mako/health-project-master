@@ -1,17 +1,11 @@
 <template>
   <div class="center_bottom" id="center_bottom" ref="centerBottom">
-<!--    <Echart-->
-<!--      :options="options"-->
-<!--      id="bottomLeftChart"-->
-<!--      class="echarts_bottom"-->
-<!--    ></Echart>-->
+
   </div>
 </template>
 
 <script>
-import {mylog} from "@/utils";
-import { currentGET } from "api";
-import { graphic } from "echarts";
+
 import * as echarts from 'echarts/core';
 import {
   ToolboxComponent,

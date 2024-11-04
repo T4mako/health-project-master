@@ -12,6 +12,7 @@ public enum ResultCodeEnum {
     PARAM_ERROR("400", "参数异常"),
     PARAM_LOST_ERROR("4001", "参数缺失"),
     SYSTEM_ERROR("500", "系统异常"),
+    CITYNAME_LOST_ERROR("4002","城市名称缺失")
     ;
 
     public String code;
