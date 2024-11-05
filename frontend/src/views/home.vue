@@ -38,6 +38,7 @@
             <el-input v-model="input" placeholder="请开始搜索"></el-input>
             <el-button type="primary" icon="el-icon-search" style="margin-left: 10px">搜索</el-button>
           </div>
+
         </div>
         <!-- 头部 e-->
         <!-- 内容  s-->

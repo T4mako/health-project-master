@@ -107,14 +107,7 @@ export default {
         cityCenter[item.properties.name] =
             item.properties.centroid || item.properties.center;
       });
-      // mydata.map((item) => {
-      //   if (cityCenter[item.name]) {
-      //     newData.push({
-      //       name: item.name,
-      //       value: cityCenter[item.name].concat(item.value),
-      //     });
-      //   }
-      // });
+
       this.newData = [];
       this.apartments = [];
       // 具体市的点
@@ -126,87 +119,84 @@ export default {
         // this.newData.push({name: "西安市", value: [108.797426, 34.10671, 1]});
         this.apartments = [
           {
-            id: 1,
-            value: "新福小区",
+            id: 22,
+            value: "东关南街社区",
             top: 365,
             left: 200
           },
           {
-            id: 2,
-            value: "阳光小区",
+            id: 23,
+            value: "长安路社区",
             top: 355,
             left: 430
           },
           {
-            id: 1,
-            value: "德才小区",
+            id: 24,
+            value: "长乐坊社区",
             top: 314,
             left: 585
+          },
+          {
+            id: 25,
+            value: "小寨永松路社区",
+            top: 320,
+            left: 330
           },
         ]
       } else if (this.name === "河南省") {
         // this.newData.push({name: "郑州市", value: [113.477391, 34.626256, 1]});
         this.apartments = [
           {
-            id: 1,
-            value: "新福小区",
+            id: 16,
+            value: "九街示范区",
             top: 365,
             left: 200
           },
           {
-            id: 2,
-            value: "阳光小区",
+            id: 17,
+            value: "城南示范区",
             top: 355,
             left: 430
           },
           {
-            id: 1,
-            value: "德才小区",
+            id: 18,
+            value: "城北示范区",
             top: 314,
             left: 585
+          },
+          {
+            id: 19,
+            value: "西站示范区",
+            top: 320,
+            left: 330
           },
         ]
       } else if (this.name === "江苏省") {
         // this.newData.push({name: "徐州市", value: [117.184811, 34.261792, 1]});
         this.apartments = [
           {
-            id: 1,
-            value: "新福小区",
+            id: 13,
+            value: "永安社区",
             top: 365,
             left: 200
           },
           {
-            id: 2,
-            value: "阳光小区",
+            id: 26,
+            value: "泉山社区",
             top: 355,
             left: 430
           },
           {
-            id: 1,
-            value: "德才小区",
+            id: 27,
+            value: "黄山社区",
             top: 314,
             left: 585
           },
-        ]
-      } else {
-        this.apartments = [
           {
-            id: 1,
-            value: "新福小区",
-            top: 365,
-            left: 200
-          },
-          {
-            id: 2,
-            value: "阳光小区",
-            top: 355,
-            left: 430
-          },
-          {
-            id: 1,
-            value: "德才小区",
-            top: 314,
-            left: 585
+            id: 28,
+            value: "铜沛社区",
+            top: 320,
+            left: 330
           },
         ]
       }
@@ -227,32 +217,7 @@ export default {
         legend: {
           show: false,
         },
-        // visualMap: {
-        //   left: 20,
-        //   bottom: 20,
-        //   pieces: [
-        //     { gte: 1000, label: "1000个以上" }, // 不指定 max，表示 max 为无限大（Infinity）。
-        //     { gte: 600, lte: 999, label: "600-999个" },
-        //     { gte: 200, lte: 599, label: "200-599个" },
-        //     { gte: 50, lte: 199, label: "49-199个" },
-        //     { gte: 10, lte: 49, label: "10-49个" },
-        //     { lte: 9, label: "1-9个" }, // 不指定 min，表示 min 为无限大（-Infinity）。
-        //   ],
-        //   inRange: {
-        //     // 渐变颜色，从小到大
-        //     color: [
-        //       "#c3d7df",
-        //       "#5cb3cc",
-        //       "#8abcd1",
-        //       "#66a9c9",
-        //       "#2f90b9",
-        //       "#1781b5",
-        //     ],
-        //   },
-        //   textStyle: {
-        //     color: "#fff",
-        //   },
-        // },
+
         geo: {
           map: name,
           roam: false,

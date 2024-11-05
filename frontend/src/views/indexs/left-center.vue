@@ -35,12 +35,6 @@ export default {
     return {
       options: {},
       colors: ["#ECA444", "#33A1DB", "#56B557"], // 固定颜色数组
-      countUserNumData: {
-        lockNum: 902.8,
-        onlineNum: 1316.3,
-        offlineNum: 1274.2,
-        totalNum: 0
-      },
       dataItems: [],
       pageflag: true,
       timer: null
