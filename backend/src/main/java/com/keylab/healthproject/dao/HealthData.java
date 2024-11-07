@@ -2,6 +2,7 @@ package com.keylab.healthproject.dao;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.LocalDate;
 
 public class HealthData {
 
@@ -11,7 +12,7 @@ public class HealthData {
   private long systolic;
   private long diastolic;
   @JsonProperty("create_time")
-  private String createTime;
+  private LocalDate createTime;
   @JsonProperty("blood_oxygen")
   private long bloodOxygen;
   @JsonProperty("family_user_id")
@@ -61,11 +62,11 @@ public class HealthData {
   }
 
 
-  public String getCreateTime() {
+  public LocalDate getCreateTime() {
     return createTime;
   }
 
-  public void setCreateTime(String createTime) {
+  public void setCreateTime(LocalDate createTime) {
     this.createTime = createTime;
   }
 
