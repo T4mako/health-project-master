@@ -16,5 +16,9 @@ public interface ICityService {
     // 获取城市的男女人口数量
     List<Map<String, Object>> getSexCountByCity(String cityName);
 
+    // 返回各个省所有社区健康情况累加和
+    List<Map<String, Object>> getHealthStatus();
 
+    // 返回指定城市的健康情况
+    List<Map<String, Object>> getHealthStatusByCity(String cityName);
 }

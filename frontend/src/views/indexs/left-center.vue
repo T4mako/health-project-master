@@ -20,8 +20,9 @@
 </template>
 
 <script>
-import {currentGET} from 'api/modules'
-import {mylog} from "@/utils";
+
+import axios from "axios";
+import {baseUrl} from "@/api/api";
 
 export default {
   props: {
@@ -33,31 +34,14 @@ export default {
   data() {
     return {
       options: {},
+      colors: ["#ECA444", "#33A1DB", "#56B557"], // 固定颜色数组
       countUserNumData: {
         lockNum: 902.8,
         onlineNum: 1316.3,
         offlineNum: 1274.2,
         totalNum: 0
       },
-      dataItems: [{
-        value: 902.8,
-        name: "徐州",
-        label: {
-          shadowColor: "#ECA444",
-        },
-      }, {
-        value: 1316.3,
-        name: "西安",
-        label: {
-          shadowColor: "#33A1DB",
-        },
-      }, {
-        value: 1274.2,
-        name: "郑州",
-        label: {
-          shadowColor: "#56B557"
-        },
-      }],
+      dataItems: [],
       pageflag: true,
       timer: null
     };
@@ -69,47 +53,11 @@ export default {
 
   },
   watch: {
-    province(newVal, oldVal) {
-      this.province = newVal;
-      if (newVal.indexOf("省") >= 0) {
-        this.dataItems = [
-          {
-            value: 902.8,
-            name: "徐州",
-            label: {
-              shadowColor: "#ECA444",
-            },
-          },
-          {
-            value: 3,
-            name: "小区个数",
-            label: {
-              shadowColor: "#e04444"
-            }
-          }
-        ]
-        this.init();
-      }else {
-        console.log("进中国");
-        this.dataItems = [{
-          value: 902.8,
-          name: "徐州",
-          label: {
-            shadowColor: "#ECA444",
-          },
-        }, {
-          value: 1316.3,
-          name: "西安",
-          label: {
-            shadowColor: "#33A1DB",
-          },
-        }, {
-          value: 1274.2,
-          name: "郑州",
-          label: {
-            shadowColor: "#56B557"
-          },
-        }];
+    province(newVal) {
+      if (!newVal || newVal === "中国") {  // 当 province 为空或等于 "中国" 时，获取全国数据
+        this.getData();
+      } else {  // 当 province 有值且不等于 "中国" 时，获取该省份的数据
+        this.getProvinceData(newVal);
       }
     }
 
@@ -126,54 +74,73 @@ export default {
       }
     },
     getData() {
-      this.pageflag = true
-      // this.pageflag =false
+      this.pageflag = true;
+      axios.get(`${baseUrl}/city/getCityNameAndNum`).then(response => {
+            const data = response.data;
+        if (response.code === "200") {
+              // 使用返回的数据更新 dataItems
+          this.dataItems = data.map((item, index) => ({
+            value: item.total_count,
+            name: item.city_name,
+            label: {
+              shadowColor: this.colors[index % this.colors.length],
+            }
+          }));
 
-      currentGET('big1').then(res => {
-        //只打印一次
-        if (!this.timer) {
-          console.log("设备总览", res);
-        }
-        if (res.success) {
-          let data = this.countUserNumData;
-          data.totalNum = data.lockNum + data.onlineNum + data.offlineNum;
-          this.countUserNumData = data
-          this.$nextTick(() => {
-            this.init()
-            this.switper()
+          this.init();  // 初始化图表
+            } else {
+              this.pageflag = false;
+              this.$Message({
+                text: response.data.msg,
+                type: 'warning'
+              });
+            }
           })
-
-        } else {
-          this.pageflag = false
-          this.$Message({
-            text: res.msg,
-            type: 'warning'
-          })
-        }
-      })
+          .catch(error => {
+            console.error(error);
+            this.pageflag = false;
+            this.$Message({
+              text: '获取数据失败',
+              type: 'error'
+            });
+          });
     },
-    //轮询
-    switper() {
-      if (this.timer) {
-        return
-      }
-      let looper = (a) => {
-        this.getData()
-      };
-      this.timer = setInterval(looper, this.$store.state.setting.echartsAutoTime);
-      let myChart = this.$refs.charts.chart
-      myChart.on('mouseover', params => {
-        this.clearData()
-      });
-      myChart.on('mouseout', params => {
-        this.timer = setInterval(looper, this.$store.state.setting.echartsAutoTime);
-      });
+    // 根据 province 获取特定省份的数据
+    getProvinceData(provinceName) {
+      if (!provinceName) return; // 确保省份名称有效
+      axios.get(`${baseUrl}/city/getNumByCityName?cityName=${provinceName}`).then(response => {
+            const data  = response.data;
+            if (response.code === "200") {
+              this.dataItems = [{
+                value: data,
+                name: provinceName,
+                label: {
+                  shadowColor: this.colors[Math.floor(Math.random() * this.colors.length)],
+                }
+              }]
+              this.init();  // 重新初始化图表
+            } else {
+              this.pageflag = false;
+              this.$Message({
+                text: response.data.msg,
+                type: 'warning'
+              });
+            }
+          })
+          .catch(error => {
+            console.error(error);
+            this.pageflag = false;
+            this.$Message({
+              text: '获取省份数据失败',
+              type: 'error'
+            });
+          });
     },
     init: function () {
       const data = this.dataItems;
       let total = 0
       data.forEach(d => total += d.value)
-      let colors = ["#ECA444", "#33A1DB", "#56B557"];
+      let colors = this.colors
       let piedata = {
         name: "数据",
         type: "pie",

@@ -7,7 +7,7 @@
  */
 var UtilVar = {
     ENC: false, //返回结果是否加密
-    baseUrl: `http://locolhost:8888`,
+    baseUrl: `http://localhost:8081`,
     code: 401,
 }
 const runtimeType = {

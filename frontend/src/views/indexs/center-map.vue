@@ -76,8 +76,6 @@ export default {
           this.$Message.warning(res.msg);
         }
       });
-      // location.reload();
-      // this.$emit('childNeedChangeData', "中国");
     },
     /**
      * @description: 获取geojson
