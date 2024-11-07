@@ -1,9 +1,11 @@
 package com.keylab.healthproject.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.keylab.healthproject.common.Result;
 import com.keylab.healthproject.dao.HealthData;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -16,4 +18,8 @@ import java.util.List;
 public interface IHealthDataService extends IService<HealthData> {
 
     List<HealthData> dayHData(long id);
+
+    List<HealthData> dateHData(long id, String date);
+
+    List<Map<String, Object>> getDataByArea(long id, int flag, String indicator);
 }
