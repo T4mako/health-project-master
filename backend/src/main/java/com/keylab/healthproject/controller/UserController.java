@@ -35,7 +35,7 @@ public class UserController {
 
     @GetMapping("/dateHData")
     public Result dateHData(@RequestParam long id, @RequestParam String date) {
-        if(date.equals("month") || date.equals("year") || date.equals("all")) {
+        if(date.equals("week") || date.equals("month") || date.equals("year") || date.equals("all")) {
             return Result.success(iHealthDataService.dateHData(id,date));
         }else {
             return Result.error(ResultCodeEnum.PARAM_ERROR);

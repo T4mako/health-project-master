@@ -28,7 +28,7 @@ import java.util.Map;
 @Service
 public class HealthDataServiceImpl extends ServiceImpl<HealthDataMapper, HealthData> implements IHealthDataService {
 
-    String today = "2024-10-31";
+    Date today = DateUtil.parse("2024-10-31");
 
     @Autowired
     HealthDataMapper healthDataMapper;
@@ -50,11 +50,14 @@ public class HealthDataServiceImpl extends ServiceImpl<HealthDataMapper, HealthD
 
         // 根据date的值选择不同的查询条件
         switch (date) {
+            case "week":
+                queryWrapper.ge(HealthData::getCreateTime,DateUtil.offsetWeek(today,-1));
+                break;
             case "month":
-                queryWrapper.ge(HealthData::getCreateTime, DateUtil.offsetMonth(new Date(), -1)); // 查询过去一个月的数据
+                queryWrapper.ge(HealthData::getCreateTime, DateUtil.offsetMonth(today, -1)); // 查询过去一个月的数据
                 break;
             case "year":
-                queryWrapper.ge(HealthData::getCreateTime, DateUtil.offsetMonth(new Date(), -12)); // 查询过去一年的数据
+                queryWrapper.ge(HealthData::getCreateTime, DateUtil.offsetMonth(today, -12)); // 查询过去一年的数据
                 break;
             case "all":
                 // 不添加时间限制，查询全部数据

@@ -19,12 +19,12 @@ import java.util.List;
  * @date 2024/10/31 13:01
  */
 @RestController
-@RequestMapping("/")
+@RequestMapping("/hData")
 public class HealthDataController {
     @Autowired
     IHealthDataService iHealthDataService;
 
-    @GetMapping("/hData")
+    @GetMapping("/areaHDataAndAge")
     public Result getHealthData(@RequestParam long id,@RequestParam int flag, @RequestParam String indicator) {
         if(!Indicator.healthIndicators.contains(indicator)){
             return Result.error(ResultCodeEnum.PARAM_ERROR);
