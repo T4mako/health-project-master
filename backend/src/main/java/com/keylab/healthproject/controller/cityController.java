@@ -79,6 +79,33 @@ public class cityController {
             return Result.error(ResultCodeEnum.PARAM_ERROR);
         } else {
             List<Map<String, Object>> list = indexService.getHealthStatusByCity(cityName);
+            if (list == null){
+                return Result.error(ResultCodeEnum.PARAM_ERROR);
+            }
+            return Result.success(list);
+        }
+    }
+
+    // 返回所有城市健康水平风险数量
+    @RequestMapping("/getHealthLevel")
+    public Result getHealthLevel() {
+        List<Map<String, Object>> list = indexService.getHealthLevel();
+        return Result.success(list);
+    }
+
+    // 返回指定城市的健康水平风险数量
+    @RequestMapping("/getHealthLevelByCity")
+    public Result getHealthLevelByCity(@RequestParam @Validated String cityName) {
+        if (cityName.equals("中国")) {
+            List<Map<String, Object>> list = indexService.getHealthLevel();
+            return Result.success(list);
+        } else if (cityName.isEmpty()) {
+            return Result.error(ResultCodeEnum.PARAM_ERROR);
+        } else {
+            List<Map<String, Object>> list = indexService.getHealthLevelByCity(cityName);
+            if (list == null){
+                return Result.error(ResultCodeEnum.PARAM_ERROR);
+            }
             return Result.success(list);
         }
     }
