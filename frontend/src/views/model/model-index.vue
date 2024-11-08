@@ -22,7 +22,24 @@
           </div>
         </div>
 
-        <router-view></router-view>
+        <!-- 主体 -->
+        <div class="content">
+          <ItemWrap class="wrap" title="老年人信息">
+            <UserSelect></UserSelect>
+          </ItemWrap>
+          <ItemWrap class="wrap" style="text-align: center;" title="模型选择">
+            <div style="margin-left: 160px;">
+              <div @click="goTo('/model')">
+                <ModleBtn name="健康数据分析图" ></ModleBtn>
+              </div>
+              <ModleBtn name="疾病预测"></ModleBtn>
+              <ModleBtn name="摔倒监测报警"></ModleBtn>
+              <ModleBtn name="健康数字人"></ModleBtn>
+            </div>
+
+          </ItemWrap>
+        </div>
+        <!-- <router-view></router-view> -->
       </div>
     </div>
   </ScaleScreen>

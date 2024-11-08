@@ -133,7 +133,7 @@ export default {
   gap: 40px;
   width: 75%;
   height: 90%;
-  padding-left: 40px;
+  padding-left: 30px;
 }
 
 /* 修改下拉框样式 */
