@@ -27,8 +27,9 @@ public class EnvController {
         List<EnvVal> list = iEnvValServicel.list();
         return Result.success(list);
     }
-    @GetMapping("/env/userEnv")
-    public List<EnvVal> getTodayEnvDataByUserId(@RequestParam long id) {
-        return iEnvValServicel.getTodayEnvDataByUserId(id);
+    @GetMapping("/userEnv")
+    public Result getTodayEnvDataByUserId(@RequestParam long id) {
+        List<EnvVal> list = iEnvValServicel.getTodayEnvDataByUserId(id);
+        return Result.success(list);
     }
 }
