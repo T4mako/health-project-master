@@ -53,4 +53,7 @@ public interface HealthDataMapper extends BaseMapper<HealthData> {
             "select name from community where dep_id  " +
             "in (select dep_id from community c,person_data p where p.dept_id = c.id and p.id = #{id}));")
     List<Map<String, Object>> selectAllProvinceCompareData(long id, String indicator);
+
+    @Select("SELECT * FROM health_data WHERE researched_person_id = #{id} AND create_time = CURDATE()")
+    HealthData findByResearchedPersonId(long id);
 }

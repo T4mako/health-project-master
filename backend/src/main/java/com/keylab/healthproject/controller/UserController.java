@@ -42,5 +42,9 @@ public class UserController {
         }
     }
 
+    @GetMapping("/warning")
+    public Result warning(@RequestParam long id) {
+        return Result.success(iHealthDataService.getThresholdWarnings(id));
+    }
 
 }
