@@ -22,4 +22,6 @@ public interface IHealthDataService extends IService<HealthData> {
     List<HealthData> dateHData(long id, String date);
 
     List<Map<String, Object>> getDataByArea(long id, int flag, String indicator);
+
+    List<String> getThresholdWarnings(long id);
 }
