@@ -33,10 +33,9 @@
 import { formatTime } from "@/utils/index.js";
 import ScaleScreen from "@/components/scale-screen/scale-screen.vue";
 import ItemWrap from "@/components/item-wrap/item-wrap.vue";
-import UserSelect from "./user-select.vue"
 import ModleBtn from "./model-btn.vue"
 export default {
-  components: { ScaleScreen, UserSelect, ModleBtn },
+  components: { ScaleScreen, ModleBtn },
   data() {
     return {
       timing: null,
