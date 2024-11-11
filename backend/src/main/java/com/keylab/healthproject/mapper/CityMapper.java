@@ -230,4 +230,57 @@ public interface CityMapper {
             ORDER BY month;
             """)
     List<Map<String, Object>> getHealthLevelByCity(Integer Id);
+
+    @Select("""
+            SELECT
+                  total,
+                  female,
+                  male,
+                  family_num,
+                  age_30,
+                  age_30_40,
+                  age_40_50,
+                  age_50_60,
+                  age_60_70,
+                  age_70,
+                  normal,
+                  warn_level1,
+                  warn_level2,
+                  warn_level3
+                FROM
+                  community
+                WHERE
+                  name = #{communityName}
+            
+            """)
+    Map<String, Object> getHealthDataByCommunity(String communityName);
+
+    @Select("""
+            SELECT
+                pd.id AS person_id,
+                pd.gender,
+                pd.age,
+                pd.dept_name,
+                c.dep_id,
+                FORMAT(AVG(hd.breath_rate), 1) AS breath_rate,
+                FORMAT(AVG(hd.systolic), 1) AS systolic,
+                FORMAT(AVG(hd.diastolic), 1) AS diastolic,
+                FORMAT(AVG(hd.blood_oxygen), 1) AS blood_oxygen,
+                FORMAT(AVG(hd.temperature), 1) AS temperature,
+                FORMAT(AVG(hd.heart_rate), 1) AS heart_rate,
+                FORMAT(AVG(hd.blood_glucose), 1) AS blood_glucose
+            FROM
+                community c
+            JOIN
+                person_data pd ON c.id = pd.dept_id
+            LEFT JOIN
+                health_data hd ON pd.id = hd.researched_person_id
+            WHERE
+                c.name = #{communityName}
+                AND hd.create_time >= DATE_FORMAT(NOW() - INTERVAL 1 MONTH, '%Y-%m-01')
+                AND hd.create_time < DATE_FORMAT(NOW(), '%Y-%m-01')
+            GROUP BY
+                pd.id, pd.gender, pd.age, pd.dept_name, c.dep_id;
+            """)
+    List<Map<String, Object>> getDataByCommunityAll(String communityName);
 }

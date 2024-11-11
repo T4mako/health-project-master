@@ -109,4 +109,31 @@ public class cityController {
         }
     }
 
+    //返回指定小区相关健康数据
+    @RequestMapping("/getHealthDataByCommunity")
+    public Result getHealthDataByCommunity(@RequestParam String communityName){
+        if (communityName.isEmpty()){
+            return Result.error(ResultCodeEnum.PARAM_ERROR);
+        }else {
+            Map<String, Object> map = indexService.getHealthDataByCommunity(communityName);
+            if (map == null){
+                return Result.error(ResultCodeEnum.PARAM_ERROR);
+            }
+            return Result.success(map);
+        }
+    }
+    // 返回小区全员健康信息
+    @RequestMapping("/getHealthDataByCommunityAll")
+    public Result getDataByCommunityAll(@RequestParam String communityName){
+        if (communityName.isEmpty()){
+            return Result.error(ResultCodeEnum.PARAM_ERROR);
+        }else {
+            List<Map<String, Object>> list = indexService.getDataByCommunityAll(communityName);
+            if (list.isEmpty()){
+                return Result.error(ResultCodeEnum.PARAM_ERROR);
+            }
+            return Result.success(list);
+        }
+    }
+
 }
