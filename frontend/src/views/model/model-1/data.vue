@@ -7,7 +7,8 @@
           <p>ID：{{ userInfo.id }}</p>
           <p>性别：{{ userInfo.gender }}</p>
           <p>年龄：{{ userInfo.age }} 岁</p>
-          <p>社区：{{ userInfo.community }}</p>
+          <p>城市：{{ userInfo.city }}</p>
+          <p>社区：{{ userInfo.deptName }}</p>
           <p>身高：{{ userInfo.height }} cm</p>
           <p>体重：{{ userInfo.weight }} kg</p>
         </div>
@@ -59,19 +60,23 @@ import HRader from "./health-rader.vue";
 import EnvRader from "./env-rader.vue";
 import HWarning from "./health-warning.vue";
 import BMIChart from "./bmi-chart.vue";
+import axios from "axios";
+import {baseUrl} from "@/api/api";
 export default {
   components: {
     IChart, CompareChart, HRader, EnvRader, HWarning, BMIChart
   },
   data() {
     return {
+      userId:null,
       userInfo: {
-        id: "12345",
-        gender: "男",
-        age: 30,
-        community: "和平小区",
-        height: 175,
-        weight: 70,
+        id: "",
+        gender: "",
+        age: 0,
+        city: "",
+        deptName: "",
+        height: 0,
+        weight: 0,
       },
       timeOptions: [
         { value: 'day', label: '过去一天' },
@@ -88,7 +93,34 @@ export default {
       ],
       areaChoose: 'community',
     };
+  },
+  created() {
+    this.userId = this.$route.query.id
+    axios.get(`${baseUrl}/user/info`,{  params:{id:this.userId}}).then(response => {
+            const data = response.data;
+            this.userInfo = data.pd;
+            this.userInfo.city = data.city;
+        if (response.code === "200") {
+          console.log(response.data);
+          
+            } else {
+              this.pageflag = false;
+              this.$Message({
+                text: response.data.msg,
+                type: 'warning'
+              });
+            }
+          })
+          .catch(error => {
+            console.error(error);
+            this.pageflag = false;
+            this.$Message({
+              text: '获取数据失败',
+              type: 'error'
+            });
+          });
   }
+
 };
 </script>
 
@@ -118,7 +150,7 @@ export default {
 
 .user-info {
   text-align: left;
-  font-size: 24px;
+  font-size: 18px;
   line-height: 1.5;
   color: #fff;
   padding-left: 120px;
@@ -133,7 +165,7 @@ export default {
   gap: 40px;
   width: 75%;
   height: 90%;
-  padding-left: 40px;
+  padding-left: 30px;
 }
 
 /* 修改下拉框样式 */

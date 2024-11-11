@@ -3,11 +3,7 @@
  * @Date: 2024-11-05 13:23:59
 -->
 <template>
-  <ScaleScreen 
-  :width="1920"
-  :height="1080"
-  class="scale-wrap"
-  :selfAdaption="$store.state.setting.isScale">
+  <ScaleScreen :width="1920" :height="1080" class="scale-wrap">
     <div class="bg">
       <dv-loading v-if="loading">Loading...</dv-loading>
       <div v-else class="host-body">
@@ -18,41 +14,41 @@
           <div class="guang"></div>
           <div class="d-flex jc-center">
             <div class="title">
-              <span class="title-text"v-on:click="()=>{this.$router.push({path:'/'})}">数字健康家庭服务城市平台</span>
+              <span class="title-text" v-on:click="() => { this.$router.push({ path: '/' }) }">数字健康家庭服务城市平台</span>
             </div>
           </div>
           <div class="timers">
             {{ dateYear }} {{ dateWeek }} {{ dateDay }}
-            <i
-              class="blq-icon-shezhi02"
-              style="margin-left: 10px"
-              @click="showSetting"
-            ></i>
           </div>
         </div>
+
         <router-view></router-view>
       </div>
-  </div>
+    </div>
   </ScaleScreen>
-  
+
 </template>
 
 <script>
+import { formatTime } from "@/utils/index.js";
 import ScaleScreen from "@/components/scale-screen/scale-screen.vue";
+import ItemWrap from "@/components/item-wrap/item-wrap.vue";
+import ModleBtn from "./model-btn.vue"
 export default {
-  components: { ScaleScreen },
-  data(){
-    return{
+  components: { ScaleScreen, ModleBtn },
+  data() {
+    return {
       timing: null,
-      loading: false,
+      loading: true,
       dateDay: null,
       dateYear: null,
       dateWeek: null,
       weekday: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
       input: '',
       path: '',
-    }
-  },filters: {
+    };
+  },
+  filters: {
     numsFilter(msg) {
       return msg || 0;
     },
@@ -70,9 +66,6 @@ export default {
     clearInterval(this.timing);
   },
   methods: {
-    showSetting() {
-      this.$refs.setting.init();
-    },
     timeFn() {
       this.timing = setInterval(() => {
         this.dateDay = formatTime(new Date(), "HH: mm: ss");
@@ -86,19 +79,35 @@ export default {
         clearTimeout(timer);
       }, 500);
     },
+    goTo(path) {
+      this.$router.push(path);
+    }
   },
 };
 </script>
 
 <style lang="scss" scoped>
 .bg {
-        width: 100%;
-        height: 100%;
-        padding: 16px 16px 10px 16px;
-        box-sizing: border-box;
-        background-size: cover;
-        background-position: center center;
-    }
-@import "model.scss";
+  width: 100%;
+  height: 100%;
+  padding: 16px 16px 10px 16px;
+  box-sizing: border-box;
+  background-size: cover;
+  background-position: center center;
+}
 
+.content {
+  display: flex;
+  width: 100%;
+  height: 90%;
+
+  .wrap {
+    margin: 15px;
+  }
+
+  font-size: 24px;
+
+}
+
+@import "model.scss";
 </style>
