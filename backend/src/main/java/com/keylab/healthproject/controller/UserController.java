@@ -1,6 +1,7 @@
 package com.keylab.healthproject.controller;
 
 import com.keylab.healthproject.common.Result;
+import com.keylab.healthproject.common.ResultCodeEnum;
 import com.keylab.healthproject.service.IHealthDataService;
 import com.keylab.healthproject.service.IPersonDataService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,15 @@ public class UserController {
     @GetMapping("/dayHData")
     public Result dayHData(@RequestParam long id) {
         return Result.success(iHealthDataService.dayHData(id));
+    }
+
+    @GetMapping("/dateHData")
+    public Result dateHData(@RequestParam long id, @RequestParam String date) {
+        if(date.equals("week") || date.equals("month") || date.equals("year") || date.equals("all")) {
+            return Result.success(iHealthDataService.dateHData(id,date));
+        }else {
+            return Result.error(ResultCodeEnum.PARAM_ERROR);
+        }
     }
 
 

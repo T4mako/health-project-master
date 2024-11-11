@@ -21,4 +21,10 @@ public interface ICityService {
 
     // 返回指定城市的健康情况
     List<Map<String, Object>> getHealthStatusByCity(String cityName);
+
+    // 返回健康等级
+    List<Map<String, Object>> getHealthLevel();
+
+    // 返回指定城市的健康等级
+    List<Map<String, Object>> getHealthLevelByCity(String cityName);
 }

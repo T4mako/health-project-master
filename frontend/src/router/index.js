@@ -42,6 +42,23 @@ const routes = [
             }
         ]
     },
+    {
+        path: '/model',
+        name: 'model',
+        component: () => import('../views/model/index.vue'),
+        children: [
+            {
+                path: '/data',
+                name: 'data',
+                component: () => import('../views/model/model-1/data.vue')
+            },
+            {
+                path: '/disease',
+                name: 'disease',
+                component: () => import('../views/model/model-2/data.vue')
+            }
+        ]
+    }
 
 ];
 const router = new VueRouter({

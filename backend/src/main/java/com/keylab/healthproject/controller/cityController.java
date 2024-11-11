@@ -4,7 +4,6 @@ import com.keylab.healthproject.common.Result;
 import com.keylab.healthproject.common.ResultCodeEnum;
 import com.keylab.healthproject.service.ICityService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,15 +50,15 @@ public class cityController {
     // 根据城市名称，返回该城市的男女数量比例
     @RequestMapping("/getSexCountByCity")
     public Result getSexCountByCity(@RequestParam String cityName) {
+        List<Map<String, Object>> list;
         if (cityName.equals("中国")) {
-            List<Map<String, Object>> list = indexService.getSexCount();
-            return Result.success(list);
+            list = indexService.getSexCount();
         } else {
-            List<Map<String, Object>> list = indexService.getSexCountByCity(cityName);
+            list = indexService.getSexCountByCity(cityName);
             if (list == null)
                 return Result.error(ResultCodeEnum.PARAM_ERROR);
-            return Result.success(list);
         }
+        return Result.success(list);
     }
 
     // 返回各个省所有社区健康情况累加和
@@ -79,6 +78,33 @@ public class cityController {
             return Result.error(ResultCodeEnum.PARAM_ERROR);
         } else {
             List<Map<String, Object>> list = indexService.getHealthStatusByCity(cityName);
+            if (list == null){
+                return Result.error(ResultCodeEnum.PARAM_ERROR);
+            }
+            return Result.success(list);
+        }
+    }
+
+    // 返回所有城市健康水平风险数量
+    @RequestMapping("/getHealthLevel")
+    public Result getHealthLevel() {
+        List<Map<String, Object>> list = indexService.getHealthLevel();
+        return Result.success(list);
+    }
+
+    // 返回指定城市的健康水平风险数量
+    @RequestMapping("/getHealthLevelByCity")
+    public Result getHealthLevelByCity(@RequestParam @Validated String cityName) {
+        if (cityName.equals("中国")) {
+            List<Map<String, Object>> list = indexService.getHealthLevel();
+            return Result.success(list);
+        } else if (cityName.isEmpty()) {
+            return Result.error(ResultCodeEnum.PARAM_ERROR);
+        } else {
+            List<Map<String, Object>> list = indexService.getHealthLevelByCity(cityName);
+            if (list == null){
+                return Result.error(ResultCodeEnum.PARAM_ERROR);
+            }
             return Result.success(list);
         }
     }
