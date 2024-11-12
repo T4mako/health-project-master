@@ -1,5 +1,6 @@
 package com.keylab.healthproject.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.keylab.healthproject.common.Indicator;
 import com.keylab.healthproject.common.Result;
 import com.keylab.healthproject.common.ResultCodeEnum;
@@ -24,11 +25,16 @@ public class HealthDataController {
     @Autowired
     IHealthDataService iHealthDataService;
 
-    @GetMapping("/areaHDataAndAge")
-    public Result getHealthData(@RequestParam long id,@RequestParam int flag, @RequestParam String indicator) {
+    @GetMapping("/areaHDataAge")
+    public Result getHealthData(@RequestParam long id, @RequestParam String area,@RequestParam String indicator) {
         if(!Indicator.healthIndicators.contains(indicator)){
             return Result.error(ResultCodeEnum.PARAM_ERROR);
         }
-        return Result.success(iHealthDataService.getDataByArea(id,flag,indicator));
+        if (area != null && !area.isEmpty()) {
+            if(area.equals("community") || area.equals("city") || area.equals("all")){
+                return Result.success(iHealthDataService.getAreaHDataAge(id,area,indicator));
+            }
+        }
+        return Result.error(ResultCodeEnum.PARAM_ERROR);
     }
 }

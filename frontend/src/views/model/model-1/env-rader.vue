@@ -1,12 +1,13 @@
 <template>
   <div>
-
     <Echart id="leftCenter" :options="option" class="left_center_inner" v-if="true" ref="charts" width="600px"
       height="380px" />
   </div>
 </template>
 
 <script>
+import axios from "axios";
+import { baseUrl } from "@/api/api";
 export default {
   data() {
     return {
@@ -78,8 +79,30 @@ export default {
           }
         ]
       }
-
     };
+  },
+  created() {
+    this.userId = this.$route.query.id
+    // axios.get(`${baseUrl}/env/userEnv`, { params: { id: this.userId } }).then(response => {
+    //   if (response.code === "200") {
+    //     const data = response.data;
+        
+    //   } else {
+    //     this.pageflag = false;
+    //     this.$Message({
+    //       text: response.data.msg,
+    //       type: 'warning'
+    //     });
+    //   }
+    // })
+    //   .catch(error => {
+    //     console.error(error);
+    //     this.pageflag = false;
+    //     this.$Message({
+    //       text: '获取数据失败',
+    //       type: 'error'
+    //     });
+    //   });
   }
 };
 </script>
