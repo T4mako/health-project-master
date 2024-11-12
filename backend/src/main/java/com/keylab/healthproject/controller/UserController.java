@@ -76,4 +76,9 @@ public class UserController {
         return Result.success(iHealthDataService.getThresholdWarnings(id));
     }
 
+    @GetMapping("/ageIndicator")
+    public Result ageIndicator(@RequestParam long id,@RequestParam String indicator) {
+        return Result.success(iHealthDataService.getAgeIndicator(id,indicator));
+    }
+
 }
