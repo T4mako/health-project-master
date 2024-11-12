@@ -1,12 +1,12 @@
 <template>
   <div>
-
-    <Echart id="leftCenter" :options="option" class="left_center_inner" v-if="true" ref="charts" width="600px"
-      height="380px" />
+    <Echart id="leftCenter" :options="option" class="left_center_inner" ref="charts" width="600px" height="380px" />
   </div>
 </template>
 
 <script>
+import axios from "axios";
+import { baseUrl } from "@/api/api";
 export default {
   data() {
     return {
@@ -21,7 +21,7 @@ export default {
           }
         },
         tooltip: {
-          trigger: 'item' // 设置触发类型为 'item'，在鼠标悬停时显示值
+          trigger: 'item'
         },
         radar: {
           indicator: [
@@ -39,23 +39,14 @@ export default {
             fontSize: '16px'
           },
           splitLine: {
-            lineStyle: {
-              // color: [
-              //   'rgba(238, 197, 102, 0.1)',
-              //   'rgba(238, 197, 102, 0.2)',
-              //   'rgba(238, 197, 102, 0.4)',
-              //   'rgba(238, 197, 102, 0.6)',
-              //   'rgba(238, 197, 102, 0.8)',
-              //   'rgba(238, 197, 102, 1)'
-              // ].reverse()
-            }
+            lineStyle: {}
           },
           splitArea: {
             show: false
           },
           axisLine: {
             lineStyle: {
-              color: 'white)'
+              color: 'white'
             }
           }
         },
@@ -68,7 +59,7 @@ export default {
                 name: '安全指标',
                 lineStyle: {
                   color: 'green',
-                  width: 2,
+                  width: 2
                 },
                 itemStyle: {
                   color: 'green'
@@ -76,7 +67,7 @@ export default {
                 symbol: 'none'
               },
               {
-                value: [8, 136, 85, 96, 36.5, 75, 6],
+                value: [], // 将通过接口数据填充
                 name: '实际指标',
                 itemStyle: {
                   color: '#F9713C'
@@ -90,9 +81,41 @@ export default {
           }
         ]
       }
-
     };
-  }
+  },
+  created() {
+    this.userId = this.$route.query.id;
+    axios
+        .get(`${baseUrl}/user/dayHData`, { params: { id: this.userId } })
+        .then(response => {
+          if (response.code === "200") {
+          const healthData = response.data;
+          // 使用返回的数据填充“实际指标”值
+          this.option.series[0].data[1].value = [
+              healthData[0].breath_rate,
+              healthData[0].systolic,
+              healthData[0].diastolic,
+              healthData[0].blood_oxygen,
+              healthData[0].temperature,
+              healthData[0].heart_rate,
+              healthData[0].blood_glucose
+            ];
+
+          } else {
+            this.$Message({
+              text: response.data.msg,
+              type: 'warning'
+            });
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          this.$Message({
+            text: '获取数据失败',
+            type: 'error'
+          });
+        });
+  },
 };
 </script>
 

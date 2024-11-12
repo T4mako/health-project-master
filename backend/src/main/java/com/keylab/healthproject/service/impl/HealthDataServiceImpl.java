@@ -68,12 +68,12 @@ public class HealthDataServiceImpl extends ServiceImpl<HealthDataMapper, HealthD
     }
 
     @Override
-    public List<Map<String, Object>> getDataByArea(long id,int flag, String indicator) {
+    public List<Map<String, Object>> getAreaHDataAge(long id,String area, String indicator) {
         List<Map<String, Object>> res = null;
-        if(flag==0){
+        if(area.equals("community")){
             // 查询区数据
             res = healthDataMapper.selectAllCommunityCompareData(id,indicator);
-        }else if(flag==1){
+        }else if(area.equals("city")){
             // 查询市数据
             res = healthDataMapper.selectAllProvinceCompareData(id,indicator);
         }else{
@@ -101,6 +101,11 @@ public class HealthDataServiceImpl extends ServiceImpl<HealthDataMapper, HealthD
         return warnings;
     }
 
+    @Override
+    public List<Map<String, Object>> getAgeIndicator(long id,String indicator) {
+        return healthDataMapper.getAgeIndicator(id,indicator);
+    }
+
     private String evaluateBreathRate(Long breathRate) {
         if (breathRate == null) return "数据缺失";
         if (breathRate <= 5) return "安全";
@@ -111,10 +116,9 @@ public class HealthDataServiceImpl extends ServiceImpl<HealthDataMapper, HealthD
     private String evaluateSystolic(Long systolic) {
         if (systolic == null) return "数据缺失";
         if (systolic >= 90 && systolic <= 139) return "安全";
-        if ((systolic >= 149 && systolic <= 159) || (systolic >= 80 && systolic <= 89)) return "一级预警";
-        if (systolic >= 160 && systolic <= 179) return "二级预警";
-        if (systolic >= 180 || systolic <= 79) return "三级预警";
-        return "";
+        if ((systolic >= 140 && systolic <= 159))  return "一级预警";
+        if ((systolic >= 160 && systolic <= 179) || (systolic >= 80 && systolic <= 89))  return "二级预警";
+        else return "三级预警";
     }
 
     private String evaluateDiastolic(Long diastolic) {
@@ -122,17 +126,15 @@ public class HealthDataServiceImpl extends ServiceImpl<HealthDataMapper, HealthD
         if (diastolic >= 60 && diastolic <= 89) return "安全";
         if (diastolic >= 90 && diastolic <= 99) return "一级预警";
         if (diastolic >= 100 && diastolic <= 109) return "二级预警";
-        if (diastolic >= 110) return "三级预警";
-        return "";
+        else return "三级预警";
     }
 
     private String evaluateBloodOxygen(Long bloodOxygen) {
         if (bloodOxygen == null) return "数据缺失";
         if (bloodOxygen >= 95) return "安全";
-        if (bloodOxygen >= 90 && bloodOxygen <= 94) return "一级预警";
-        if (bloodOxygen >= 85 && bloodOxygen <= 89) return "二级预警";
-        if (bloodOxygen <= 84) return "三级预警";
-        return "";
+        if (bloodOxygen >= 90) return "一级预警";
+        if (bloodOxygen >= 85) return "二级预警";
+        return "三级预警";
     }
 
     private String evaluateTemperature(Double temperature) {
@@ -154,10 +156,9 @@ public class HealthDataServiceImpl extends ServiceImpl<HealthDataMapper, HealthD
 
     private String evaluateBloodGlucose(Double bloodGlucose) {
         if (bloodGlucose == null) return "数据缺失";
-        if (bloodGlucose >= 3.9 && bloodGlucose <= 6.1) return "安全";
-        if ((bloodGlucose >= 11.1 && bloodGlucose <= 19.9) || (bloodGlucose >= 3.0 && bloodGlucose < 3.9)) return "一级预警";
-        if ((bloodGlucose >= 20 && bloodGlucose <= 29.9) || (bloodGlucose >= 2.0 && bloodGlucose < 3.0)) return "二级预警";
-        if (bloodGlucose >= 30 || bloodGlucose < 2) return "三级预警";
-        return "";
+        if (bloodGlucose >= 4 && bloodGlucose <= 11) return "安全";
+        if ((bloodGlucose > 11 && bloodGlucose <= 19.9) || (bloodGlucose >= 3.5 && bloodGlucose <= 3.9)) return "一级预警";
+        if ((bloodGlucose >= 20 && bloodGlucose <= 29.9) || (bloodGlucose >= 3 && bloodGlucose < 3.5)) return "二级预警";
+        else return "三级预警";
     }
 }
