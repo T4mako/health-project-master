@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <Echart id="leftCenter" :options="option" class="left_center_inner" v-if="true" ref="charts" width="430px"
       height="300px" />
   </div>
@@ -8,6 +7,7 @@
 
 <script>
 export default {
+  props: ['bmi'],
   data() {
     return {
       option: {
@@ -85,14 +85,23 @@ export default {
             },
             data: [
               {
-                value: 22
+                value: this.bmi
               }
             ]
           }
         ]
       }
-
     };
+  },
+  watch: {
+    bmi(newValue) {
+      // 监控 bmi 值变化，并更新图表数据
+      this.option.series[0].data[0].value = newValue;
+    }
+  },
+  mounted() {
+    // 初始化图表数据
+    this.option.series[0].data[0].value = this.bmi;
   }
 };
 </script>

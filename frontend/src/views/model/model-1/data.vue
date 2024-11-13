@@ -7,7 +7,8 @@
           <p>ID：{{ userInfo.id }}</p>
           <p>性别：{{ userInfo.gender }}</p>
           <p>年龄：{{ userInfo.age }} 岁</p>
-          <p>社区：{{ userInfo.community }}</p>
+          <p>城市：{{ userInfo.city }}</p>
+          <p>社区：{{ userInfo.deptName }}</p>
           <p>身高：{{ userInfo.height }} cm</p>
           <p>体重：{{ userInfo.weight }} kg</p>
         </div>
@@ -16,33 +17,20 @@
         <HWarning></HWarning>
       </ItemWrap>
       <ItemWrap class="block-1-area area-3" title="BMI">
-        <BMIChart></BMIChart>
+        <BMIChart :bmi="this.bmi"></BMIChart>
       </ItemWrap>
     </div>
 
     <!-- 剩余2/3的区域 -->
     <div class="right">
       <ItemWrap class="block block-2" title="各项健康指标">
-        <div>
-          <span style="font-size: 18px;">时间段：</span>
-          <el-select v-model="timeChoose" placeholder="请选择">
-            <el-option v-for="item in timeOptions" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-        </div>
         <IChart></IChart>
       </ItemWrap>
       <ItemWrap class="block block-3" title="健康数据监控">
         <HRader></HRader>
       </ItemWrap>
       <ItemWrap class="block block-4" title="健康数据对比图">
-        <div>
-          <span style="font-size: 18px;">地区：</span>
-          <el-select v-model="areaChoose" placeholder="请选择">
-            <el-option v-for="item in areaOptions" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-        </div>
+        
         <CompareChart></CompareChart>
       </ItemWrap>
       <ItemWrap class="block block-5" title="环境数据监控">
@@ -59,36 +47,69 @@ import HRader from "./health-rader.vue";
 import EnvRader from "./env-rader.vue";
 import HWarning from "./health-warning.vue";
 import BMIChart from "./bmi-chart.vue";
+import axios from "axios";
+import { baseUrl } from "@/api/api";
 export default {
   components: {
     IChart, CompareChart, HRader, EnvRader, HWarning, BMIChart
   },
   data() {
     return {
+      userId: null,
       userInfo: {
-        id: "12345",
-        gender: "男",
-        age: 30,
-        community: "和平小区",
-        height: 175,
-        weight: 70,
+        id: "",
+        gender: "",
+        age: 0,
+        city: "",
+        deptName: "",
+        height: 0,
+        weight: 0,
+        bmi: 0,
       },
-      timeOptions: [
-        { value: 'day', label: '过去一天' },
-        { value: 'week', label: '过去一周' },
-        { value: 'month', label: '过去一月' },
-        { value: 'year', label: '过去一年' },
-        { value: 'all', label: '全部' },
-      ],
-      timeChoose: 'day',
-      areaOptions:[
-      { value: 'community', label: '本社区' },
-        { value: 'city', label: '本城市' },
-        { value: 'all', label: '全部' },
-      ],
-      areaChoose: 'community',
+      // timeOptions: [
+      //   { value: 'day', label: '过去一天' },
+      //   { value: 'week', label: '过去一周' },
+      //   { value: 'month', label: '过去一月' },
+      //   { value: 'year', label: '过去一年' },
+      //   { value: 'all', label: '全部' },
+      // ],
+      // timeChoose: 'day',
+      // areaOptions: [
+      //   { value: 'community', label: '本社区' },
+      //   { value: 'city', label: '本城市' },
+      //   { value: 'all', label: '全部' },
+      // ],
+      // areaChoose: 'community',
     };
+  },
+  created() {
+    this.userId = this.$route.query.id
+    axios.get(`${baseUrl}/user/info`, { params: { id: this.userId } }).then(response => {
+
+      if (response.code === "200") {
+        const data = response.data;
+        this.userInfo = data.pd;
+        this.userInfo.city = data.city;
+        this.bmi = data.pd.bmi
+        
+      } else {
+        this.pageflag = false;
+        this.$Message({
+          text: response.data.msg,
+          type: 'warning'
+        });
+      }
+    })
+      .catch(error => {
+        console.error(error);
+        this.pageflag = false;
+        this.$Message({
+          text: '获取数据失败',
+          type: 'error'
+        });
+      });
   }
+
 };
 </script>
 
@@ -118,7 +139,7 @@ export default {
 
 .user-info {
   text-align: left;
-  font-size: 24px;
+  font-size: 18px;
   line-height: 1.5;
   color: #fff;
   padding-left: 120px;
@@ -133,7 +154,7 @@ export default {
   gap: 40px;
   width: 75%;
   height: 90%;
-  padding-left: 40px;
+  padding-left: 30px;
 }
 
 /* 修改下拉框样式 */
@@ -146,7 +167,7 @@ export default {
 /* 修改边框和字体颜色 */
 :deep(.el-select) {
   position: relative;
-  width: 150px; 
+  width: 150px;
 
   .el-input {
     input {

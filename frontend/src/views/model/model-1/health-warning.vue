@@ -6,6 +6,9 @@
 </template>
 
 <script>
+import axios from "axios";
+import {baseUrl} from "@/api/api";
+
 export default {
   data() {
     return {
@@ -54,6 +57,53 @@ export default {
       }
 
     };
+  },
+  created() {
+    this.userId = this.$route.query.id    
+    axios.get(`${baseUrl}/user/warning`,{  params:{id:this.userId}}).then(response => {
+        const warningData = response.data;
+        const counts = {
+            '安全': 0,
+            '一级预警': 0,
+            '二级预警': 0,
+            '紧急预警': 0
+          };
+
+          // 统计每种预警级别的数量
+          warningData.forEach(item => {
+            const level = item.split(': ')[1];
+            if (counts.hasOwnProperty(level)) {
+              counts[level]++;
+            }
+          });
+
+          // 更新 ECharts 数据
+          this.option.series[0].data = [
+            { value: counts['安全'], name: '安全' },
+            { value: counts['一级预警'], name: '一级预警' },
+            { value: counts['二级预警'], name: '二级预警' },
+            { value: counts['紧急预警'], name: '紧急预警' }
+          ];
+            
+        if (response.code === "200") {
+          console.log(response.data);
+          
+            } else {
+              this.pageflag = false;
+              this.$Message({
+                text: response.data.msg,
+                type: 'warning'
+              });
+            }
+          })
+          .catch(error => {
+            console.error(error);
+            this.pageflag = false;
+            this.$Message({
+              text: '获取数据失败',
+              type: 'error'
+            });
+          });
   }
 };
 </script>

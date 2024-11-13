@@ -68,12 +68,12 @@ public class HealthDataServiceImpl extends ServiceImpl<HealthDataMapper, HealthD
     }
 
     @Override
-    public List<Map<String, Object>> getDataByArea(long id,int flag, String indicator) {
+    public List<Map<String, Object>> getAreaHDataAge(long id,String area, String indicator) {
         List<Map<String, Object>> res = null;
-        if(flag==0){
+        if(area.equals("community")){
             // 查询区数据
             res = healthDataMapper.selectAllCommunityCompareData(id,indicator);
-        }else if(flag==1){
+        }else if(area.equals("city")){
             // 查询市数据
             res = healthDataMapper.selectAllProvinceCompareData(id,indicator);
         }else{
@@ -81,5 +81,84 @@ public class HealthDataServiceImpl extends ServiceImpl<HealthDataMapper, HealthD
             res = healthDataMapper.selectAllCompareData(indicator);
         }
         return res;
+    }
+
+    @Override
+    public List<String> getThresholdWarnings(long id) {
+        HealthData healthData = healthDataMapper.findByResearchedPersonId(id);
+        List<String> warnings = new ArrayList<>();
+
+        if (healthData != null) {
+            warnings.add("breath_rate: " + evaluateBreathRate(healthData.getBreathRate()));
+            warnings.add("systolic: " + evaluateSystolic(healthData.getSystolic()));
+            warnings.add("diastolic: " + evaluateDiastolic(healthData.getDiastolic()));
+            warnings.add("blood_oxygen: " + evaluateBloodOxygen(healthData.getBloodOxygen()));
+            warnings.add("temperature: " + evaluateTemperature(healthData.getTemperature()));
+            warnings.add("heart_rate: " + evaluateHeartRate(healthData.getHeartRate()));
+            warnings.add("blood_glucose: " + evaluateBloodGlucose(healthData.getBloodGlucose()));
+        }
+
+        return warnings;
+    }
+
+    @Override
+    public List<Map<String, Object>> getAgeIndicator(long id,String indicator) {
+        return healthDataMapper.getAgeIndicator(id,indicator);
+    }
+
+    private String evaluateBreathRate(Long breathRate) {
+        if (breathRate == null) return "数据缺失";
+        if (breathRate <= 5) return "安全";
+        if (breathRate <= 20) return "一级预警";
+        return "二级预警";
+    }
+
+    private String evaluateSystolic(Long systolic) {
+        if (systolic == null) return "数据缺失";
+        if (systolic >= 90 && systolic <= 139) return "安全";
+        if ((systolic >= 140 && systolic <= 159))  return "一级预警";
+        if ((systolic >= 160 && systolic <= 179) || (systolic >= 80 && systolic <= 89))  return "二级预警";
+        else return "三级预警";
+    }
+
+    private String evaluateDiastolic(Long diastolic) {
+        if (diastolic == null) return "数据缺失";
+        if (diastolic >= 60 && diastolic <= 89) return "安全";
+        if (diastolic >= 90 && diastolic <= 99) return "一级预警";
+        if (diastolic >= 100 && diastolic <= 109) return "二级预警";
+        else return "三级预警";
+    }
+
+    private String evaluateBloodOxygen(Long bloodOxygen) {
+        if (bloodOxygen == null) return "数据缺失";
+        if (bloodOxygen >= 95) return "安全";
+        if (bloodOxygen >= 90) return "一级预警";
+        if (bloodOxygen >= 85) return "二级预警";
+        return "三级预警";
+    }
+
+    private String evaluateTemperature(Double temperature) {
+        if (temperature == null) return "数据缺失";
+        if (temperature >= 36.0 && temperature <= 37.3) return "安全";
+        if (temperature >= 37.4 && temperature <= 39.0) return "一级预警";
+        if (temperature >= 39.1) return "二级预警";
+        return "";
+    }
+
+    private String evaluateHeartRate(Long heartRate) {
+        if (heartRate == null) return "数据缺失";
+        if (heartRate >= 60 && heartRate <= 100) return "安全";
+        if ((heartRate >= 110 && heartRate <= 130) || (heartRate >= 50 && heartRate <= 59)) return "一级预警";
+        if ((heartRate >= 140 && heartRate <= 180) || (heartRate >= 40 && heartRate <= 49)) return "二级预警";
+        if (heartRate > 180 || heartRate < 40) return "三级预警";
+        return "";
+    }
+
+    private String evaluateBloodGlucose(Double bloodGlucose) {
+        if (bloodGlucose == null) return "数据缺失";
+        if (bloodGlucose >= 4 && bloodGlucose <= 11) return "安全";
+        if ((bloodGlucose > 11 && bloodGlucose <= 19.9) || (bloodGlucose >= 3.5 && bloodGlucose <= 3.9)) return "一级预警";
+        if ((bloodGlucose >= 20 && bloodGlucose <= 29.9) || (bloodGlucose >= 3 && bloodGlucose < 3.5)) return "二级预警";
+        else return "三级预警";
     }
 }

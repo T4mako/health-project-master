@@ -43,8 +43,14 @@ const routes = [
         ]
     },
     {
+        path: '/modelIndex',
+        name: 'modelIndex',
+        component: () => import('../views/model/model-index.vue'),
+    },
+    {
         path: '/model',
         name: 'model',
+        redirect: '/data',
         component: () => import('../views/model/index.vue'),
         children: [
             {

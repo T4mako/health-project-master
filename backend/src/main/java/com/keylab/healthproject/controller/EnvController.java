@@ -6,6 +6,7 @@ import com.keylab.healthproject.service.IEnvValService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -20,9 +21,15 @@ public class EnvController {
     @Autowired
     IEnvValService iEnvValServicel;
 
+
     @GetMapping("/all")
     public Result getAllEnvVal() {
         List<EnvVal> list = iEnvValServicel.list();
+        return Result.success(list);
+    }
+    @GetMapping("/userEnv")
+    public Result getTodayEnvDataByUserId(@RequestParam long id) {
+        List<EnvVal> list = iEnvValServicel.getTodayEnvDataByUserId(id);
         return Result.success(list);
     }
 }
