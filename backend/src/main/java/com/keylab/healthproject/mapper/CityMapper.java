@@ -283,4 +283,82 @@ public interface CityMapper {
                 pd.id, pd.gender, pd.age, pd.dept_name, c.dep_id;
             """)
     List<Map<String, Object>> getDataByCommunityAll(String communityName);
+
+    @Select("""
+            SELECT
+                pd.id,
+                pd.gender,
+                pd.age,
+                pd.dept_id AS community_id,
+                pd.height,
+                pd.weight,
+                pd.bmi,
+                hd.breath_rate,
+                hd.systolic,
+                hd.diastolic,
+                hd.blood_oxygen,
+                hd.temperature AS p_temperature,
+                hd.heart_rate,
+                hd.blood_glucose,
+                ev.co2,
+                ev.tvoc,
+                ev.light,
+                ev.pm25,
+                ev.db,
+                ev.humidity,
+                ev.temperature AS e_temperature
+            FROM
+                person_data pd
+            LEFT JOIN (
+                SELECT
+                    h.researched_person_id,
+                    h.breath_rate,
+                    h.systolic,
+                    h.diastolic,
+                    h.blood_oxygen,
+                    h.temperature,
+                    h.heart_rate,
+                    h.blood_glucose
+                FROM
+                    health_data h
+                JOIN (
+                    SELECT
+                        researched_person_id,
+                        MAX(create_time) AS max_time
+                    FROM
+                        health_data
+                    GROUP BY
+                        researched_person_id
+                ) AS latest_health
+                ON h.researched_person_id = latest_health.researched_person_id
+                AND h.create_time = latest_health.max_time
+            ) AS hd ON pd.id = hd.researched_person_id
+            LEFT JOIN (
+                SELECT
+                    e.family_user_id,
+                    e.co2,
+                    e.tvoc,
+                    e.light,
+                    e.pm25,
+                    e.db,
+                    e.humidity,
+                    e.temperature
+                FROM
+                    env_val e
+                JOIN (
+                    SELECT
+                        family_user_id,
+                        MAX(create_time) AS max_time
+                    FROM
+                        env_val
+                    GROUP BY
+                        family_user_id
+                ) AS latest_env
+                ON e.family_user_id = latest_env.family_user_id
+                AND e.create_time = latest_env.max_time
+            ) AS ev ON pd.family_user_id = ev.family_user_id
+            WHERE
+                pd.id =#{id}
+            """)
+    Map<String, Object> getPersonalHealthData(Integer id);
 }
