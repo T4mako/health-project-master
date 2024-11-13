@@ -136,4 +136,18 @@ public class cityController {
         }
     }
 
+    //返回个人健康信息及环境数据
+    @RequestMapping("/getPersonalHealthData")
+    public Result getPersonalHealthData(@RequestParam Integer id){
+        if (id==null){
+            return Result.error(ResultCodeEnum.PARAM_ERROR);
+        }else {
+            Map<String, Object> map = indexService.getPersonalHealthData(id);
+            if (map==null){
+                return Result.error(ResultCodeEnum.PARAM_ERROR);
+            }
+            return Result.success(map);
+        }
+    }
+
 }

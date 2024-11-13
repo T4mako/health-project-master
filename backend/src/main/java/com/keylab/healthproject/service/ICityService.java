@@ -33,4 +33,7 @@ public interface ICityService {
 
     // 返回指定社区全员的数据
     List<Map<String, Object>> getDataByCommunityAll(String communityName);
+
+    // 返回个人健康数据
+    Map<String, Object> getPersonalHealthData(Integer id);
 }

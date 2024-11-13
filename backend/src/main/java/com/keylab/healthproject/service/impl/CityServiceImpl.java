@@ -246,4 +246,9 @@ public class CityServiceImpl implements ICityService {
         // 返回最终结果列表
         return resultList;
     }
+
+    @Override
+    public Map<String, Object> getPersonalHealthData(Integer id) {
+        return cityMapper.getPersonalHealthData(id);
+    }
 }
