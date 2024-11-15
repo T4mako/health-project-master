@@ -116,7 +116,16 @@ module.exports = {
 
   devServer: {
     // 配置多个代理
-    inline: true
+    inline: true,
+    open: true,
+    port: 8080, // 前端服务端口
+    proxy: {
+      '/api': { // 代理路径，指向8000端口的服务
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        pathRewrite: { '^/api': '' }
+      },
+    }
   },
   pluginOptions: {
   }

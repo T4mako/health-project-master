@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.keylab.healthproject.common.Result;
 import com.keylab.healthproject.common.ResultCodeEnum;
 import com.keylab.healthproject.dao.Community;
+import com.keylab.healthproject.dao.HealthData;
 import com.keylab.healthproject.dao.Hospital;
 import com.keylab.healthproject.dao.PersonData;
 import com.keylab.healthproject.service.ICommunityService;
@@ -79,6 +80,30 @@ public class UserController {
     @GetMapping("/ageIndicator")
     public Result ageIndicator(@RequestParam long id,@RequestParam String indicator) {
         return Result.success(iHealthDataService.getAgeIndicator(id,indicator));
+    }
+
+    @GetMapping("/allDayInfo")
+    public Result allDayInfo(@RequestParam long id) {
+        Map<String, Object> res = new HashMap<>();
+        LambdaQueryWrapper<PersonData> queryWrapper1 = new LambdaQueryWrapper<>();
+        queryWrapper1.eq(PersonData::getId, id);
+        PersonData personData = iPersonDataService.getOne(queryWrapper1);
+        LambdaQueryWrapper<HealthData> queryWrapper2 = new LambdaQueryWrapper<>();
+        queryWrapper2.eq(HealthData::getResearchedPersonId,id).eq(HealthData::getCreateTime,"2024-10-31");
+        HealthData healthData = iHealthDataService.getOne(queryWrapper2);
+        res.put("pd", personData);
+        res.put("hd", healthData);
+        return Result.success(res);
+    }
+
+    @GetMapping("/communityAllInfo")
+    public Result communityAllInfo(@RequestParam long id) {
+        return Result.success(iHealthDataService.communityAllInfo(id));
+    }
+
+    @GetMapping("/allUserBaseInfo")
+    public Result allUserBaseInfo() {
+        return Result.success(iPersonDataService.allUserBaseInfo());
     }
 
 }

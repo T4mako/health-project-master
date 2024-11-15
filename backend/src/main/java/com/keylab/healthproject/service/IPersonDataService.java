@@ -5,6 +5,7 @@ import com.keylab.healthproject.dao.HealthData;
 import com.keylab.healthproject.dao.PersonData;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author T4mako
@@ -12,4 +13,6 @@ import java.util.List;
  */
 public interface IPersonDataService extends IService<PersonData> {
     List<HealthData> getDayHData(long id);
+
+    List<Map<String,Object>> allUserBaseInfo();
 }

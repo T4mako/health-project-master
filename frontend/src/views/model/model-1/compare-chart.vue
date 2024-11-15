@@ -12,7 +12,7 @@
         </el-option>
       </el-select>
     </div>
-    <Echart id="leftCenter" :options="option" class="left_center_inner" ref="charts" width="650px" height="380px" />
+    <Echart :options="option" class="left_center_inner" ref="charts" width="650px" height="380px" />
   </div>
 </template>
 

@@ -62,6 +62,10 @@ const routes = [
                 path: '/disease',
                 name: 'disease',
                 component: () => import('../views/model/model-2/data.vue')
+            },{
+                path: '/atlas',
+                name: 'atlas',
+                component: () => import('../views/atlas/index.vue')
             }
         ]
     }
