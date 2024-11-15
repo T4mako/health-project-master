@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Echart id="leftCenter" :options="option" class="left_center_inner" v-if="true" ref="charts" width="430px"
+    <Echart :options="option" class="left_center_inner" v-if="true" ref="charts" width="430px"
       height="300px" />
   </div>
 </template>

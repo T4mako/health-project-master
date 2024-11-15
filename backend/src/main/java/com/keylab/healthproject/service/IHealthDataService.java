@@ -26,4 +26,6 @@ public interface IHealthDataService extends IService<HealthData> {
     List<String> getThresholdWarnings(long id);
 
     List<Map<String, Object>> getAgeIndicator(long id,String indicator);
+
+    List<Map<String,Object>> communityAllInfo(long id);
 }

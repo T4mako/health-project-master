@@ -30,7 +30,7 @@
         <HRader></HRader>
       </ItemWrap>
       <ItemWrap class="block block-4" title="健康数据对比图">
-        
+
         <CompareChart></CompareChart>
       </ItemWrap>
       <ItemWrap class="block block-5" title="环境数据监控">
@@ -66,32 +66,17 @@ export default {
         weight: 0,
         bmi: 0,
       },
-      // timeOptions: [
-      //   { value: 'day', label: '过去一天' },
-      //   { value: 'week', label: '过去一周' },
-      //   { value: 'month', label: '过去一月' },
-      //   { value: 'year', label: '过去一年' },
-      //   { value: 'all', label: '全部' },
-      // ],
-      // timeChoose: 'day',
-      // areaOptions: [
-      //   { value: 'community', label: '本社区' },
-      //   { value: 'city', label: '本城市' },
-      //   { value: 'all', label: '全部' },
-      // ],
-      // areaChoose: 'community',
     };
   },
   created() {
     this.userId = this.$route.query.id
     axios.get(`${baseUrl}/user/info`, { params: { id: this.userId } }).then(response => {
-
       if (response.code === "200") {
         const data = response.data;
         this.userInfo = data.pd;
         this.userInfo.city = data.city;
         this.bmi = data.pd.bmi
-        
+
       } else {
         this.pageflag = false;
         this.$Message({

@@ -68,4 +68,30 @@ public interface HealthDataMapper extends BaseMapper<HealthData> {
             "where hd.create_time = '2024-10-31'\n" +
             "and hd.researched_person_id  = #{id}")
     List<Map<String, Object>> getAgeIndicator(long id,String indicator);
+
+    @Select("SELECT \n" +
+            "    pd.id,\n" +
+            "    pd.gender,\n" +
+            "    pd.age,\n" +
+            "    pd.height,\n" +
+            "    pd.weight,\n" +
+            "    pd.bmi,\n" +
+            "    hd.breath_rate,\n" +
+            "    hd.systolic,\n" +
+            "    hd.diastolic ,\n" +
+            "    hd.blood_oxygen ,\n" +
+            "    hd.temperature ,\n" +
+            "    hd.heart_rate ,\n" +
+            "    hd.blood_glucose \n" +
+            "FROM \n" +
+            "    person_data pd\n" +
+            "JOIN \n" +
+            "    health_data hd  \n" +
+            "ON \n" +
+            "    pd.id = hd.researched_person_id\n" +
+            "WHERE \n" +
+            "    pd.dept_id = (SELECT dept_id FROM person_data WHERE id = #{id}) \n" +
+            "    AND hd.create_time = '2024-10-31'" +
+            "LIMIT 20;")
+    List<Map<String, Object>> communityAllInfo(long id);
 }

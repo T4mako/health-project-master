@@ -21,11 +21,11 @@
         <!-- 主体 -->
         <div class="content">
           <ItemWrap class="wrap" title="老年人信息">
-            <div>
+            <div style="padding: 20px;">
               <el-table ref="singleTable" :data="tableData" highlight-current-row @current-change="handleCurrentChange"
                 style="width: 100%" size="medium" :lazy="true"
-                :header-cell-style="{ background: 'rgb(0,0,0,0)', color: '#fff' }">
-                <el-table-column type="index" width="50">
+                :header-cell-style="{ background: 'rgb(0,0,0,0)', color: '#fff' }" height="875">
+                <el-table-column type="index" width="60">
                 </el-table-column>
                 <el-table-column property="id" label="用户id" width="120">
                 </el-table-column>
@@ -44,10 +44,10 @@
           </ItemWrap>
           <ItemWrap class="wrap" style="text-align: center;" title="模型选择">
             <div style="margin-left: 160px;">
-              <div @click="goTo('/model?id='+userid)">
+              <div @click="goTo('/model?id=' + userid)">
                 <ModleBtn name="健康数据分析图"></ModleBtn>
               </div>
-              <div @click="goTo('/disease?id='+userid)">
+              <div @click="goTo('/disease?id=' + userid)">
                 <ModleBtn name="疾病预测"></ModleBtn>
               </div>
               <ModleBtn name="摔倒监测报警"></ModleBtn>
@@ -66,6 +66,8 @@ import { formatTime } from "@/utils/index.js";
 import ScaleScreen from "@/components/scale-screen/scale-screen.vue";
 import ItemWrap from "@/components/item-wrap/item-wrap.vue";
 import ModleBtn from "./model-btn.vue";
+import axios from "axios";
+import { baseUrl } from "@/api/api";
 
 export default {
   components: { ScaleScreen, ItemWrap, ModleBtn },
@@ -91,6 +93,28 @@ export default {
   },
   created() {
     this.path = this.$route.path;
+    axios.get(`${baseUrl}/user/allUserBaseInfo`).then(response => {
+
+      if (response.code === "200") {
+        const data = response.data;
+        this.tableData = data
+
+      } else {
+        this.pageflag = false;
+        this.$Message({
+          text: response.data.msg,
+          type: 'warning'
+        });
+      }
+    })
+      .catch(error => {
+        console.error(error);
+        this.pageflag = false;
+        this.$Message({
+          text: '获取数据失败',
+          type: 'error'
+        });
+      });
   },
   mounted() {
     this.timeFn();
@@ -114,15 +138,15 @@ export default {
       }, 500);
     },
     goTo(path) {
-      if(this.userid){
+      if (this.userid) {
         this.$router.push(path);
-      }else{
+      } else {
         this.$Message.warning("请选择用户")
       }
     },
     handleCurrentChange(row) {
       this.userid = row.id; // Update userid with selected user's id
-      
+
     }
   }
 };
@@ -155,9 +179,19 @@ export default {
 
 <style lang="scss">
 /* Most outer transparent layer */
-.el-table, .el-table__expanded-cell {
+.el-table,
+.el-table__expanded-cell{
   color: #ffffff;
   background-color: transparent;
+}
+
+.el-table th.gutter {
+  display: none;
+  width: 0;
+}
+.el-table colgroup col[name='gutter'] {
+  display: none;
+  width: 0;
 }
 
 /* Background color for table cells */
@@ -173,11 +207,44 @@ export default {
   font-weight: 500;
 }
 
-.el-table--enable-row-hover .el-table__body tr:hover > td {
+.el-table--enable-row-hover .el-table__body tr:hover>td {
   background-color: rgba(174, 209, 249, 0.25) !important;
 }
 
-.el-table__body tr.current-row > td {
+.el-table__body tr.current-row>td {
   background-color: rgba(48, 141, 247, 0.75) !important;
 }
+
+/* 删除表格下最底层的横线 */
+.el-table::before {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 0px;
+}
+
+.el-table {
+  border-bottom: 0;
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: transparent;
+    -webkit-border-radius: 2em;
+    -moz-border-radius: 2em;
+    border-radius: 2em;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: rgb(1, 179, 255, 1);
+    -webkit-border-radius: 2em;
+    -moz-border-radius: 2em;
+    border-radius: 2em;
+  }
+}
+
+
 </style>

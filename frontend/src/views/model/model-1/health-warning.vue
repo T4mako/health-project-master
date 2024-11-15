@@ -86,8 +86,6 @@ export default {
           ];
             
         if (response.code === "200") {
-          console.log(response.data);
-          
             } else {
               this.pageflag = false;
               this.$Message({

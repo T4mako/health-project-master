@@ -1,5 +1,6 @@
 package com.keylab.healthproject.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -12,10 +13,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -104,6 +102,11 @@ public class HealthDataServiceImpl extends ServiceImpl<HealthDataMapper, HealthD
     @Override
     public List<Map<String, Object>> getAgeIndicator(long id,String indicator) {
         return healthDataMapper.getAgeIndicator(id,indicator);
+    }
+
+    @Override
+    public List<Map<String, Object>> communityAllInfo(long id) {
+        return healthDataMapper.communityAllInfo(id);
     }
 
     private String evaluateBreathRate(Long breathRate) {
