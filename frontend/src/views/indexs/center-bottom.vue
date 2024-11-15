@@ -15,7 +15,8 @@ import {
 } from 'echarts/components';
 import { BarChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
-
+import axios from 'axios';  // 导入 axios 用于请求后端接口
+import { baseUrl } from "@/api/api";
 
 export default {
   name: "centerBottom",
@@ -23,11 +24,11 @@ export default {
     return {
       options: {},
       dataItem: {
-        title: ['徐州', '西安', '郑州'],
-        normal: [320, 332, 301, 334, 390],
-        oneLevel: [120, 103, 101, 134, 190],
-        twoLevel: [62, 184, 78, 15, 36],
-        threeLevel: [258, 77, 122, 185, 164]
+        title: [],
+        normal: [],
+        oneLevel: [],
+        twoLevel: [],
+        threeLevel: []
       }
     };
   },
@@ -38,33 +39,66 @@ export default {
     }
   },
   mounted() {
+    this.fetchNationalData();  // 初始加载全国数据
     this.getData();
   },
   watch: {
-    province(newVal, oldVal) {
-      this.province = newVal;
-      if (newVal.indexOf("省") >= 0) {
-        this.dataItem = {
-          title: ["新福小区","阳光小区","德才小区"],
-          normal: [100, 200, 300, 400],
-          oneLevel: [200,100,300,500],
-          twoLevel: [300,500,300,100],
-          threeLevel: [300,100,400,300]
-        }
-        this.getData();
-      }else {
-        this.dataItem = {
-          title: ['徐州', '西安', '郑州'],
-          normal: [320, 332, 301, 334, 390],
-          oneLevel: [120, 103, 101, 134, 190],
-          twoLevel: [62, 184, 78, 15, 36],
-          threeLevel: [258, 77, 122, 185, 164]
-        }
-        this.getData();
+    // 监听 province 属性的变化并根据新值获取相应的数据
+    province(newVal) {
+      if (!newVal || newVal === "中国") {  // 当 province 为空或等于 "中国" 时，获取全国数据
+        this.fetchNationalData();
+      } else {  // 当 province 有值且不等于 "中国" 时，获取该省份的数据
+        this.fetchProvinceData(newVal);
       }
     }
   },
   methods: {
+    // 获取全国数据并更新 dataItem
+    fetchNationalData() {
+      axios.get(`${baseUrl}/city/getHealthStatus`).then(response => {
+        if (response.code === "200") {
+          const data = response.data;
+          this.updateDataItem(data);  // 更新 dataItem
+        } else {
+          console.warn("Failed to fetch national data:", responsemsg);
+        }
+      }).catch(error => {
+        console.error("Error fetching national data:", error);
+      });
+    },
+
+    // 获取指定省份的数据并更新 dataItem
+    fetchProvinceData(provinceName) {
+      axios.get(`${baseUrl}/city/getHealthStatusByCity`, {
+        params: { cityName: provinceName }
+      }).then(response => {
+        if (response.code === "200") {
+          const data = response.data;  // 已是数组格式
+          this.updateDataItem(data);  // 更新 dataItem
+        } else {
+          console.warn("Failed to fetch province data:", response.msg);
+        }
+      }).catch(error => {
+        console.error("Error fetching province data:", error);
+      });
+    },
+
+    // 更新 dataItem 的数据
+    updateDataItem(data) {
+      const isNationalData = data[0] && data[0].hospital_name !== undefined;
+
+      this.dataItem.title = data.map(item => {
+        const name = isNationalData ? item.hospital_name : item.name;
+        return name ? (name.length > 4 ? name.slice(0, 4) + "..." : name) : "未知区域";
+      });
+
+      this.dataItem.normal = data.map(item => Number(item.normal) || 0);
+      this.dataItem.oneLevel = data.map(item => Number(item.warn_level1) || 0);
+      this.dataItem.twoLevel = data.map(item => Number(item.warn_level2) || 0);
+      this.dataItem.threeLevel = data.map(item => Number(item.warn_level3) || 0);
+
+      this.getData();  // 调用原始 getData 方法刷新图表
+    },
     getData() {
       echarts.use([
         ToolboxComponent,
@@ -206,7 +240,7 @@ export default {
               show: true,
               textStyle: {
                 color: 'white',
-                fontSize: 20
+                fontSize: 16
               }
             }
           }
