@@ -56,7 +56,6 @@ export default {
   computed: {},
   created() {
     this.path = this.$route.path
-    console.log(this.$route.path);
   },
   mounted() {
     this.timeFn();

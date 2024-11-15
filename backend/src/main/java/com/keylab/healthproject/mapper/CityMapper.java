@@ -306,7 +306,9 @@ public interface CityMapper {
                 ev.pm25,
                 ev.db,
                 ev.humidity,
-                ev.temperature AS e_temperature
+                ev.temperature AS e_temperature,
+                hd.create_time AS p_create_time,
+                ev.create_time AS e_create_time
             FROM
                 person_data pd
             LEFT JOIN (
@@ -318,7 +320,8 @@ public interface CityMapper {
                     h.blood_oxygen,
                     h.temperature,
                     h.heart_rate,
-                    h.blood_glucose
+                    h.blood_glucose,
+                    h.create_time
                 FROM
                     health_data h
                 JOIN (
@@ -342,7 +345,8 @@ public interface CityMapper {
                     e.pm25,
                     e.db,
                     e.humidity,
-                    e.temperature
+                    e.temperature,
+                    e.create_time
                 FROM
                     env_val e
                 JOIN (
@@ -358,7 +362,7 @@ public interface CityMapper {
                 AND e.create_time = latest_env.max_time
             ) AS ev ON pd.family_user_id = ev.family_user_id
             WHERE
-                pd.id =#{id}
+                pd.id = #{id}
             """)
     Map<String, Object> getPersonalHealthData(Integer id);
 }

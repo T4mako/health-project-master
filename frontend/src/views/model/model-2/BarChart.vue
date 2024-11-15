@@ -1,57 +1,115 @@
 <template>
-  <div ref="lineChart" class="line-chart"></div>
+  <div>
+    <Echart :options="option" class="left_center_inner" ref="charts" width="920px" height="450px" />
+  </div>
 </template>
 
 <script>
-import * as echarts from 'echarts';
-
+import axios from "axios";
+import { baseUrl } from "@/api/api";
 export default {
-  name: 'BarChart',
-  mounted() {
-    this.initChart();
-  },
-  methods: {
-    initChart() {
-      let chart = echarts.init(this.$refs.lineChart);
-      let option = {
-        title: { text: '', left: 'center' },
-        tooltip: { trigger: 'axis' },
+  data() {
+    return {
+      option: {
+        tooltip: {
+          trigger: 'item',  // Trigger the tooltip on hovering over the item (bar)
+          formatter: '{b}: {c}',  // Display the category label (b) and value (c)
+        },
         xAxis: {
           type: 'category',
-          data: ['01月', '02月', '03月', '04月', '05月', '06月', '07月', '08月', '09月', '10月', '11月', '12月']
+          data: ['中风预警', '糖尿病预警', '心脏病预警']
         },
         yAxis: {
           type: 'value',
-          min: 0,
-          max: 2000, // 设置最大值
+          min: 0, // Set the minimum value to 0
+          max: 1, // Set the maximum value to 1
+          name: '概率', // Set the label for the y-axis
           axisLabel: {
-            formatter: '{value}'
+            formatter: '{value}' // To display the value on the axis
           }
         },
         series: [
           {
-            name: '人数',
-            type: 'line', // 改为折线图
-            data: [500, 700, 800, 600, 900, 1100, 1500, 1300, 1200, 1000, 900, 800],
-            smooth: true, // 使曲线平滑
-            areaStyle: {
-              color: 'rgba(0, 150, 255, 0.3)' // 设置填充颜色
-            },
+            data: [],
+            type: 'bar',
             itemStyle: {
-              color: 'blue' // 设置线条颜色
+              // Dynamic color based on value
+              normal: {
+                color: function(params) {
+                  return params.value > 0.5 ? 'red' : '#5470C6'; // Red for > 0.5, default blue
+                }
+              }
             }
           }
         ]
-      };
-      chart.setOption(option);
+      }
     }
+  },
+  created() {
+    this.userId = this.$route.query.id;
+    axios.get(`${baseUrl}/user/allDayInfo`, { params: { id: this.userId } })
+      .then(response => {
+        if (response.code === "200") {
+          const data = response.data;
+          const mergedData = [{
+            id: data.pd.id,
+            ...data.pd,
+            ...data.hd,
+          }];
+          this.getPredictData(mergedData);
+        } else {
+          this.$Message({
+            text: response.data.msg,
+            type: 'warning'
+          });
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        this.$Message({
+          text: '获取数据失败',
+          type: 'error'
+        });
+      });
+  },
+  methods: {
+    getPredictData(data) {
+      let res = [];
+
+      // Define disease prediction endpoints and corresponding labels
+      const predictEndpoints = [
+        { api: '/api/predict_heart', label: 'heart_disease_prediction' },
+        { api: '/api/predict_diabetes', label: 'diabetes_prediction' },
+        { api: '/api/predict_stroke', label: 'stroke_prediction' }
+      ];
+
+      // Make requests to all prediction endpoints
+      Promise.all(predictEndpoints.map(endpoint => {
+        return axios.post(endpoint.api, data)
+          .then(response => response) // Return the response data
+          .catch(error => {
+            console.error(error);
+            this.$Message({
+              text: '获取数据失败',
+              type: 'error'
+            });
+            return [];  // Return an empty array to avoid crashing
+          });
+      }))
+        .then(results => {
+          
+          const heartDiseaseData = results[0]; // Heart disease prediction data
+          const diabetesData = results[1]; // Diabetes prediction data
+          const strokeData = results[2]; // Stroke prediction data
+          this.option.series[0].data = [
+            heartDiseaseData[0].probability.toFixed(3),
+            diabetesData[0].probability.toFixed(3),
+            strokeData[0].probability.toFixed(3)
+          ];
+        });
+    },
   }
 };
 </script>
 
-<style scoped>
-.line-chart {
-  width: 100%;
-  height: 400px;
-}
-</style>
+<style scoped></style>

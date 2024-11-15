@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author T4mako
@@ -32,5 +33,10 @@ public class PersonDataServiceImpl extends ServiceImpl<PersonDataMapper, PersonD
         queryWrapper.eq(HealthData::getResearchedPersonId,id).eq(HealthData::getCreateTime,date);
         List<HealthData> healthData = healthDataMapper.selectList(queryWrapper);
         return healthData;
+    }
+
+    @Override
+    public List<Map<String, Object>> allUserBaseInfo() {
+        return personDataMapper.allUserBaseInfo();
     }
 }

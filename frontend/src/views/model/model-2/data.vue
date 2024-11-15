@@ -1,65 +1,35 @@
 <template>
-  <div class="dashboard">
-    <div class="left-column">
-      <!-- 家庭信息 -->
-      <ItemWrap title="家庭信息" style="height: 500px; flex: 2; margin-bottom: 20px;">
-        <div class="family-info">
-          <p>家庭成员：{{ familyInfo.members }}</p>
-          <p>遗传病史：{{ familyInfo.geneticHistory }}</p>
+  <div class="content">
+    <div class="left">
+      <div class="top">
+        <div class="top-left">
+          <ItemWrap title="基础信息">
+            <div class="user-info">
+              <p>ID：{{ userInfo.id }}</p>
+              <p>性别：{{ userInfo.gender }}</p>
+              <p>年龄：{{ userInfo.age }} 岁</p>
+              <p>城市：{{ userInfo.city }}</p>
+              <p>社区：{{ userInfo.deptName }}</p>
+              <p>身高：{{ userInfo.height }} cm</p>
+              <p>体重：{{ userInfo.weight }} kg</p>
+            </div>
+          </ItemWrap>
         </div>
-      </ItemWrap>
-
-      <!-- 个人信息 -->
-      <ItemWrap title="个人信息" style="height: 500px; flex: 2; margin-bottom: 20px;">
-        <div class="personal-info">
-          <ul>
-            <li>姓名：{{ familyInfo.name }}</li>
-            <li>年龄：{{ familyInfo.age }}</li>
-            <li>性别：{{ familyInfo.gender }}</li>
-            <li>职业：{{ familyInfo.occupation }}</li>
-            <li>作息习惯：{{ familyInfo.sleepHabits }}</li>
-            <li>饮食习惯：{{ familyInfo.dietaryHabits }}</li>
-            <li>联系方式：{{ familyInfo.contact }}</li>
-          </ul>
+        <div class="top-right">
+          <ItemWrap title="健康信息">
+            <HealthRader></HealthRader>
+          </ItemWrap>
         </div>
-      </ItemWrap>
-
-      <!-- 病例史 -->
-      <ItemWrap title="病例史" style="height: 500px; flex: 2; margin-bottom: 20px;">
-        <div class="medical-history">
-          <p>家庭成员病例史：</p>
-          <ul>
-            <li v-for="(record, index) in familyInfo.medicalRecords" :key="index">
-              {{ record }}
-            </li>
-          </ul>
-          <p>个人病例史：</p>
-          <ul>
-            <li v-for="(record, index) in familyInfo.personalMedicalRecords" :key="index">
-              {{ record }}
-            </li>
-          </ul>
-        </div>
-      </ItemWrap>
+      </div>
+      <div class="bottom">
+        <ItemWrap title="疾病预测">
+          <BarChart></BarChart>
+        </ItemWrap>
+      </div>
     </div>
-
-    <div class="middle-column">
-      <!-- 男女比例和社区人数调查 -->
-      <ItemWrap title="风险指标" style="height: 500px; flex: 2; margin-bottom: 20px;">
-        <GenderRatio /> <!-- 假设 GenderRatio 是一个已定义的组件 -->
-      </ItemWrap>
-      <ItemWrap title="社区人数调查" style="height: 500px; flex: 1; margin-top: -10px;">
-        <BarChart /> <!-- 假设 BarChart 是一个已定义的组件 -->
-      </ItemWrap>
-    </div>
-
-    <div class="right-column">
-      <!-- 热力图和条形图 -->
-      <ItemWrap title="热力图" style="height: 500px; flex: 1;">
-        <Heatmap /> <!-- 假设 Heatmap 是一个已定义的组件 -->
-      </ItemWrap>
-      <ItemWrap title="风险预测" style="height: 500px; flex: 1;">
-        <RiskForecast /> <!-- 假设 RiskForecast 是一个已定义的组件 -->
+    <div class="right">
+      <ItemWrap title="社区疾病预测对比">
+        <Heatmap></Heatmap>
       </ItemWrap>
     </div>
   </div>
@@ -67,105 +37,117 @@
 
 <script>
 import ItemWrap from '@/components/item-wrap/item-wrap.vue';
-import GenderRatio from './GenderRatio.vue';
 import BarChart from './BarChart.vue';
 import Heatmap from './Heatmap.vue';
-import RiskForecast from './RiskForecast.vue';
-
+import HealthRader from './health-rader.vue';
+import axios from "axios";
+import { baseUrl } from "@/api/api";
 export default {
   components: {
     ItemWrap,
-    GenderRatio,
     BarChart,
     Heatmap,
-    RiskForecast
+    HealthRader
   },
   data() {
     return {
-      familyInfo: {
-        name: '张三',
-        age: 30,
-        gender: '男',
-        members: '父母、兄弟姐妹',
-        geneticHistory: '无',
-        occupation: '软件工程师',
-        sleepHabits: '早上7点起床，睡眠时间不规律，经常熬夜',
-        dietaryHabits: '相对均衡饮食，偶尔不吃早晚饭，喜欢蔬菜和水果',
-        contact: '1234567890',
-        medicalRecords: [
-          '父亲：高血压，糖尿病',
-          '母亲：无',
-          '兄弟：哮喘',
-          '姐妹：无'
-        ],
-        personalMedicalRecords: [
-          '无'
-        ]
-      }
+      userId: null,
+      userInfo: {
+        id: "",
+        gender: "",
+        age: 0,
+        city: "",
+        deptName: "",
+        height: 0,
+        weight: 0,
+        bmi: 0,
+      },
     };
+  },
+  created() {
+    this.userId = this.$route.query.id
+    axios.get(`${baseUrl}/user/info`, { params: { id: this.userId } }).then(response => {
+      if (response.code === "200") {
+        const data = response.data;
+        this.userInfo = data.pd;
+        this.userInfo.city = data.city;
+        this.bmi = data.pd.bmi
+      } else {
+        this.pageflag = false;
+        this.$Message({
+          text: response.data.msg,
+          type: 'warning'
+        });
+      }
+    })
+      .catch(error => {
+        console.error(error);
+        this.pageflag = false;
+        this.$Message({
+          text: '获取数据失败',
+          type: 'error'
+        });
+      });
   }
 };
 </script>
 
-<style lang="scss" scoped>
-.dashboard {
+<style scoped>
+.content {
   display: flex;
-  height: 100%;
+  height: 90%;
+  color: #fff;
+  font-size: 24px;
+  justify-content: space-around;
 }
 
-/* 左侧列 */
-.left-column {
-  display: flex;
-  flex-direction: column;
-  width: 25%;
-}
-
-/* 中间列 */
-.middle-column {
+.left {
+  width: 50%; /* Set the left part to 45% width */
   display: flex;
   flex-direction: column;
-  width: 25%;
 }
 
-/* 右侧列 */
-.right-column {
+.right {
+  width: 50%; /* Set the right part to 55% width */
   display: flex;
   flex-direction: column;
-  width: 50%;
 }
 
-/* 每个区域 */
-.item-wrap {
+.left .top {
+  display: flex;
   flex: 1;
+  margin-right: 20px;
 }
 
-/* 家庭信息样式 */
-.family-info {
+.left .top-left,
+.left .top-right {
+  flex: 1;
+  margin: 0 10px;
+  align-items: center
+}
+
+.left .bottom {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.top {
+  margin-bottom: 20px;
+}
+
+.mid,
+.right {
+  display: flex;
+  align-items: center;
+}
+
+.user-info {
   text-align: left;
-  font-size: 18px;
-  line-height: 1.5;
+  font-size: 24px;
+  line-height: 2;
   color: #fff;
-  padding-left: 20px;
+  padding-left: 90px;
   padding-top: 20px;
 }
 
-/* 个人信息样式 */
-.personal-info {
-  text-align: left;
-  font-size: 18px;
-  line-height: 1.5;
-  color: #fff;
-  padding-left: 20px;
-  padding-top: 20px;
-}
-
-/* 病例史样式 */
-.medical-history {
-  text-align: left;
-  font-size: 18px;
-  line-height: 1.5;
-  color: #fff;
-  padding-left: 20px;
-  padding-top: 20px;
-}
 </style>
