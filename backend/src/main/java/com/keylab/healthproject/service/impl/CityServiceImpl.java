@@ -251,4 +251,25 @@ public class CityServiceImpl implements ICityService {
     public Map<String, Object> getPersonalHealthData(Integer id) {
         return cityMapper.getPersonalHealthData(id);
     }
+
+    @Override
+    public Map<String, Object> getEnvironmentData() {
+        return cityMapper.getEnvironmentData();
+    }
+
+    @Override
+    public Map<String, Object> getEnvironmentDataByCity(String cityName) {
+        Map<String, Object> map = new HashMap<>();
+        if (cityName.equals("西安市") || cityName.equals("陕西省")) {
+            map = cityMapper.getEnvironmentDataByCity(12);
+        } else if (cityName.equals("郑州市") || cityName.equals("河南省")) {
+            map = cityMapper.getEnvironmentDataByCity(11);
+        } else if (cityName.equals("徐州市") || cityName.equals("江苏省"))
+            map = cityMapper.getEnvironmentDataByCity(10);
+        else
+            return null;
+        return map;
+    }
+
+
 }
