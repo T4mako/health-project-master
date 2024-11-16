@@ -36,4 +36,10 @@ public interface ICityService {
 
     // 返回个人健康数据
     Map<String, Object> getPersonalHealthData(Integer id);
+
+    // 返回环境数据
+    Map<String, Object> getEnvironmentData();
+
+    // 返回指定城市的环境数据
+    Map<String, Object> getEnvironmentDataByCity(String cityName);
 }

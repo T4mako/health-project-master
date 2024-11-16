@@ -365,4 +365,46 @@ public interface CityMapper {
                 pd.id = #{id}
             """)
     Map<String, Object> getPersonalHealthData(Integer id);
+
+    @Select("""
+            SELECT 
+                ROUND(AVG(co2), 2) AS co2,
+                ROUND(AVG(tvoc), 2) AS tvoc,
+                ROUND(AVG(light), 2) AS light,
+                ROUND(AVG(pm25), 2) AS pm25,
+                ROUND(AVG(db), 2) AS db,
+                ROUND(AVG(humidity), 2) AS humidity,
+                ROUND(AVG(temperature), 2) AS temperature,
+                COUNT(*) AS count,
+                DATE(MAX(create_time)) AS latest_time
+            FROM 
+                env_val
+            WHERE 
+                create_time >= NOW() - INTERVAL 7 DAY;
+            """)
+    Map<String, Object> getEnvironmentData();
+
+
+    @Select("""
+            SELECT 
+                ROUND(AVG(ev.co2), 2) AS avg_co2,
+                ROUND(AVG(ev.tvoc), 2) AS avg_tvoc,
+                ROUND(AVG(ev.light), 2) AS avg_light,
+                ROUND(AVG(ev.pm25), 2) AS avg_pm25,
+                ROUND(AVG(ev.db), 2) AS avg_db,
+                ROUND(AVG(ev.humidity), 2) AS avg_humidity,
+                ROUND(AVG(ev.temperature), 2) AS avg_temperature,
+                COUNT(*) AS count,
+                DATE(MAX(ev.create_time)) AS latest_date
+            FROM 
+                env_val ev
+            WHERE 
+                ev.dept_id IN (
+                    SELECT c.id
+                    FROM community c
+                    WHERE c.dep_id = 12
+                )
+                AND ev.create_time >= NOW() - INTERVAL 7 DAY;
+            """)
+    Map<String, Object> getEnvironmentDataByCity(Integer Id);
 }

@@ -150,4 +150,28 @@ public class cityController {
         }
     }
 
+    //查询所有环境数据，返回近一个周的环境平均值
+    @RequestMapping("/getEnvironmentData")
+    public Result getEnvironmentData(){
+        Map<String, Object> map = indexService.getEnvironmentData();
+        return Result.success(map);
+    }
+
+    // 返回指定城市的一个周环境数据平均值
+    @RequestMapping("/getEnvironmentDataByCity")
+    public Result getEnvironmentDataByCity(@RequestParam String cityName) {
+        if (cityName.equals("中国")) {
+            Map<String, Object> map = indexService.getEnvironmentData();
+            return Result.success(map);
+        } else if (cityName.isEmpty()) {
+            return Result.error(ResultCodeEnum.PARAM_ERROR);
+        } else {
+            Map<String, Object> map = indexService.getEnvironmentDataByCity(cityName);
+            if (map == null){
+                return Result.error(ResultCodeEnum.PARAM_ERROR);
+            }
+            return Result.success(map);
+        }
+    }
+
 }
