@@ -375,14 +375,13 @@ public interface CityMapper {
                 ROUND(AVG(db), 2) AS db,
                 ROUND(AVG(humidity), 2) AS humidity,
                 ROUND(AVG(temperature), 2) AS temperature,
-                COUNT(*) AS count,
-                DATE(MAX(create_time)) AS latest_time,
-                COUNT(DISTINCT family_user_id) AS family_count
+                DATE(MAX(create_time)) AS latest_date
             FROM 
                 env_val
             WHERE 
                 create_time >= NOW() - INTERVAL 7 DAY;
             """)
+        //COUNT(DISTINCT family_user_id) AS family_count
     Map<String, Object> getEnvironmentData();
 
 
@@ -395,9 +394,7 @@ public interface CityMapper {
                 ROUND(AVG(ev.db), 2) AS db,
                 ROUND(AVG(ev.humidity), 2) AS humidity,
                 ROUND(AVG(ev.temperature), 2) AS temperature,
-                COUNT(*) AS count,
-                DATE(MAX(ev.create_time)) AS latest_date,
-                COUNT(DISTINCT ev.family_user_id) AS family_count
+                DATE(MAX(ev.create_time)) AS latest_date
             FROM 
                 env_val ev
             WHERE 
@@ -408,5 +405,72 @@ public interface CityMapper {
                 )
                 AND ev.create_time >= NOW() - INTERVAL 7 DAY;
             """)
+        //COUNT(DISTINCT ev.family_user_id) AS family_count
     Map<String, Object> getEnvironmentDataByCity(Integer Id);
+
+
+    @Select("""
+            SELECT
+                pd.id AS person_id,
+                pd.gender,
+                pd.age,
+                pd.dept_name,
+                c.dep_id,
+                FORMAT(AVG(hd.breath_rate), 1) AS breath_rate,
+                FORMAT(AVG(hd.systolic), 1) AS systolic,
+                FORMAT(AVG(hd.diastolic), 1) AS diastolic,
+                FORMAT(AVG(hd.blood_oxygen), 1) AS blood_oxygen,
+                FORMAT(AVG(hd.temperature), 1) AS temperature,
+                FORMAT(AVG(hd.heart_rate), 1) AS heart_rate,
+                FORMAT(AVG(hd.blood_glucose), 1) AS blood_glucose
+            FROM
+                community c
+            JOIN
+                person_data pd ON c.id = pd.dept_id
+            LEFT JOIN
+                health_data hd ON pd.id = hd.researched_person_id
+            WHERE
+                hd.create_time >= DATE_FORMAT(NOW() - INTERVAL 1 MONTH, '%Y-%m-01')
+                AND hd.create_time < DATE_FORMAT(NOW(), '%Y-%m-01')
+            GROUP BY
+                pd.id, pd.gender, pd.age, pd.dept_name, c.dep_id
+            ORDER BY
+                RAND()
+            LIMIT 50;
+            """)
+    List<Map<String, Object>> getHealthDataRandomFifty();
+
+    @Select("""
+            WITH RandomIDs AS (
+                SELECT pd.id
+                FROM person_data pd
+                JOIN community c ON c.id = pd.dept_id
+                WHERE c.dep_id = #{id}
+                LIMIT 50
+            )
+            SELECT
+                pd.id AS person_id,
+                pd.gender,
+                pd.age,
+                pd.dept_name,
+                c.dep_id,
+                FORMAT(AVG(hd.breath_rate), 1) AS breath_rate,
+                FORMAT(AVG(hd.systolic), 1) AS systolic,
+                FORMAT(AVG(hd.diastolic), 1) AS diastolic,
+                FORMAT(AVG(hd.blood_oxygen), 1) AS blood_oxygen,
+                FORMAT(AVG(hd.temperature), 1) AS temperature,
+                FORMAT(AVG(hd.heart_rate), 1) AS heart_rate,
+                FORMAT(AVG(hd.blood_glucose), 1) AS blood_glucose
+            FROM
+                RandomIDs ri
+            JOIN person_data pd ON ri.id = pd.id
+            LEFT JOIN health_data hd ON pd.id = hd.researched_person_id
+            LEFT JOIN community c ON c.id = pd.dept_id
+            WHERE
+                hd.create_time >= DATE_FORMAT(NOW() - INTERVAL 1 MONTH, '%Y-%m-01')
+                AND hd.create_time < DATE_FORMAT(NOW(), '%Y-%m-01')
+            GROUP BY
+                pd.id, pd.gender, pd.age, pd.dept_name, c.dep_id;
+            """)
+    List<Map<String, Object>> getHealthDataRandomFiftyByCity(Integer id);
 }
