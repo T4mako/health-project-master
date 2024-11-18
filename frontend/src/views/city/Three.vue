@@ -34,8 +34,7 @@ export default {
   },
   methods: {
     getData() {
-      axios
-          .get(`${baseUrl}/city/getHealthDataByCommunity`, {
+      axios.get(`${baseUrl}/city/getHealthDataByCommunity`, {
             params: { communityName: this.communityName }
           })
           .then((res) => {
@@ -53,7 +52,7 @@ export default {
               // 调用 init 方法，传入格式化后的数据
               this.init(ageData);
             } else {
-              console.error("数据获取失败:", res.data.msg);
+              console.error("数据获取失败:", res.msg);
             }
           })
           .catch((error) => {
