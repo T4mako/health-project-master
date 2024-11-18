@@ -173,5 +173,12 @@ public class cityController {
             return Result.success(map);
         }
     }
-
+    //根据参数，返回全国或整省50条健康信息
+    @RequestMapping("/getHealthDataAll")
+    public Result getHealthDataAll(@RequestParam String name){
+        List<Map<String, Object>> list = indexService.getHealthDataAll(name);
+        if (list==null)
+            return Result.error(ResultCodeEnum.PARAM_ERROR);
+        return Result.success(list);
+    }
 }
