@@ -174,6 +174,16 @@ public class cityController {
             return Result.success(map);
         }
     }
+    // 返回指定小区的健康数据，返回近一个周的数据
+    @RequestMapping("/getCommunityEnvironmentDataByCity")
+    public Result getCommunityEnvironmentDataByCity(@RequestParam String communityName) {
+        if (communityName.isEmpty())
+            return Result.error(ResultCodeEnum.PARAM_ERROR);
+        Map<String, Object> map = indexService.getCommunityEnvironmentDataByCity(communityName);
+        if (map == null)
+            return Result.error(ResultCodeEnum.PARAM_ERROR);
+        return Result.success(map);
+    }
 
     //根据参数，返回全国或整省50条健康信息
     @RequestMapping("/getHealthDataAllByCityName")

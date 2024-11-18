@@ -408,6 +408,27 @@ public interface CityMapper {
         //COUNT(DISTINCT ev.family_user_id) AS family_count
     Map<String, Object> getEnvironmentDataByCity(Integer Id);
 
+    @Select("""
+            SELECT 
+                ROUND(AVG(ev.co2), 2) AS co2,
+                ROUND(AVG(ev.tvoc), 2) AS tvoc,
+                ROUND(AVG(ev.light), 2) AS light,
+                ROUND(AVG(ev.pm25), 2) AS pm25,
+                ROUND(AVG(ev.db), 2) AS db,
+                ROUND(AVG(ev.humidity), 2) AS humidity,
+                ROUND(AVG(ev.temperature), 2) AS temperature,
+                DATE(MAX(ev.create_time)) AS latest_date
+            FROM 
+                env_val ev
+            WHERE 
+                ev.dept_id IN (
+                    SELECT c.id
+                    FROM community c
+                    WHERE c.name = #{cityName}
+                )
+                AND ev.create_time >= NOW() - INTERVAL 7 DAY;
+            """)
+    Map<String, Object> getCommunityEnvironmentDataByCity(String cityName);
 
     @Select("""
             SELECT
@@ -495,4 +516,6 @@ public interface CityMapper {
             LIMIT 1;
             """)
     Map<String, Object> getEnviromentByUserId(Integer id);
+
+
 }

@@ -48,4 +48,7 @@ public interface ICityService {
     List<Map<String, Object>> getHealthDataAll();
 
     Map<String, Object> getEnviromentByUserId(Integer id);
+
+    // 返回指定小区的环境数据
+    Map<String, Object> getCommunityEnvironmentDataByCity(String communityName);
 }
