@@ -473,4 +473,26 @@ public interface CityMapper {
                 pd.id, pd.gender, pd.age, pd.dept_name, c.dep_id;
             """)
     List<Map<String, Object>> getHealthDataRandomFiftyByCity(Integer id);
+
+    @Select("""
+            SELECT 
+                e.co2, 
+                e.tvoc, 
+                e.light, 
+                e.pm25, 
+                e.db, 
+                e.humidity, 
+                e.temperature,
+                DATE_FORMAT(e.create_time, '%Y-%m-%d') AS latest_date  -- 格式化日期
+            FROM 
+                env_val e
+            JOIN 
+                person_data p ON e.family_user_id = p.family_user_id
+            WHERE 
+                p.id = #{id}
+            ORDER BY 
+                e.create_time DESC
+            LIMIT 1;
+            """)
+    Map<String, Object> getEnviromentByUserId(Integer id);
 }

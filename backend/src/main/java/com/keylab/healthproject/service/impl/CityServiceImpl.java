@@ -290,4 +290,9 @@ public class CityServiceImpl implements ICityService {
     public List<Map<String, Object>> getHealthDataAll() {
         return getHealthDataByCity(null);
     }
+
+    @Override
+    public Map<String, Object> getEnviromentByUserId(Integer id) {
+        return cityMapper.getEnviromentByUserId(id);
+    }
 }

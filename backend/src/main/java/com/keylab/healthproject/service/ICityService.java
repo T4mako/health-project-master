@@ -46,4 +46,6 @@ public interface ICityService {
     List<Map<String, Object>> getHealthDataAllByCityName(String name);
 
     List<Map<String, Object>> getHealthDataAll();
+
+    Map<String, Object> getEnviromentByUserId(Integer id);
 }
