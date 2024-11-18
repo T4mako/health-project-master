@@ -43,7 +43,6 @@ public interface ICityService {
     // 返回指定城市的环境数据
     Map<String, Object> getEnvironmentDataByCity(String cityName);
 
-    // 返回指定城市的健康数据
     List<Map<String, Object>> getHealthDataAllByCityName(String name);
 
     List<Map<String, Object>> getHealthDataAll();
