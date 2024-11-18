@@ -258,11 +258,11 @@ public class CityServiceImpl implements ICityService {
 
     //根据城市名查询健康数据
     private List<Map<String, Object>> getHealthDataByCity(Integer id) {
-        List<Map<String,Object>> fiftyData;
+        List<Map<String, Object>> fiftyData;
         if (id == null) {
-            fiftyData=cityMapper.getHealthDataRandomFifty();
+            fiftyData = cityMapper.getHealthDataRandomFifty();
         } else {
-            fiftyData=cityMapper.getHealthDataRandomFiftyByCity(id);
+            fiftyData = cityMapper.getHealthDataRandomFiftyByCity(id);
         }
         fiftyData = packagePersonalHealthData(fiftyData);
         Collections.shuffle(fiftyData);
@@ -270,7 +270,7 @@ public class CityServiceImpl implements ICityService {
     }
 
     @Override
-    public List<Map<String, Object>> getHealthDataAll(String name) {
+    public List<Map<String, Object>> getHealthDataAllByCityName(String name) {
         //1. 如果是空参或者中国
         if (name.isEmpty() || name.equals("中国")) {
             return getHealthDataByCity(null);
@@ -284,5 +284,10 @@ public class CityServiceImpl implements ICityService {
             else
                 return null;
         }
+    }
+
+    @Override
+    public List<Map<String, Object>> getHealthDataAll() {
+        return getHealthDataByCity(null);
     }
 }
