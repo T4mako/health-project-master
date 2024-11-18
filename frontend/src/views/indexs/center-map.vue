@@ -1,10 +1,4 @@
-<!--
- * @Author: daidai
- * @Date: 2022-03-01 11:17:39
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2022-09-29 15:50:18
- * @FilePath: \web-pc\src\pages\big-screen\view\indexs\center-map.vue
--->
+
 <template>
   <div class="centermap">
     <div class="maptitle">
@@ -40,6 +34,12 @@ import * as echarts from "echarts";
 import {GETNOBASE} from "api";
 
 export default {
+  props: {
+    isEnvironment: {
+      type: Boolean,
+      default: true
+    }
+  },
   data() {
     return {
       maptitle: "分布图",
@@ -52,13 +52,7 @@ export default {
       apartments: [],// 小区的点
     };
   },
-  computed: {
-  },
-  created() {
-  },
-
   mounted() {
-    // console.log(xzqCode);
     this.getData("china");
   },
   methods: {
@@ -87,7 +81,7 @@ export default {
       this.code = name;
       //如果要展示南海群岛并且展示的是中国的话
       let geoname = name
-      if (this.isSouthChinaSea && name == "china") {
+      if (this.isSouthChinaSea && name == "china" ) {
         geoname = "chinaNanhai";
       }
       //如果有注册地图的话就不用再注册 了
@@ -115,7 +109,7 @@ export default {
         this.newData.push({name: "徐州市", value: [117.184811, 34.261792, 1]});
         this.newData.push({name: "郑州市", value: [113.477391, 34.626256, 1]});
         this.newData.push({name: "西安市", value: [108.797426, 34.10671, 1]});
-      } else if (this.name === "陕西省") {
+      } else if (this.name === "陕西省" || this.name === '西安市') {
         // this.newData.push({name: "西安市", value: [108.797426, 34.10671, 1]});
         this.apartments = [
           {
@@ -143,7 +137,7 @@ export default {
             left: 330
           },
         ]
-      } else if (this.name === "河南省") {
+      } else if (this.name === "河南省" || this.name === '郑州市') {
         // this.newData.push({name: "郑州市", value: [113.477391, 34.626256, 1]});
         this.apartments = [
           {
@@ -171,7 +165,7 @@ export default {
             left: 330
           },
         ]
-      } else if (this.name === "江苏省") {
+      } else if (this.name === "江苏省" || this.name === '徐州市') {
         // this.newData.push({name: "徐州市", value: [117.184811, 34.261792, 1]});
         this.apartments = [
           {
@@ -200,13 +194,12 @@ export default {
           },
         ]
       }
-
       // 小区的点
-
-      this.init(name, mydata);
+      this.$nextTick(() => {
+        this.init(name, mydata);
+      });
     },
     init(name, data) {
-      // console.log(data2);
       let top = 45;
       let zoom = 1.05;
       let option = {
@@ -358,10 +351,7 @@ export default {
             },
           },
         ],
-        //动画效果
-        // animationDuration: 1000,
-        // animationEasing: 'linear',
-        // animationDurationUpdate: 1000
+
       };
       this.options = option;
     },
@@ -406,7 +396,17 @@ export default {
     },
     // 跳转到具体小区
     toApartment(val) {
-      this.$router.push({name:'city',params: {cityName:val.value}})
+      if (this.isEnvironment === true){
+        this.$router.push({name:'city',params: {cityName:val.value}})
+      }else {
+        // 当 isEnvironment 为 false 时，执行其他操作
+        this.handleCommunityClick(val.value);
+      }
+    },
+    //向environment传递社区名字
+    handleCommunityClick(value) {
+        // 触发自定义事件，将社区名传递出去
+        this.$emit('communityClick', value);
     },
     /**
      * 小区点位
@@ -427,6 +427,7 @@ export default {
   border-radius: 50%;
   z-index: 9999;
   position: absolute;
+  cursor: pointer;
   //top: 10px;
   //left: 10px;
 }

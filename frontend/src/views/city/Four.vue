@@ -1,20 +1,15 @@
 <template>
   <div id="four">
     <div class="center_bottom" id="center_bottom" ref="centerBottom">
-      <!--    <Echart-->
-      <!--      :options="options"-->
-      <!--      id="bottomLeftChart"-->
-      <!--      class="echarts_bottom"-->
-      <!--    ></Echart>-->
     </div>
   </div>
 </template>
 
 <script>
-import {mylog} from "@/utils";
-import { currentGET } from "api";
-import { graphic } from "echarts";
+
 import * as echarts from 'echarts/core';
+import axios from "axios";
+import { baseUrl } from "@/api/api";
 import {
   ToolboxComponent,
   TooltipComponent,
@@ -25,17 +20,49 @@ import { BarChart } from 'echarts/charts';
 import { CanvasRenderer } from 'echarts/renderers';
 export default {
   name: "Four",
+  props: {
+    communityName: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       options: {},
     };
   },
-  props: {},
   mounted() {
     this.getData();
   },
   methods: {
     getData() {
+      axios
+          .get(`${baseUrl}/city/getHealthDataByCommunity`, {
+            params: { communityName: this.communityName },
+          })
+          .then((res) => {
+            if (res.code === "200") {
+              const data = res.data;
+
+              // 将接口数据映射为图表需要的格式
+              const chartData = {
+                normal: data.normal || 0,
+                warn_level1: data.warn_level1 || 0,
+                warn_level2: data.warn_level2 || 0,
+                warn_level3: data.warn_level3 || 0,
+              };
+
+              // 调用 init 方法初始化图表
+              this.init(chartData);
+            } else {
+              console.error("数据获取失败:", res.msg);
+            }
+          })
+          .catch((error) => {
+            console.error("API Error:", error);
+          });
+    },
+    init(chartData) {
       echarts.use([
         ToolboxComponent,
         TooltipComponent,
@@ -44,103 +71,25 @@ export default {
         BarChart,
         CanvasRenderer
       ]);
-      let app = {};
 
       let chartDom = this.$refs.centerBottom;
       let myChart = echarts.init(chartDom);
-      let option;
 
-      const posList = [
-        'left',
-        'right',
-        'top',
-        'bottom',
-        'inside',
-        'insideTop',
-        'insideLeft',
-        'insideRight',
-        'insideBottom',
-        'insideTopLeft',
-        'insideTopRight',
-        'insideBottomLeft',
-        'insideBottomRight'
-      ];
-      app.configParameters = {
-        rotate: {
-          min: -90,
-          max: 90
-        },
-        align: {
-          options: {
-            left: 'left',
-            center: 'center',
-            right: 'right'
-          }
-        },
-        verticalAlign: {
-          options: {
-            top: 'top',
-            middle: 'middle',
-            bottom: 'bottom'
-          }
-        },
-        position: {
-          options: posList.reduce(function (map, pos) {
-            map[pos] = pos;
-            return map;
-          }, {})
-        },
-        distance: {
-          min: 0,
-          max: 100
-        }
-      };
-      app.config = {
-        rotate: 90,
-        align: 'left',
-        verticalAlign: 'middle',
-        position: 'insideBottom',
-        distance: 15,
-        onChange: function () {
-          const labelOption = {
-            rotate: app.config.rotate,
-            align: app.config.align,
-            verticalAlign: app.config.verticalAlign,
-            position: app.config.position,
-            distance: app.config.distance
-          };
-          myChart.setOption({
-            series: [
-              {
-                label: labelOption
-              },
-              {
-                label: labelOption
-              },
-              {
-                label: labelOption
-              },
-              {
-                label: labelOption
-              }
-            ]
-          });
-        }
-      };
       const labelOption = {
         show: false,
-        position: app.config.position,
-        distance: app.config.distance,
-        align: app.config.align,
-        verticalAlign: app.config.verticalAlign,
-        rotate: app.config.rotate,
+        position: 'insideBottom',
+        distance: 15,
+        align: 'left',
+        verticalAlign: 'middle',
+        rotate: 90,
         formatter: '{c}  {name|{a}}',
         fontSize: 14,
         rich: {
           name: {}
         }
       };
-      option = {
+
+      const option = {
         tooltip: {
           trigger: 'axis',
           axisPointer: {
@@ -159,13 +108,6 @@ export default {
           orient: 'vertical',
           left: 'right',
           top: 'center',
-          // feature: {
-          //   mark: { show: true },
-          //   dataView: { show: true, readOnly: false },
-          //   magicType: { show: true, type: ['line', 'bar', 'stack'] },
-          //   restore: { show: true },
-          //   saveAsImage: { show: true }
-          // }
         },
         xAxis: [
           {
@@ -195,8 +137,7 @@ export default {
             emphasis: {
               focus: 'series'
             },
-
-            data: [320]
+            data: [chartData.normal]
           },
           {
             name: '一级预警',
@@ -205,7 +146,7 @@ export default {
             emphasis: {
               focus: 'series'
             },
-            data: [120]
+            data: [chartData.warn_level1]
           },
           {
             name: '二级预警',
@@ -214,7 +155,7 @@ export default {
             emphasis: {
               focus: 'series'
             },
-            data: [62]
+            data: [chartData.warn_level2]
           },
           {
             name: '三级预警',
@@ -223,13 +164,13 @@ export default {
             emphasis: {
               focus: 'series'
             },
-            data: [258]
+            data: [chartData.warn_level3]
           }
         ]
       };
 
       option && myChart.setOption(option);
-    },
+    }
   },
 }
 </script>

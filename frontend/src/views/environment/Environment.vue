@@ -3,11 +3,11 @@
  * @Date: 2024-11-05 13:23:59
 -->
 <template>
-  <ScaleScreen 
-  :width="1920"
-  :height="1080"
-  class="scale-wrap"
-  :selfAdaption="$store.state.setting.isScale">
+  <ScaleScreen
+      :width="1920"
+      :height="1080"
+      class="scale-wrap"
+      :selfAdaption="$store.state.setting.isScale">
     <div class="bg">
       <dv-loading v-if="loading">Loading...</dv-loading>
       <div v-else class="host-body">
@@ -23,22 +23,19 @@
           </div>
           <div class="timers">
             {{ dateYear }} {{ dateWeek }} {{ dateDay }}
-            <i
-              class="blq-icon-shezhi02"
-              style="margin-left: 10px"
-              @click="showSetting"
-            ></i>
           </div>
         </div>
         <router-view></router-view>
       </div>
-  </div>
+    </div>
+
   </ScaleScreen>
-  
+
 </template>
 
 <script>
 import ScaleScreen from "@/components/scale-screen/scale-screen.vue";
+import { formatTime } from "@/utils/index.js";
 export default {
   components: { ScaleScreen },
   data(){
@@ -60,6 +57,7 @@ export default {
   computed: {},
   created() {
     this.path = this.$route.path
+
   },
   mounted() {
     this.timeFn();
@@ -69,9 +67,6 @@ export default {
     clearInterval(this.timing);
   },
   methods: {
-    showSetting() {
-      this.$refs.setting.init();
-    },
     timeFn() {
       this.timing = setInterval(() => {
         this.dateDay = formatTime(new Date(), "HH: mm: ss");
@@ -91,13 +86,13 @@ export default {
 
 <style lang="scss" scoped>
 .bg {
-        width: 100%;
-        height: 100%;
-        padding: 16px 16px 10px 16px;
-        box-sizing: border-box;
-        background-size: cover;
-        background-position: center center;
-    }
-
+  width: 100%;
+  height: 100%;
+  padding: 16px 16px 10px 16px;
+  box-sizing: border-box;
+  background-size: cover;
+  background-position: center center;
+}
+@import "env";
 
 </style>

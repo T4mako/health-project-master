@@ -1,14 +1,14 @@
 <template>
   <div class="city-index">
     <div class="left">
-      <ItemWrap class="one" title="人数比例(单位万)"><One/></ItemWrap>
-      <ItemWrap class="two" title="男女比例(单位万)"><Two/></ItemWrap>
-      <ItemWrap class="three" title="年龄分布(单位万)"><Three/></ItemWrap>
-      <ItemWrap class="four" title="健康状况(单位万)"><Four/></ItemWrap>
+      <ItemWrap class="one" title="人数比例(单位万)"><One :communityName="communityName"/></ItemWrap>
+      <ItemWrap class="two" title="男女比例(单位万)"><Two :communityName="communityName"/></ItemWrap>
+      <ItemWrap class="three" title="年龄分布(单位万)"><Three :communityName="communityName"/></ItemWrap>
+      <ItemWrap class="four" title="健康状况(单位万)"><Four :communityName="communityName"/></ItemWrap>
     </div>
     <div class="right">
       <ItemWrap title="已检测人信息">
-        <right-bottom/>
+        <right-bottom :communityName="communityName"/>
       </ItemWrap>
     </div>
   </div>
@@ -27,11 +27,11 @@ export default {
   components: {RightBottom, Five, Four, Three, Two, One},
   data() {
     return {
-      cityName: "新福小区"
+      communityName: '',
     };
   },
   created() {
-    this.cityName = this.$route.params.cityName;
+    this.communityName = this.$route.params.cityName;
   },
   methods: {
 

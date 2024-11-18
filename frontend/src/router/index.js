@@ -36,7 +36,7 @@ const routes = [
                 component: () => import('../views/city/index.vue')
             },
             {
-                path: '/people/:peopleName',
+                path: '/people/:peopleId',
                 name: 'people',
                 component: () => import('../views/people/index.vue')
             }
@@ -62,10 +62,29 @@ const routes = [
                 path: '/disease',
                 name: 'disease',
                 component: () => import('../views/model/model-2/data.vue')
-            },{
+            },
+            {
                 path: '/atlas',
                 name: 'atlas',
                 component: () => import('../views/atlas/index.vue')
+            },
+            {
+                path: '/medic',
+                name:'medic',
+                component: () => import('@/views/model/medic.vue')
+            }
+        ]
+    },
+    {
+        path: '/environment',
+        name: 'Environment',
+        redirect: '/enviromentIndex',
+        component: () => import('../views/environment/Environment.vue'),
+        children: [
+            {
+                path: '/enviromentIndex',
+                name: 'EnviromentIndex',
+                component: () => import('@/views/environment/EnvironmentIndex.vue')
             }
         ]
     }

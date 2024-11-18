@@ -51,7 +51,9 @@
                 <ModleBtn name="疾病预测"></ModleBtn>
               </div>
               <ModleBtn name="摔倒监测报警"></ModleBtn>
+              <div @click="goTo('/medic')">
               <ModleBtn name="健康数字人"></ModleBtn>
+              </div>
             </div>
           </ItemWrap>
         </div>
@@ -174,7 +176,7 @@ export default {
   font-size: 24px;
 }
 
-@import "model.scss";
+//@import "model.scss";
 </style>
 
 <style lang="scss">

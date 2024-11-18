@@ -1,16 +1,7 @@
-<!--
- * @Author: daidai
- * @Date: 2022-03-04 09:23:59
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2022-05-07 11:05:02
- * @FilePath: \web-pc\src\pages\big-screen\view\indexs\index.vue
--->
 <template>
   <div class="contents">
     <div class="contetn_left">
       <div class="pagetab">
-        <!-- <div class="item">实时监测</div> -->
-
       </div>
 
       <ItemWrap
@@ -30,7 +21,7 @@
     </div>
     <div class="contetn_center">
 <!--      地图-->
-      <CenterMap class="contetn_center_top" @childNeedChangeData="childNeedChangeData($event)"/>
+      <CenterMap class="contetn_center_top" @childNeedChangeData="childNeedChangeData($event)" :isEnvironment="isEnvironment"/>
 <!--      健康状况-->
       <ItemWrap class="contetn_center-bottom" title="健康状况(单位万)" :province="province">
         <CenterBottom :province="province"/>
@@ -53,12 +44,6 @@
       >
         <RightTop :province="province"/>
       </ItemWrap>
-<!--      <ItemWrap-->
-<!--        class="contetn_left-bottom contetn_lr-item"-->
-<!--        title="数据统计图 "-->
-<!--      >-->
-<!--        <RightBottom />-->
-<!--      </ItemWrap>-->
     </div>
   </div>
 </template>
@@ -87,6 +72,7 @@ export default {
   data() {
     return {
       province:'',
+      isEnvironment:true,
     };
   },
   filters: {
