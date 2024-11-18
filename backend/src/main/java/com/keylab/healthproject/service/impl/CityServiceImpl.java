@@ -255,7 +255,10 @@ public class CityServiceImpl implements ICityService {
             return null;
         return map;
     }
-
+    @Override
+    public Map<String, Object> getCommunityEnvironmentDataByCity(String communityName) {
+        return cityMapper.getCommunityEnvironmentDataByCity(communityName);
+    }
     //根据城市名查询健康数据
     private List<Map<String, Object>> getHealthDataByCity(Integer id) {
         List<Map<String, Object>> fiftyData;
