@@ -23,7 +23,7 @@ export default {
     return {
       images: [
         { src: require('@/assets/img/back1.png'), alt: "City Health - Person", caption: "城市家庭人员健康", path: "/index" },
-        { src: require('@/assets/img/back2.png'), alt: "City Health - Building", caption: "城市健康建筑环境" },
+        { src: require('@/assets/img/back2.png'), alt: "City Health - Building", caption: "城市健康建筑环境",path: "/environment" },
         { src: require('@/assets/img/back3.png'), alt: "Active Health - City Map", caption: "主动健康城市图谱",path: "/Atlas" },
         { src: require('@/assets/img/back4.png'), alt: "Active Health - Model", caption: "主动健康模型",path:"/modelIndex" },
       ]

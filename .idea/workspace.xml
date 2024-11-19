@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="a9893b25-86d0-4bf6-a875-6c226ea1fa5d" name="Changes" comment="完成两个模块的编写">
+      <change afterPath="$PROJECT_DIR$/frontend/src/views/model/model.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/model/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/model/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/model/medic.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/model/medic.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/model/model-index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/model/model-index.vue" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Vue Options API Component" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="test" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;gjmyguy&quot;
+  }
+}</component>
+  <component name="GithubDefaultAccount">
+    <option name="defaultAccountId" value="c180d842-3099-426f-8053-c70d3818b434" />
+  </component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/T4mako/health-project-master.git&quot;,
+    &quot;accountId&quot;: &quot;c180d842-3099-426f-8053-c70d3818b434&quot;
+  }
+}</component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="customMavenHome" value="D:\software\Maven\apache-maven-3.9.9" />
+        <option name="mavenHomeTypeForPersistence" value="CUSTOM" />
+        <option name="userSettingsFile" value="D:\software\Maven\apache-maven-3.9.9\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2oFBHB86A8rcAp99hSWw3Cg9si3" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "Spring Boot.BackendApplication.executor": "Run",
+    "git-widget-placeholder": "wkw",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/Project/JavaProject/health-project-master/frontend/src/views/model",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.serve.executor": "Run",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "D:\\software\\IntelliJ IDEA 2024.1.7\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "vue.recent.templates": [
+      "Vue Options API Component"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Project\JavaProject\health-project-master\frontend\src\views\environment" />
+      <recent name="D:\Project\JavaProject\health-project-master\frontend\src\assets\css\env" />
+      <recent name="D:\Project\JavaProject\health-project-master\frontend\src\views\model" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.serve">
+    <configuration name="BackendApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="health-project-master" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.keylab.healthproject.BackendApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="serve" type="js.build_tools.npm" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/frontend/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="serve" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="npm.serve" />
+      <item itemvalue="Spring Boot.BackendApplication" />
+    </list>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.19416.15" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-IU-241.19416.15" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="a9893b25-86d0-4bf6-a875-6c226ea1fa5d" name="Changes" comment="" />
+      <created>1730455353710</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1730455353710</updated>
+      <workItem from="1730455354962" duration="1781000" />
+      <workItem from="1730802592391" duration="4722000" />
+      <workItem from="1730945173985" duration="6425000" />
+      <workItem from="1730972109921" duration="465000" />
+      <workItem from="1731309934390" duration="15095000" />
+      <workItem from="1731460782379" duration="814000" />
+      <workItem from="1731461611686" duration="13605000" />
+      <workItem from="1731660902786" duration="8358000" />
+      <workItem from="1731761492081" duration="6452000" />
+      <workItem from="1731814649549" duration="13591000" />
+      <workItem from="1731926526975" duration="5727000" />
+      <workItem from="1731939907139" duration="9144000" />
+      <workItem from="1731984832314" duration="642000" />
+    </task>
+    <task id="LOCAL-00001" summary="center-bottom修改">
+      <option name="closed" value="true" />
+      <created>1730808181851</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1730808181851</updated>
+    </task>
+    <task id="LOCAL-00002" summary="EnvironmentIndex.vue">
+      <option name="closed" value="true" />
+      <created>1731927671996</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1731927671996</updated>
+    </task>
+    <task id="LOCAL-00003" summary="EnvironmentIndex.vue">
+      <option name="closed" value="true" />
+      <created>1731927776295</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1731927776295</updated>
+    </task>
+    <task id="LOCAL-00004" summary="完成两个模块的编写">
+      <option name="closed" value="true" />
+      <created>1731951240097</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1731951240097</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="center-bottom修改" />
+    <MESSAGE value="EnvironmentIndex.vue" />
+    <MESSAGE value="完成两个模块的编写" />
+    <option name="LAST_COMMIT_MESSAGE" value="完成两个模块的编写" />
+  </component>
+</project>

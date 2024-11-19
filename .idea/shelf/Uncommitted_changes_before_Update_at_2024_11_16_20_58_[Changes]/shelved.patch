@@ -1,0 +1,2430 @@
+Index: frontend/src/router/index.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/*\r\n * @Author: daidai\r\n * @Date: 2022-01-12 14:22:29\r\n * @LastEditors: Please set LastEditors\r\n * @LastEditTime: 2022-04-28 14:53:02\r\n * @FilePath: \\web-pc\\src\\pages\\big-screen\\router\\index.js\r\n */\r\nimport Vue from \"vue\";\r\nimport VueRouter from \"vue-router\";\r\n\r\nVue.use(VueRouter);\r\n\r\nconst routes = [\r\n    {\r\n        path: '/',\r\n        redirect: '/homeIndex',\r\n    },\r\n    {\r\n        path: '/homeIndex',\r\n        name: 'HomeIndex',\r\n        component: () => import( '../views/HomeIndex.vue'),\r\n    },\r\n    {\r\n        path: '/home',\r\n        name: 'home',\r\n        component: () => import(/* webpackChunkName: \"LSD.bighome\" */ '../views/home.vue'),\r\n        children: [\r\n            {\r\n                path: '/index',\r\n                name: 'index',\r\n                component: () => import(/* webpackChunkName: \"LSD.bighome\" */ '../views/indexs/index.vue'),\r\n            },\r\n            {\r\n                path: '/city/:cityName',\r\n                name: 'city',\r\n                component: () => import('../views/city/index.vue')\r\n            },\r\n            {\r\n                path: '/people/:peopleName',\r\n                name: 'people',\r\n                component: () => import('../views/people/index.vue')\r\n            }\r\n        ]\r\n    },\r\n    {\r\n        path: '/modelIndex',\r\n        name: 'modelIndex',\r\n        component: () => import('../views/model/model-index.vue'),\r\n    },\r\n    {\r\n        path: '/model',\r\n        name: 'model',\r\n        redirect: '/data',\r\n        component: () => import('../views/model/index.vue'),\r\n        children: [\r\n            {\r\n                path: '/data',\r\n                name: 'data',\r\n                component: () => import('../views/model/model-1/data.vue')\r\n            },\r\n            {\r\n                path: '/disease',\r\n                name: 'disease',\r\n                component: () => import('../views/model/model-2/data.vue')\r\n            },{\r\n                path: '/atlas',\r\n                name: 'atlas',\r\n                component: () => import('../views/atlas/index.vue')\r\n            }\r\n        ]\r\n    }\r\n\r\n];\r\nconst router = new VueRouter({\r\n    mode: \"hash\",\r\n    // base: process.env.BASE_URL,\r\n    routes\r\n});\r\n\r\nexport default router;\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/router/index.js b/frontend/src/router/index.js
+--- a/frontend/src/router/index.js	(revision 99e30852e80eb203bfc10716051edc368135c9c9)
++++ b/frontend/src/router/index.js	(date 1731664879747)
+@@ -36,7 +36,7 @@
+                 component: () => import('../views/city/index.vue')
+             },
+             {
+-                path: '/people/:peopleName',
++                path: '/people/:peopleId',
+                 name: 'people',
+                 component: () => import('../views/people/index.vue')
+             }
+@@ -68,6 +68,19 @@
+                 component: () => import('../views/atlas/index.vue')
+             }
+         ]
++    },
++    {
++        path: '/environment',
++        name: 'Environment',
++        redirect: '/enviromentIndex',
++        component: () => import('../views/environment/Environment.vue'),
++        children: [
++            {
++                path: '/enviromentIndex',
++                name: 'EnviromentIndex',
++                component: () => import('@/views/environment/EnvironmentIndex.vue')
++            }
++        ]
+     }
+ 
+ ];
+Index: frontend/src/views/indexs/center-map.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><!--\r\n * @Author: daidai\r\n * @Date: 2022-03-01 11:17:39\r\n * @LastEditors: Please set LastEditors\r\n * @LastEditTime: 2022-09-29 15:50:18\r\n * @FilePath: \\web-pc\\src\\pages\\big-screen\\view\\indexs\\center-map.vue\r\n-->\r\n<template>\r\n  <div class=\"centermap\">\r\n    <div class=\"maptitle\">\r\n      <div class=\"zuo\"></div>\r\n      <span class=\"titletext\">{{ maptitle }}</span>\r\n      <div class=\"you\"></div>\r\n    </div>\r\n    <div class=\"mapwrap\">\r\n      <dv-border-box-13>\r\n        <div class=\"quanguo\" @click=\"toChina()\" v-if=\"code !== 'china'\" >\r\n          中国\r\n        </div>\r\n\r\n        <Echart id=\"CenterMap\" :options=\"options\" ref=\"CenterMap\" width=\"800px\" height=\"590px\" style=\"left: -50px\"/>\r\n      </dv-border-box-13>\r\n    </div>\r\n    <div\r\n        class=\"apartmentDot\"\r\n        v-for=\"val in apartments\"\r\n        :style=\"position(val)\"\r\n        v-on:click=\"toApartment(val)\"\r\n    >\r\n      {{ val.value }}\r\n    </div>\r\n  </div>\r\n</template>\r\n\r\n<script>\r\nimport {mylog} from \"@/utils\";\r\nimport xzqCode from \"../../utils/map/xzqCode\";\r\nimport {currentGET} from \"api/modules\";\r\nimport * as echarts from \"echarts\";\r\nimport {GETNOBASE} from \"api\";\r\n\r\nexport default {\r\n  data() {\r\n    return {\r\n      maptitle: \"分布图\",\r\n      options: {},\r\n      code: \"china\", //china 代表中国 其他地市是行政编码\r\n      echartBindClick: false,\r\n      isSouthChinaSea: true, //是否要展示南海群岛  修改此值请刷新页面\r\n      name: \"中国\", //判断当前处于哪个地区\r\n      newData: [], // 地图上标的点\r\n      apartments: [],// 小区的点\r\n    };\r\n  },\r\n  computed: {\r\n  },\r\n  created() {\r\n  },\r\n\r\n  mounted() {\r\n    // console.log(xzqCode);\r\n    this.getData(\"china\");\r\n  },\r\n  methods: {\r\n    toChina() {\r\n      this.getData('china');\r\n      this.$emit('childNeedChangeData', \"中国\");\r\n    },\r\n    getData(code) {\r\n      currentGET(\"big8\", {regionCode: code}).then((res) => {\r\n        const data = res.data.dataList;\r\n        if (res.success) {\r\n          this.getGeojson(res.data.regionCode, res.data.dataList);\r\n          this.mapclick();\r\n        } else {\r\n          this.$Message.warning(res.msg);\r\n        }\r\n      });\r\n    },\r\n    /**\r\n     * @description: 获取geojson\r\n     * @param {*} name china 表示中国 其他省份行政区编码\r\n     * @param {*} mydata 接口返回列表数据\r\n     * @return {*}\r\n     */\r\n    async getGeojson(name, mydata) {\r\n      this.code = name;\r\n      //如果要展示南海群岛并且展示的是中国的话\r\n      let geoname = name\r\n      if (this.isSouthChinaSea && name == \"china\") {\r\n        geoname = \"chinaNanhai\";\r\n      }\r\n      //如果有注册地图的话就不用再注册 了\r\n      let mapjson = echarts.getMap(name);\r\n      if (mapjson) {\r\n        mapjson = mapjson.geoJSON;\r\n      } else {\r\n        mapjson = await GETNOBASE(`./map-geojson/${geoname}.json`).then((res) => {\r\n          return res;\r\n        });\r\n        echarts.registerMap(name, mapjson);\r\n      }\r\n      let cityCenter = {};\r\n      let arr = mapjson.features;\r\n      //根据geojson获取省份中心点\r\n      arr.map((item) => {\r\n        cityCenter[item.properties.name] =\r\n            item.properties.centroid || item.properties.center;\r\n      });\r\n\r\n      this.newData = [];\r\n      this.apartments = [];\r\n      // 具体市的点\r\n      if (this.name === \"中国\" || name === 'china') {\r\n        this.newData.push({name: \"徐州市\", value: [117.184811, 34.261792, 1]});\r\n        this.newData.push({name: \"郑州市\", value: [113.477391, 34.626256, 1]});\r\n        this.newData.push({name: \"西安市\", value: [108.797426, 34.10671, 1]});\r\n      } else if (this.name === \"陕西省\") {\r\n        // this.newData.push({name: \"西安市\", value: [108.797426, 34.10671, 1]});\r\n        this.apartments = [\r\n          {\r\n            id: 22,\r\n            value: \"东关南街社区\",\r\n            top: 365,\r\n            left: 200\r\n          },\r\n          {\r\n            id: 23,\r\n            value: \"长安路社区\",\r\n            top: 355,\r\n            left: 430\r\n          },\r\n          {\r\n            id: 24,\r\n            value: \"长乐坊社区\",\r\n            top: 314,\r\n            left: 585\r\n          },\r\n          {\r\n            id: 25,\r\n            value: \"小寨永松路社区\",\r\n            top: 320,\r\n            left: 330\r\n          },\r\n        ]\r\n      } else if (this.name === \"河南省\") {\r\n        // this.newData.push({name: \"郑州市\", value: [113.477391, 34.626256, 1]});\r\n        this.apartments = [\r\n          {\r\n            id: 16,\r\n            value: \"九街示范区\",\r\n            top: 365,\r\n            left: 200\r\n          },\r\n          {\r\n            id: 17,\r\n            value: \"城南示范区\",\r\n            top: 355,\r\n            left: 430\r\n          },\r\n          {\r\n            id: 18,\r\n            value: \"城北示范区\",\r\n            top: 314,\r\n            left: 585\r\n          },\r\n          {\r\n            id: 19,\r\n            value: \"西站示范区\",\r\n            top: 320,\r\n            left: 330\r\n          },\r\n        ]\r\n      } else if (this.name === \"江苏省\") {\r\n        // this.newData.push({name: \"徐州市\", value: [117.184811, 34.261792, 1]});\r\n        this.apartments = [\r\n          {\r\n            id: 13,\r\n            value: \"永安社区\",\r\n            top: 365,\r\n            left: 200\r\n          },\r\n          {\r\n            id: 26,\r\n            value: \"泉山社区\",\r\n            top: 355,\r\n            left: 430\r\n          },\r\n          {\r\n            id: 27,\r\n            value: \"黄山社区\",\r\n            top: 314,\r\n            left: 585\r\n          },\r\n          {\r\n            id: 28,\r\n            value: \"铜沛社区\",\r\n            top: 320,\r\n            left: 330\r\n          },\r\n        ]\r\n      }\r\n\r\n      // 小区的点\r\n\r\n      this.init(name, mydata);\r\n    },\r\n    init(name, data) {\r\n      // console.log(data2);\r\n      let top = 45;\r\n      let zoom = 1.05;\r\n      let option = {\r\n        backgroundColor: \"rgba(0,0,0,0)\",\r\n        tooltip: {\r\n          show: false,\r\n        },\r\n        legend: {\r\n          show: false,\r\n        },\r\n\r\n        geo: {\r\n          map: name,\r\n          roam: false,\r\n          selectedMode: false, //是否允许选中多个区域\r\n          zoom: zoom,\r\n          top: top,\r\n          // aspectScale: 0.78,\r\n          show: false,\r\n        },\r\n        series: [\r\n          {\r\n            name: \"MAP\",\r\n            type: \"map\",\r\n            map: name,\r\n            // aspectScale: 0.78,\r\n            data: data,\r\n            // data: [1,100],\r\n            selectedMode: false, //是否允许选中多个区域\r\n            zoom: zoom,\r\n            geoIndex: 1,\r\n            top: top,\r\n            tooltip: {\r\n              show: true,\r\n              formatter: function (params) {\r\n                if (params.data) {\r\n                  return params.name + \"：\" + params.data[\"value\"];\r\n                } else {\r\n                  return params.name;\r\n                }\r\n              },\r\n              backgroundColor: \"rgba(0,0,0,.6)\",\r\n              borderColor: \"rgba(147, 235, 248, .8)\",\r\n              textStyle: {\r\n                color: \"#FFF\",\r\n              },\r\n            },\r\n            label: {\r\n              show: false,\r\n              color: \"#000\",\r\n              // position: [-10, 0],\r\n              formatter: function (val) {\r\n                // console.log(val)\r\n                if (val.data !== undefined) {\r\n                  return val.name.slice(0, 2);\r\n                } else {\r\n                  return \"\";\r\n                }\r\n              },\r\n              rich: {},\r\n            },\r\n            emphasis: {\r\n              label: {\r\n                show: false,\r\n              },\r\n              itemStyle: {\r\n                areaColor: \"#389BB7\",\r\n                borderWidth: 1,\r\n              },\r\n            },\r\n            itemStyle: {\r\n              borderColor: \"rgba(147, 235, 248, .8)\",\r\n              borderWidth: 1,\r\n              areaColor: {\r\n                type: \"radial\",\r\n                x: 0.5,\r\n                y: 0.5,\r\n                r: 0.8,\r\n                colorStops: [\r\n                  {\r\n                    offset: 0,\r\n                    color: \"rgba(147, 235, 248, 0)\", // 0% 处的颜色\r\n                  },\r\n                  {\r\n                    offset: 1,\r\n                    color: \"rgba(147, 235, 248, .2)\", // 100% 处的颜色\r\n                  },\r\n                ],\r\n                globalCoord: false, // 缺为 false\r\n              },\r\n              shadowColor: \"rgba(128, 217, 248, .3)\",\r\n              shadowOffsetX: -2,\r\n              shadowOffsetY: 2,\r\n              shadowBlur: 10,\r\n            },\r\n          },\r\n          {\r\n            data: this.newData,\r\n            type: \"effectScatter\",\r\n            coordinateSystem: \"geo\",\r\n            symbolSize: function (val) {\r\n              return 4;\r\n              // return val[2] / 50;\r\n            },\r\n            legendHoverLink: true,\r\n            showEffectOn: \"render\",\r\n            rippleEffect: {\r\n              // period: 4,\r\n              scale: 6,\r\n              color: \"rgba(255,255,255, 1)\",\r\n              brushType: \"fill\",\r\n            },\r\n            tooltip: {\r\n              show: true,\r\n              formatter: function (params) {\r\n                if (params.data) {\r\n                  return params.name + \"：\" + params.data[\"value\"][2];\r\n                } else {\r\n                  return params.name;\r\n                }\r\n              },\r\n              backgroundColor: \"rgba(0,0,0,.6)\",\r\n              borderColor: \"rgba(147, 235, 248, .8)\",\r\n              textStyle: {\r\n                color: \"#FFF\",\r\n              },\r\n            },\r\n            label: {\r\n              formatter: (param) => {\r\n                return param.name.slice(0, 2);\r\n              },\r\n              fontSize: 11,\r\n              offset: [0, 2],\r\n              position: \"bottom\",\r\n              textBorderColor: \"#fff\",\r\n              textShadowColor: \"#000\",\r\n              textShadowBlur: 10,\r\n              textBorderWidth: 0,\r\n              color: \"#FFF\",\r\n              show: true,\r\n            },\r\n            // colorBy: \"data\",\r\n            itemStyle: {\r\n              color: \"rgba(255,255,255,1)\",\r\n              borderColor: \"rgba(2255,255,255,2)\",\r\n              borderWidth: 4,\r\n              shadowColor: \"#000\",\r\n              shadowBlur: 10,\r\n            },\r\n          },\r\n        ],\r\n        //动画效果\r\n        // animationDuration: 1000,\r\n        // animationEasing: 'linear',\r\n        // animationDurationUpdate: 1000\r\n      };\r\n      this.options = option;\r\n    },\r\n    message(text) {\r\n      this.$Message({\r\n        text: text,\r\n        type: \"warning\",\r\n      });\r\n    },\r\n    mapclick() {\r\n      if (this.echartBindClick) return;\r\n      //单击切换到级地图，当mapCode有值,说明可以切换到下级地图\r\n      this.$refs.CenterMap.chart.on(\"click\", (params) => {\r\n        let xzqData = xzqCode[params.name];\r\n        this.name = params.name;\r\n        const isProvince = this.name.indexOf(\"省\")\r\n        if (isProvince) {\r\n          console.log(\"开始传递省份\");\r\n          // 传递数据给父组件通知进行数据修改\r\n          this.$emit('childNeedChangeData', this.name);\r\n        }\r\n        switch (xzqData.adcode) {\r\n          case '320000':\r\n            xzqData.adcode = '320300';\r\n            break;\r\n          case '610000':\r\n            xzqData.adcode = '610100';\r\n            break;\r\n          case '410000':\r\n            xzqData.adcode = '410100';\r\n            break;\r\n        }\r\n        if (xzqData) {\r\n          const tempName = params.name;\r\n          this.getData(xzqData.adcode);\r\n        } else {\r\n          // 判断当前具体是哪个地区\r\n          mylog(this.name)\r\n        }\r\n      });\r\n      this.echartBindClick = true;\r\n    },\r\n    // 跳转到具体小区\r\n    toApartment(val) {\r\n      this.$router.push({name:'city',params: {cityName:val.value}})\r\n    },\r\n    /**\r\n     * 小区点位\r\n     * @param val\r\n     * @returns {string}\r\n     */\r\n    position(val) {\r\n      return \"top: \" + val.top + \"px;\" + \"left: \" + val.left + \"px;\";\r\n    },\r\n  },\r\n};\r\n</script>\r\n<style lang=\"scss\" scoped>\r\n.apartmentDot {\r\n  background: #fff;\r\n  width: 20px;\r\n  height: 20px;\r\n  border-radius: 50%;\r\n  z-index: 9999;\r\n  position: absolute;\r\n  //top: 10px;\r\n  //left: 10px;\r\n}\r\n\r\n.centermap {\r\n  margin-bottom: 30px;\r\n  overflow: hidden;\r\n  position: relative;\r\n\r\n  .maptitle {\r\n    height: 60px;\r\n    display: flex;\r\n    justify-content: center;\r\n    padding-top: 10px;\r\n    box-sizing: border-box;\r\n\r\n    .titletext {\r\n      font-size: 28px;\r\n      font-weight: 900;\r\n      letter-spacing: 6px;\r\n      background: linear-gradient(\r\n              92deg,\r\n              #0072ff 0%,\r\n              #00eaff 48.8525390625%,\r\n              #01aaff 100%\r\n      );\r\n      -webkit-background-clip: text;\r\n      -webkit-text-fill-color: transparent;\r\n      margin: 0 10px;\r\n    }\r\n\r\n    .zuo,\r\n    .you {\r\n      background-size: 100% 100%;\r\n      width: 29px;\r\n      height: 20px;\r\n      margin-top: 8px;\r\n    }\r\n\r\n    .zuo {\r\n      background: url(\"../../assets/img/xiezuo.png\") no-repeat;\r\n    }\r\n\r\n    .you {\r\n      background: url(\"../../assets/img/xieyou.png\") no-repeat;\r\n    }\r\n  }\r\n\r\n  .mapwrap {\r\n    height: 548px;\r\n    width: 100%;\r\n    // padding: 0 0 10px 0;\r\n    box-sizing: border-box;\r\n    position: relative;\r\n    display: flex;\r\n    justify-content: space-around;\r\n\r\n    .quanguo {\r\n      position: absolute;\r\n      right: 20px;\r\n      top: -46px;\r\n      width: 80px;\r\n      height: 28px;\r\n      border: 1px solid #00eded;\r\n      border-radius: 10px;\r\n      color: #00f7f6;\r\n      text-align: center;\r\n      line-height: 26px;\r\n      letter-spacing: 6px;\r\n      cursor: pointer;\r\n      box-shadow: 0 2px 4px rgba(0, 237, 237, 0.5),\r\n      0 0 6px rgba(0, 237, 237, 0.4);\r\n    }\r\n  }\r\n}\r\n</style>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/views/indexs/center-map.vue b/frontend/src/views/indexs/center-map.vue
+--- a/frontend/src/views/indexs/center-map.vue	(revision 99e30852e80eb203bfc10716051edc368135c9c9)
++++ b/frontend/src/views/indexs/center-map.vue	(date 1731668740508)
+@@ -1,10 +1,4 @@
+-<!--
+- * @Author: daidai
+- * @Date: 2022-03-01 11:17:39
+- * @LastEditors: Please set LastEditors
+- * @LastEditTime: 2022-09-29 15:50:18
+- * @FilePath: \web-pc\src\pages\big-screen\view\indexs\center-map.vue
+--->
++
+ <template>
+   <div class="centermap">
+     <div class="maptitle">
+@@ -40,6 +34,12 @@
+ import {GETNOBASE} from "api";
+ 
+ export default {
++  props: {
++    isEnvironment: {
++      type: Boolean,
++      default: true
++    }
++  },
+   data() {
+     return {
+       maptitle: "分布图",
+@@ -52,13 +52,7 @@
+       apartments: [],// 小区的点
+     };
+   },
+-  computed: {
+-  },
+-  created() {
+-  },
+-
+   mounted() {
+-    // console.log(xzqCode);
+     this.getData("china");
+   },
+   methods: {
+@@ -115,7 +109,7 @@
+         this.newData.push({name: "徐州市", value: [117.184811, 34.261792, 1]});
+         this.newData.push({name: "郑州市", value: [113.477391, 34.626256, 1]});
+         this.newData.push({name: "西安市", value: [108.797426, 34.10671, 1]});
+-      } else if (this.name === "陕西省") {
++      } else if (this.name === "陕西省" || this.name === '西安市') {
+         // this.newData.push({name: "西安市", value: [108.797426, 34.10671, 1]});
+         this.apartments = [
+           {
+@@ -143,7 +137,7 @@
+             left: 330
+           },
+         ]
+-      } else if (this.name === "河南省") {
++      } else if (this.name === "河南省" || this.name === '郑州市') {
+         // this.newData.push({name: "郑州市", value: [113.477391, 34.626256, 1]});
+         this.apartments = [
+           {
+@@ -171,7 +165,7 @@
+             left: 330
+           },
+         ]
+-      } else if (this.name === "江苏省") {
++      } else if (this.name === "江苏省" || this.name === '徐州市') {
+         // this.newData.push({name: "徐州市", value: [117.184811, 34.261792, 1]});
+         this.apartments = [
+           {
+@@ -200,13 +194,12 @@
+           },
+         ]
+       }
+-
+       // 小区的点
+-
+-      this.init(name, mydata);
++      this.$nextTick(() => {
++        this.init(name, mydata);
++      });
+     },
+     init(name, data) {
+-      // console.log(data2);
+       let top = 45;
+       let zoom = 1.05;
+       let option = {
+@@ -358,10 +351,7 @@
+             },
+           },
+         ],
+-        //动画效果
+-        // animationDuration: 1000,
+-        // animationEasing: 'linear',
+-        // animationDurationUpdate: 1000
++
+       };
+       this.options = option;
+     },
+@@ -406,7 +396,17 @@
+     },
+     // 跳转到具体小区
+     toApartment(val) {
+-      this.$router.push({name:'city',params: {cityName:val.value}})
++      if (this.isEnvironment === true){
++        this.$router.push({name:'city',params: {cityName:val.value}})
++      }else {
++        // 当 isEnvironment 为 false 时，执行其他操作
++        this.handleCommunityClick(val.value);
++      }
++    },
++    //向environment传递社区名字
++    handleCommunityClick(value) {
++        // 触发自定义事件，将社区名传递出去
++        this.$emit('communityClick', value);
+     },
+     /**
+      * 小区点位
+@@ -427,6 +427,7 @@
+   border-radius: 50%;
+   z-index: 9999;
+   position: absolute;
++  cursor: pointer;
+   //top: 10px;
+   //left: 10px;
+ }
+Index: frontend/src/views/indexs/right-bottom.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><!--\r\n * @Author: daidai\r\n * @Date: 2022-03-01 15:27:58\r\n * @LastEditors: Please set LastEditors\r\n * @LastEditTime: 2022-05-07 11:24:14\r\n * @FilePath: \\web-pc\\src\\pages\\big-screen\\view\\indexs\\right-center.vue\r\n-->\r\n<template>\r\n  <div v-if=\"pageflag\" class=\"right_center_wrap beautify-scroll-def\" :class=\"{ 'overflow-y-auto': !sbtxSwiperFlag }\" style=\"padding-top: 20px;\">\r\n    <component :is=\"components\" :data=\"list\" :class-option=\"defaultOption\">\r\n      <ul class=\"right_center \">\r\n        <li class=\"right_center_item\" v-for=\"(item, i) in list\" :key=\"i\" v-on:click=\"toPeople(item.gatewayno)\">\r\n          <span class=\"orderNum\">{{ i + 1 }}</span>\r\n          <div class=\"inner_right\">\r\n            <div class=\"dibu\"></div>\r\n            <div class=\"flex\">\r\n              <div class=\"info\">\r\n                <span class=\"labels \">姓名：</span>\r\n                <span class=\"contents zhuyao\"> {{ item.gatewayno }}</span>\r\n              </div>\r\n              <div class=\"info\">\r\n                <span class=\"labels\">性别：</span>\r\n                <span class=\"contents \"> {{ item.terminalno }}</span>\r\n              </div>\r\n              <div class=\"info\">\r\n                <span class=\"labels\">年龄：</span>\r\n                <span class=\"contents warning\"> {{ item.alertvalue | montionFilter }}</span>\r\n              </div>\r\n            </div>\r\n\r\n\r\n            <div class=\"flex\">\r\n\r\n              <div class=\"info\">\r\n                <span class=\"labels\"> 住址：</span>\r\n                <span class=\"contents ciyao\" style=\"font-size:12px\"> {{ item.provinceName }}/{{ item.cityName }}/{{ item.countyName }}</span>\r\n              </div>\r\n              <div class=\"info time\">\r\n                <span class=\"labels\">时间：</span>\r\n                <span class=\"contents\" style=\"font-size:12px\"> {{ item.createtime }}</span>\r\n              </div>\r\n\r\n            </div>\r\n            <div class=\"flex\">\r\n\r\n              <div class=\"info\">\r\n                <span class=\"labels\">身体状况：</span>\r\n                <span class=\"contents ciyao\" :class=\"{ warning: item.alertdetail }\"> {{ item.alertdetail || '无'\r\n                }}</span>\r\n              </div>\r\n            </div>\r\n          </div>\r\n        </li>\r\n      </ul>\r\n    </component>\r\n  </div>\r\n  <Reacquire v-else @onclick=\"getData\" style=\"line-height:200px\" />\r\n\r\n</template>\r\n\r\n<script>\r\nimport { currentGET } from 'api/modules'\r\nimport vueSeamlessScroll from 'vue-seamless-scroll'  // vue2引入方式\r\nimport Kong from '../../components/kong.vue'\r\nexport default {\r\n  components: { vueSeamlessScroll, Kong },\r\n\r\n  data() {\r\n    return {\r\n      list: [],\r\n      pageflag: true,\r\n      defaultOption: {\r\n        ...this.$store.state.setting.defaultOption,\r\n        limitMoveNum: 3,\r\n        singleHeight: 250,\r\n        step:0,\r\n      }\r\n\r\n    };\r\n  },\r\n  computed: {\r\n    sbtxSwiperFlag() {\r\n      let ssyjSwiper = this.$store.state.setting.ssyjSwiper\r\n      if (ssyjSwiper) {\r\n        this.components = vueSeamlessScroll\r\n      } else {\r\n        this.components = Kong\r\n      }\r\n      return ssyjSwiper\r\n    }\r\n  },\r\n  created() {\r\n    this.getData()\r\n  },\r\n\r\n  mounted() { },\r\n  methods: {\r\n    getData() {\r\n      this.pageflag = true\r\n      // this.pageflag =false\r\n      currentGET('big5', { limitNum: 50 }).then(res => {\r\n        console.log('实时预警', res);\r\n        if (res.success) {\r\n          this.list = res.data.list\r\n          let timer = setTimeout(() => {\r\n              clearTimeout(timer)\r\n              this.defaultOption.step=this.$store.state.setting.defaultOption.step\r\n          }, this.$store.state.setting.defaultOption.waitTime);\r\n        } else {\r\n          this.pageflag = false\r\n          this.$Message.warning(res.msg)\r\n        }\r\n      })\r\n    },\r\n    // 跳转到具体人\r\n    toPeople(peopleName) {\r\n      this.$router.push({path:'/people/'+peopleName})\r\n    }\r\n  },\r\n};\r\n</script>\r\n<style lang='scss' scoped>\r\n.right_center {\r\n  width: 100%;\r\n  height: 100%;\r\n\r\n  .right_center_item {\r\n    display: flex;\r\n    align-items: center;\r\n    //justify-content: center;\r\n    margin-left: 40px;\r\n    height: auto;\r\n    padding: 10px;\r\n    font-size: 14px;\r\n    color: #fff;\r\n    text-align: left;\r\n    .orderNum {\r\n      margin: 0 20px 0 -20px;\r\n    }\r\n\r\n\r\n    .inner_right {\r\n      position: relative;\r\n      height: 100%;\r\n      width: 90%;\r\n      flex-shrink: 0;\r\n      line-height: 1.5;\r\n\r\n      .dibu {\r\n        position: absolute;\r\n        height: 2px;\r\n        width: 104%;\r\n        background-image: url(\"../../assets/img/zuo_xuxian.png\");\r\n        bottom: -12px;\r\n        left: -2%;\r\n        background-size: cover;\r\n      }\r\n    }\r\n\r\n    .info {\r\n      margin-right: 10px;\r\n      display: flex;\r\n      align-items: center;\r\n\r\n      .labels {\r\n        flex-shrink: 0;\r\n        font-size: 12px;\r\n        color: rgba(255, 255, 255, 0.6);\r\n      }\r\n\r\n      .zhuyao {\r\n        color: $primary-color;\r\n        font-size: 15px;\r\n      }\r\n\r\n      .ciyao {\r\n        color: rgba(255, 255, 255, 0.8);\r\n      }\r\n\r\n      .warning {\r\n        color: #E6A23C;\r\n        font-size: 15px;\r\n      }\r\n    }\r\n\r\n  }\r\n}\r\n\r\n.right_center_wrap {\r\n  overflow: hidden;\r\n  width: 100%;\r\n  height: 830px;\r\n}\r\n\r\n.overflow-y-auto {\r\n  overflow-y: auto;\r\n}\r\n</style>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/views/indexs/right-bottom.vue b/frontend/src/views/indexs/right-bottom.vue
+--- a/frontend/src/views/indexs/right-bottom.vue	(revision 99e30852e80eb203bfc10716051edc368135c9c9)
++++ b/frontend/src/views/indexs/right-bottom.vue	(date 1731664879769)
+@@ -1,52 +1,35 @@
+-<!--
+- * @Author: daidai
+- * @Date: 2022-03-01 15:27:58
+- * @LastEditors: Please set LastEditors
+- * @LastEditTime: 2022-05-07 11:24:14
+- * @FilePath: \web-pc\src\pages\big-screen\view\indexs\right-center.vue
+--->
+ <template>
+   <div v-if="pageflag" class="right_center_wrap beautify-scroll-def" :class="{ 'overflow-y-auto': !sbtxSwiperFlag }" style="padding-top: 20px;">
+     <component :is="components" :data="list" :class-option="defaultOption">
+-      <ul class="right_center ">
+-        <li class="right_center_item" v-for="(item, i) in list" :key="i" v-on:click="toPeople(item.gatewayno)">
++      <ul class="right_center">
++        <li class="right_center_item" v-for="(item, i) in list" :key="i" v-on:click="toPeople(item.id)">
+           <span class="orderNum">{{ i + 1 }}</span>
+           <div class="inner_right">
+             <div class="dibu"></div>
+             <div class="flex">
+               <div class="info">
+-                <span class="labels ">姓名：</span>
+-                <span class="contents zhuyao"> {{ item.gatewayno }}</span>
++                <span class="labels ">ID：</span>
++                <span class="contents zhuyao">{{ item.id }}</span>
+               </div>
+               <div class="info">
+                 <span class="labels">性别：</span>
+-                <span class="contents "> {{ item.terminalno }}</span>
++                <span class="contents">{{ item.gender }}</span>
+               </div>
+               <div class="info">
+                 <span class="labels">年龄：</span>
+-                <span class="contents warning"> {{ item.alertvalue | montionFilter }}</span>
++                <span class="contents warning">{{ item.age }}</span>
+               </div>
+             </div>
+-
+-
+             <div class="flex">
+-
+               <div class="info">
+-                <span class="labels"> 住址：</span>
+-                <span class="contents ciyao" style="font-size:12px"> {{ item.provinceName }}/{{ item.cityName }}/{{ item.countyName }}</span>
+-              </div>
+-              <div class="info time">
+-                <span class="labels">时间：</span>
+-                <span class="contents" style="font-size:12px"> {{ item.createtime }}</span>
++                <span class="labels">住址：</span>
++                <span class="contents ciyao" style="font-size:12px">{{ item.address }}</span>
+               </div>
+-
+             </div>
+             <div class="flex">
+-
+               <div class="info">
+                 <span class="labels">身体状况：</span>
+-                <span class="contents ciyao" :class="{ warning: item.alertdetail }"> {{ item.alertdetail || '无'
+-                }}</span>
++                <span class="contents ciyao" :class="{ warning: item.alertLevel }">{{ item.alertLevel || '无' }}</span>
+               </div>
+             </div>
+           </div>
+@@ -55,16 +38,22 @@
+     </component>
+   </div>
+   <Reacquire v-else @onclick="getData" style="line-height:200px" />
+-
+ </template>
+ 
+ <script>
+-import { currentGET } from 'api/modules'
+-import vueSeamlessScroll from 'vue-seamless-scroll'  // vue2引入方式
+-import Kong from '../../components/kong.vue'
++import axios from "axios";
++import vueSeamlessScroll from 'vue-seamless-scroll';
++import Kong from '../../components/kong.vue';
++import { baseUrl } from "@/api/api";
++
+ export default {
+   components: { vueSeamlessScroll, Kong },
+-
++  props: {
++    communityName: {
++      type: String,
++      required: true,
++    },
++  },
+   data() {
+     return {
+       list: [],
+@@ -73,52 +62,62 @@
+         ...this.$store.state.setting.defaultOption,
+         limitMoveNum: 3,
+         singleHeight: 250,
+-        step:0,
+-      }
+-
++        step: 0,
++      },
+     };
+   },
+   computed: {
+     sbtxSwiperFlag() {
+-      let ssyjSwiper = this.$store.state.setting.ssyjSwiper
+-      if (ssyjSwiper) {
+-        this.components = vueSeamlessScroll
+-      } else {
+-        this.components = Kong
+-      }
+-      return ssyjSwiper
++      let ssyjSwiper = this.$store.state.setting.ssyjSwiper;
++      this.components = ssyjSwiper ? vueSeamlessScroll : Kong;
++      return ssyjSwiper;
+     }
+   },
+   created() {
+-    this.getData()
++    this.getData();
+   },
+-
+-  mounted() { },
+   methods: {
+     getData() {
+-      this.pageflag = true
+-      // this.pageflag =false
+-      currentGET('big5', { limitNum: 50 }).then(res => {
+-        console.log('实时预警', res);
+-        if (res.success) {
+-          this.list = res.data.list
+-          let timer = setTimeout(() => {
+-              clearTimeout(timer)
+-              this.defaultOption.step=this.$store.state.setting.defaultOption.step
+-          }, this.$store.state.setting.defaultOption.waitTime);
+-        } else {
+-          this.pageflag = false
+-          this.$Message.warning(res.msg)
+-        }
+-      })
++      axios.get(`${baseUrl}/city/getHealthDataByCommunityAll`, {
++            params: { communityName: this.communityName }
++          })
++          .then((res) => {
++            if (res.code === "200") {
++              // 格式化数据
++              this.list = res.data.map(item => ({
++                id: item.id,
++                gender: item.gender,
++                age: item.age,
++                address: item.address,
++                // 将 L1, L2, L3 拼接成身体状况显示
++                alertLevel: [
++                  item.L1.length ? `${item.L1.join(', ')} 处于一级预警状态` : '',
++                  item.L2.length ? `${item.L2.join(', ')} 处于二级预警状态` : '',
++                  item.L3.length ? `${item.L3.join(', ')} 处于三级预警状态` : ''
++                ].filter(Boolean).join('；') || '无'
++              }));
++
++              let timer = setTimeout(() => {
++                clearTimeout(timer);
++                this.defaultOption.step = this.$store.state.setting.defaultOption.step;
++              }, this.$store.state.setting.defaultOption.waitTime);
++            } else {
++              this.pageflag = false;
++              this.$Message.warning(res.msg);
++            }
++          })
++          .catch((error) => {
++            console.error("API Error:", error);
++            this.pageflag = false;
++          });
+     },
+-    // 跳转到具体人
+-    toPeople(peopleName) {
+-      this.$router.push({path:'/people/'+peopleName})
++    toPeople(peopleId) {
++      this.$router.push({ path: '/people/' + peopleId });
+     }
+-  },
++  }
+ };
+ </script>
++
+ <style lang='scss' scoped>
+ .right_center {
+   width: 100%;
+@@ -127,18 +126,17 @@
+   .right_center_item {
+     display: flex;
+     align-items: center;
+-    //justify-content: center;
+     margin-left: 40px;
+     height: auto;
+     padding: 10px;
+     font-size: 14px;
+     color: #fff;
+     text-align: left;
++
+     .orderNum {
+       margin: 0 20px 0 -20px;
+     }
+ 
+-
+     .inner_right {
+       position: relative;
+       height: 100%;
+@@ -182,7 +180,6 @@
+         font-size: 15px;
+       }
+     }
+-
+   }
+ }
+ 
+Index: frontend/src/views/city/Three.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><template>\r\n  <div id=\"three\" ref=\"three\" style=\"top:-90px\">\r\n\r\n  </div>\r\n</template>\r\n\r\n<script>\r\nimport * as echarts from \"echarts\";\r\n\r\nexport default {\r\n  name: \"Three\",\r\n  data() {\r\n    return {\r\n      gatewayno: '',\r\n      config: {\r\n        showValue: true,\r\n        unit: \"人\",\r\n        data: []\r\n      },\r\n\r\n    };\r\n  },\r\n  computed: {\r\n  },\r\n  mounted() {\r\n    this.getData();\r\n  },\r\n  methods: {\r\n    getData() {\r\n      let app = {};\r\n\r\n      let chartDom = this.$refs.three;\r\n      let myChart = echarts.init(chartDom);\r\n      let option;\r\n\r\n      option = {\r\n\r\n        tooltip: {\r\n          trigger: 'item',\r\n        },\r\n        legend: {\r\n          orient: 'vertical',\r\n          left: 'left',\r\n          show: false,\r\n          textStyle: {\r\n            fontSize: 12,\r\n            color: \"white\"\r\n          }\r\n        },\r\n\r\n        series: [\r\n          {\r\n            name: '年龄',\r\n            type: 'pie',\r\n            radius: '50%',\r\n            data: [\r\n              { value: 1048, name: '30岁以下' },\r\n              { value: 735, name: '30~40岁' },\r\n              { value: 580, name: '40~50岁' },\r\n              { value: 484, name: '50~60岁' },\r\n              { value: 300, name: '60~70岁' },\r\n              { value: 300, name: '70岁以上' }\r\n            ],\r\n            label: {\r\n              color: 'white',\r\n              fontSize: 14\r\n            },\r\n            emphasis: {\r\n              itemStyle: {\r\n                shadowBlur: 10,\r\n                shadowOffsetX: 0,\r\n                shadowColor: 'rgba(255,255,255,0.5)',\r\n              }\r\n            },\r\n          }\r\n        ]\r\n      };\r\n\r\n      option && myChart.setOption(option);\r\n\r\n    }\r\n  },\r\n}\r\n</script>\r\n\r\n<style lang='scss' scoped>\r\n#three {\r\n  height: 500px;\r\n}\r\n\r\n</style>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/views/city/Three.vue b/frontend/src/views/city/Three.vue
+--- a/frontend/src/views/city/Three.vue	(revision 99e30852e80eb203bfc10716051edc368135c9c9)
++++ b/frontend/src/views/city/Three.vue	(date 1731664879798)
+@@ -6,9 +6,16 @@
+ 
+ <script>
+ import * as echarts from "echarts";
+-
++import axios from "axios";
++import { baseUrl } from "@/api/api";
+ export default {
+   name: "Three",
++  props: {
++    communityName: {
++      type: String,
++      required: true,
++    },
++  },
+   data() {
+     return {
+       gatewayno: '',
+@@ -27,14 +34,37 @@
+   },
+   methods: {
+     getData() {
+-      let app = {};
+-
++      axios
++          .get(`${baseUrl}/city/getHealthDataByCommunity`, {
++            params: { communityName: this.communityName }
++          })
++          .then((res) => {
++            if (res.code === "200") {
++              const data = res.data;
++              // 将接口返回的数据格式化为图表需要的格式
++              const ageData = [
++                { value: data.age_30 || 0, name: '30岁以下' },
++                { value: data.age_30_40 || 0, name: '30~40岁' },
++                { value: data.age_40_50 || 0, name: '40~50岁' },
++                { value: data.age_50_60 || 0, name: '50~60岁' },
++                { value: data.age_60_70 || 0, name: '60~70岁' },
++                { value: data.age_70 || 0, name: '70岁以上' }
++              ];
++              // 调用 init 方法，传入格式化后的数据
++              this.init(ageData);
++            } else {
++              console.error("数据获取失败:", res.data.msg);
++            }
++          })
++          .catch((error) => {
++            console.error("API Error:", error);
++          });
++    },
++    init(ageData) {
++      // Echarts 初始化
+       let chartDom = this.$refs.three;
+       let myChart = echarts.init(chartDom);
+-      let option;
+-
+-      option = {
+-
++      let option = {
+         tooltip: {
+           trigger: 'item',
+         },
+@@ -47,20 +77,12 @@
+             color: "white"
+           }
+         },
+-
+         series: [
+           {
+             name: '年龄',
+             type: 'pie',
+             radius: '50%',
+-            data: [
+-              { value: 1048, name: '30岁以下' },
+-              { value: 735, name: '30~40岁' },
+-              { value: 580, name: '40~50岁' },
+-              { value: 484, name: '50~60岁' },
+-              { value: 300, name: '60~70岁' },
+-              { value: 300, name: '70岁以上' }
+-            ],
++            data: ageData, // 使用接口返回的年龄数据
+             label: {
+               color: 'white',
+               fontSize: 14
+@@ -76,8 +98,8 @@
+         ]
+       };
+ 
++      // 设置图表选项
+       option && myChart.setOption(option);
+-
+     }
+   },
+ }
+Index: frontend/src/views/city/Two.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><template>\r\n  <div id=\"two\">\r\n    <Echart\r\n        id=\"leftCenter\"\r\n        :options=\"options\"\r\n        class=\"left_center_inner\"\r\n        v-if=\"pageflag\"\r\n        ref=\"charts\"\r\n        width=\"300px\"\r\n        height=\"300px\"\r\n        style=\"left: 40px;padding: 0;\"\r\n    />\r\n    <Reacquire v-else @onclick=\"getData\" style=\"line-height:200px\">\r\n      重新获取\r\n    </Reacquire>\r\n  </div>\r\n</template>\r\n\r\n<script>\r\nimport {currentGET} from \"@/api\";\r\nexport default {\r\n  name: \"Two\",\r\n  data() {\r\n    return {\r\n      options: {},\r\n      countUserNumData: {\r\n        lockNum: 902.8,\r\n        onlineNum: 1316.3,\r\n        // offlineNum: 1274.2,\r\n        totalNum: 0\r\n      },\r\n      pageflag: true,\r\n      timer: null\r\n    };\r\n  },\r\n  created() {\r\n    this.getData()\r\n  },\r\n  mounted() {\r\n  },\r\n  beforeDestroy() {\r\n    this.clearData()\r\n\r\n  },\r\n  methods: {\r\n    clearData() {\r\n      if (this.timer) {\r\n        clearInterval(this.timer)\r\n        this.timer = null\r\n      }\r\n    },\r\n    getData() {\r\n      this.pageflag = true\r\n      // this.pageflag =false\r\n\r\n      currentGET('big1').then(res => {\r\n        //只打印一次\r\n        if (!this.timer) {\r\n          console.log(\"设备总览\", res);\r\n        }\r\n        if (res.success) {\r\n          // this.countUserNumData = res.data\r\n          let data = this.countUserNumData;\r\n          data.totalNum = data.lockNum + data.onlineNum;\r\n          this.countUserNumData = data\r\n          this.$nextTick(() => {\r\n            this.init()\r\n            this.switper()\r\n          })\r\n\r\n        } else {\r\n          this.pageflag = false\r\n          this.$Message({\r\n            text: res.msg,\r\n            type: 'warning'\r\n          })\r\n        }\r\n      })\r\n    },\r\n    //轮询\r\n    switper() {\r\n      if (this.timer) {\r\n        return\r\n      }\r\n      let looper = (a) => {\r\n        this.getData()\r\n      };\r\n      this.timer = setInterval(looper, this.$store.state.setting.echartsAutoTime);\r\n      let myChart = this.$refs.charts.chart\r\n      myChart.on('mouseover', params => {\r\n        this.clearData()\r\n      });\r\n      myChart.on('mouseout', params => {\r\n        this.timer = setInterval(looper, this.$store.state.setting.echartsAutoTime);\r\n      });\r\n    },\r\n    init() {\r\n      let total = this.countUserNumData.totalNum;\r\n      let colors = [\"#ECA444\", \"#33A1DB\"];\r\n      let piedata = {\r\n        name: \"用户总览\",\r\n        type: \"pie\",\r\n        radius: [\"42%\", \"65%\"],\r\n        avoidLabelOverlap: false,\r\n        itemStyle: {\r\n          borderRadius: 4,\r\n          borderColor: \"rgba(0,0,0,0)\",\r\n          borderWidth: 2,\r\n        },\r\n\r\n        color: colors,\r\n        data: [\r\n          // {\r\n          //   value: 0,\r\n          //   name: \"告警\",\r\n          //   label: {\r\n          //     shadowColor: colors[0],\r\n          //   },\r\n          // },\r\n          {\r\n            value: this.countUserNumData.lockNum,\r\n            name: \"男性\",\r\n            label: {\r\n              shadowColor: colors[0],\r\n            },\r\n          },\r\n          {\r\n            value: this.countUserNumData.onlineNum,\r\n            name: \"女性\",\r\n            label: {\r\n              shadowColor: colors[2],\r\n            },\r\n          },\r\n        ],\r\n      };\r\n      this.options = {\r\n        title: {\r\n          // zlevel: 0,\r\n          text: [\"{value|\" + total + \"}\", \"{name|总数}\"].join(\"\\n\"),\r\n          top: \"center\",\r\n          left: \"center\",\r\n          textStyle: {\r\n            rich: {\r\n              value: {\r\n                color: \"#ffffff\",\r\n                fontSize: 24,\r\n                fontWeight: \"bold\",\r\n                lineHeight: 20,\r\n              },\r\n              name: {\r\n                color: \"#ffffff\",\r\n                lineHeight: 20,\r\n              },\r\n            },\r\n          },\r\n        },\r\n        tooltip: {\r\n          trigger: \"item\",\r\n          backgroundColor: \"rgba(0,0,0,.6)\",\r\n          borderColor: \"rgba(147, 235, 248, .8)\",\r\n          textStyle: {\r\n            color: \"#FFF\",\r\n          },\r\n        },\r\n        legend: {\r\n          show: false,\r\n          top: \"5%\",\r\n          left: \"center\",\r\n        },\r\n        series: [\r\n          //展示圆点\r\n          {\r\n            ...piedata,\r\n            tooltip: { show: true },\r\n            label: {\r\n              formatter: \"{per|{d}%}\",\r\n              //   position: \"outside\",\r\n              rich: {\r\n                b: {\r\n                  color: \"#fff\",\r\n                  fontSize: 12,\r\n                  lineHeight: 26,\r\n                },\r\n                c: {\r\n                  color: \"#31ABE3\",\r\n                  fontSize: 14,\r\n                },\r\n                per: {\r\n                  color: \"#31ABE3\",\r\n                  fontSize: 14,\r\n                },\r\n              },\r\n            },\r\n            labelLine: {\r\n              length: 20, // 第一段线 长度\r\n              length2: 36, // 第二段线 长度\r\n              show: false,\r\n\r\n            },\r\n            emphasis: {\r\n              show: true,\r\n            },\r\n          },\r\n          {\r\n            ...piedata,\r\n            tooltip: { show: true },\r\n            itemStyle: {},\r\n            label: {\r\n              backgroundColor: \"inherit\", //圆点颜色，auto：映射的系列色\r\n              height: 0,\r\n              width: 0,\r\n              lineHeight: 0,\r\n              borderRadius: 2.5,\r\n              shadowBlur: 8,\r\n              shadowColor: \"auto\",\r\n              padding: [2.5, -2.5, 2.5, -2.5],\r\n            },\r\n            labelLine: {\r\n              length: 20, // 第一段线 长度\r\n              length2: 36, // 第二段线 长度\r\n              show: false,\r\n            },\r\n          },\r\n        ],\r\n      };\r\n    },\r\n  },\r\n}\r\n</script>\r\n\r\n<style lang='scss' scoped>\r\n</style>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/views/city/Two.vue b/frontend/src/views/city/Two.vue
+--- a/frontend/src/views/city/Two.vue	(revision 99e30852e80eb203bfc10716051edc368135c9c9)
++++ b/frontend/src/views/city/Two.vue	(date 1731664879802)
+@@ -17,18 +17,20 @@
+ </template>
+ 
+ <script>
+-import {currentGET} from "@/api";
++import axios from "axios";
++import { baseUrl } from "@/api/api";
+ export default {
+   name: "Two",
++  props: {
++    communityName: {
++      type: String,
++      required: true,
++    },
++  },
+   data() {
+     return {
+       options: {},
+-      countUserNumData: {
+-        lockNum: 902.8,
+-        onlineNum: 1316.3,
+-        // offlineNum: 1274.2,
+-        totalNum: 0
+-      },
++      countUserNumData: {},
+       pageflag: true,
+       timer: null
+     };
+@@ -50,49 +52,30 @@
+       }
+     },
+     getData() {
+-      this.pageflag = true
+-      // this.pageflag =false
+-
+-      currentGET('big1').then(res => {
+-        //只打印一次
+-        if (!this.timer) {
+-          console.log("设备总览", res);
+-        }
+-        if (res.success) {
+-          // this.countUserNumData = res.data
+-          let data = this.countUserNumData;
+-          data.totalNum = data.lockNum + data.onlineNum;
+-          this.countUserNumData = data
+-          this.$nextTick(() => {
+-            this.init()
+-            this.switper()
++      axios.get(`${baseUrl}/city/getHealthDataByCommunity`, {
++            params: {communityName: this.communityName}
+           })
++          .then((res) => {
++            if (res.code === "200") {
++              const data = res.data;
++              // 将接口返回的男性和女性数据赋值给 countUserNumData
++              this.countUserNumData = {
++                lockNum: data.male, // 男性人数
++                onlineNum: data.female, // 女性人数
++                totalNum: data.male + data.female, // 总人数
++              };
++              // 调用 init 方法初始化图表
++              this.init();
+ 
+-        } else {
+-          this.pageflag = false
+-          this.$Message({
+-            text: res.msg,
+-            type: 'warning'
+-          })
+-        }
+-      })
+-    },
+-    //轮询
+-    switper() {
+-      if (this.timer) {
+-        return
+-      }
+-      let looper = (a) => {
+-        this.getData()
+-      };
+-      this.timer = setInterval(looper, this.$store.state.setting.echartsAutoTime);
+-      let myChart = this.$refs.charts.chart
+-      myChart.on('mouseover', params => {
+-        this.clearData()
+-      });
+-      myChart.on('mouseout', params => {
+-        this.timer = setInterval(looper, this.$store.state.setting.echartsAutoTime);
+-      });
++            } else {
++              this.pageflag = false;
++              this.$Message.warning(res.msg);
++            }
++          })
++          .catch((error) => {
++            console.error("API Error:", error);
++            this.pageflag = false;
++          });
+     },
+     init() {
+       let total = this.countUserNumData.totalNum;
+@@ -110,13 +93,6 @@
+ 
+         color: colors,
+         data: [
+-          // {
+-          //   value: 0,
+-          //   name: "告警",
+-          //   label: {
+-          //     shadowColor: colors[0],
+-          //   },
+-          // },
+           {
+             value: this.countUserNumData.lockNum,
+             name: "男性",
+Index: frontend/src/views/city/index.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><template>\r\n  <div class=\"city-index\">\r\n    <div class=\"left\">\r\n      <ItemWrap class=\"one\" title=\"人数比例(单位万)\"><One/></ItemWrap>\r\n      <ItemWrap class=\"two\" title=\"男女比例(单位万)\"><Two/></ItemWrap>\r\n      <ItemWrap class=\"three\" title=\"年龄分布(单位万)\"><Three/></ItemWrap>\r\n      <ItemWrap class=\"four\" title=\"健康状况(单位万)\"><Four/></ItemWrap>\r\n    </div>\r\n    <div class=\"right\">\r\n      <ItemWrap title=\"已检测人信息\">\r\n        <right-bottom/>\r\n      </ItemWrap>\r\n    </div>\r\n  </div>\r\n</template>\r\n\r\n<script>\r\n\r\nimport One from \"@/views/city/One\";\r\nimport Two from \"@/views/city/Two\";\r\nimport Three from \"@/views/city/Three\";\r\nimport Four from \"@/views/city/Four\";\r\nimport Five from \"@/views/city/Five\";\r\nimport RightBottom from \"@/views/indexs/right-bottom\";\r\nexport default {\r\n  name: \"cityIndex\",\r\n  components: {RightBottom, Five, Four, Three, Two, One},\r\n  data() {\r\n    return {\r\n      cityName: \"新福小区\"\r\n    };\r\n  },\r\n  created() {\r\n    this.cityName = this.$route.params.cityName;\r\n  },\r\n  methods: {\r\n\r\n  },\r\n}\r\n</script>\r\n\r\n<style lang=\"scss\" scoped>\r\n  .one, .two, .three, .four{\r\n    width: 400px;\r\n    height: 400px;\r\n  }\r\n  .left {\r\n    height: 86%;\r\n    width: 900px;\r\n    display: flex;\r\n    justify-content: space-around;\r\n    flex-wrap: wrap;\r\n    border: 1px solid deepskyblue;\r\n    align-items: center;\r\n  }\r\n  .right {\r\n    height: 88%;\r\n    width: 900px;\r\n  }\r\n  .city-index {\r\n    width: 100%;\r\n    height: 100%;\r\n    display: flex;\r\n    justify-content: space-between;\r\n    align-items: center;\r\n  }\r\n</style>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/views/city/index.vue b/frontend/src/views/city/index.vue
+--- a/frontend/src/views/city/index.vue	(revision 99e30852e80eb203bfc10716051edc368135c9c9)
++++ b/frontend/src/views/city/index.vue	(date 1731664879808)
+@@ -1,14 +1,14 @@
+ <template>
+   <div class="city-index">
+     <div class="left">
+-      <ItemWrap class="one" title="人数比例(单位万)"><One/></ItemWrap>
+-      <ItemWrap class="two" title="男女比例(单位万)"><Two/></ItemWrap>
+-      <ItemWrap class="three" title="年龄分布(单位万)"><Three/></ItemWrap>
+-      <ItemWrap class="four" title="健康状况(单位万)"><Four/></ItemWrap>
++      <ItemWrap class="one" title="人数比例(单位万)"><One :communityName="communityName"/></ItemWrap>
++      <ItemWrap class="two" title="男女比例(单位万)"><Two :communityName="communityName"/></ItemWrap>
++      <ItemWrap class="three" title="年龄分布(单位万)"><Three :communityName="communityName"/></ItemWrap>
++      <ItemWrap class="four" title="健康状况(单位万)"><Four :communityName="communityName"/></ItemWrap>
+     </div>
+     <div class="right">
+       <ItemWrap title="已检测人信息">
+-        <right-bottom/>
++        <right-bottom :communityName="communityName"/>
+       </ItemWrap>
+     </div>
+   </div>
+@@ -27,11 +27,11 @@
+   components: {RightBottom, Five, Four, Three, Two, One},
+   data() {
+     return {
+-      cityName: "新福小区"
++      communityName: '',
+     };
+   },
+   created() {
+-    this.cityName = this.$route.params.cityName;
++    this.communityName = this.$route.params.cityName;
+   },
+   methods: {
+ 
+Index: frontend/src/views/environment/Environment.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/views/environment/Environment.vue b/frontend/src/views/environment/Environment.vue
+new file mode 100644
+--- /dev/null	(date 1731664879851)
++++ b/frontend/src/views/environment/Environment.vue	(date 1731664879851)
+@@ -0,0 +1,98 @@
++<!--
++ * @Author: Author T4mako
++ * @Date: 2024-11-05 13:23:59
++-->
++<template>
++  <ScaleScreen
++      :width="1920"
++      :height="1080"
++      class="scale-wrap"
++      :selfAdaption="$store.state.setting.isScale">
++    <div class="bg">
++      <dv-loading v-if="loading">Loading...</dv-loading>
++      <div v-else class="host-body">
++        <!-- 头部 s -->
++        <div class="d-flex jc-center title_wrap" style="z-index: 999">
++          <div class="zuojuxing"></div>
++          <div class="youjuxing"></div>
++          <div class="guang"></div>
++          <div class="d-flex jc-center">
++            <div class="title">
++              <span class="title-text"v-on:click="()=>{this.$router.push({path:'/'})}">数字健康家庭服务城市平台</span>
++            </div>
++          </div>
++          <div class="timers">
++            {{ dateYear }} {{ dateWeek }} {{ dateDay }}
++          </div>
++        </div>
++        <router-view></router-view>
++      </div>
++    </div>
++
++  </ScaleScreen>
++
++</template>
++
++<script>
++import ScaleScreen from "@/components/scale-screen/scale-screen.vue";
++import { formatTime } from "@/utils/index.js";
++export default {
++  components: { ScaleScreen },
++  data(){
++    return{
++      timing: null,
++      loading: false,
++      dateDay: null,
++      dateYear: null,
++      dateWeek: null,
++      weekday: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
++      input: '',
++      path: '',
++    }
++  },filters: {
++    numsFilter(msg) {
++      return msg || 0;
++    },
++  },
++  computed: {},
++  created() {
++    this.path = this.$route.path
++
++  },
++  mounted() {
++    this.timeFn();
++    this.cancelLoading();
++  },
++  beforeDestroy() {
++    clearInterval(this.timing);
++  },
++  methods: {
++    timeFn() {
++      this.timing = setInterval(() => {
++        this.dateDay = formatTime(new Date(), "HH: mm: ss");
++        this.dateYear = formatTime(new Date(), "yyyy-MM-dd");
++        this.dateWeek = this.weekday[new Date().getDay()];
++      }, 1000);
++    },
++    cancelLoading() {
++      let timer = setTimeout(() => {
++        this.loading = false;
++        clearTimeout(timer);
++      }, 500);
++    },
++  },
++};
++</script>
++
++<style lang="scss" scoped>
++.bg {
++  width: 100%;
++  height: 100%;
++  padding: 16px 16px 10px 16px;
++  box-sizing: border-box;
++  background-size: cover;
++  background-position: center center;
++}
++@import "env";
++
++</style>
+Index: frontend/src/main.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/*\r\n * @Author: daidai\r\n * @Date: 2022-01-12 14:05:56\r\n * @LastEditors: Please set LastEditors\r\n * @LastEditTime: 2022-09-27 14:55:57\r\n * @FilePath: \\web-pc\\src\\pages\\big-screen\\main.js\r\n */\r\nimport Vue from \"vue\";\r\nimport ElementUI from 'element-ui';\r\nimport 'element-ui/lib/theme-chalk/index.css';\r\nimport App from \"./App.vue\";\r\nimport router from './router'\r\nimport store from './store'\r\nimport {loading,borderBox13,digitalFlop,capsuleChart,borderBox8} from '@jiaminghi/data-view'\r\nimport { Radio,Button,RadioGroup } from 'element-ui'\r\nimport Echart from './components/echart/index.vue'\r\nimport ItemWrap from './components/item-wrap/item-wrap.vue'\r\nimport Message from './components/message/message.vue'\r\nimport Reacquire from './components/reacquire/reacquire.vue'\r\nimport Messages from './components/message/message'\r\nimport \"vue-easytable/libs/theme-default/index.css\";\r\nimport  '@/assets/css/public.scss'\r\nimport \"@/assets/css/index.scss\"\r\n\r\n\r\nimport * as filters from '@/directives/filters'\r\n\r\nrequire('./mock/mock')//是否使用mock\r\nVue.config.productionTip = false;\r\n// 自定义组件\r\nVue.component(\"Echart\",Echart)\r\nVue.component(\"ItemWrap\",ItemWrap)\r\nVue.component(\"Message\",Message)\r\nVue.component(\"Reacquire\",Reacquire)\r\nVue.prototype.$Message =  Messages\r\n// element组件\r\nVue.use(Radio);\r\nVue.use(Button);\r\nVue.use(RadioGroup)\r\nVue.use(ElementUI);\r\n\r\n// datav组件\r\nVue.use(loading)\r\nVue.use(borderBox13)\r\nVue.use(borderBox8)\r\nVue.use(digitalFlop)\r\nVue.use(capsuleChart)\r\n// 全局数据过滤器\r\nObject.keys(filters).forEach(k => Vue.filter(k, filters[k]));\r\nnew Vue({\r\n  router,\r\n  store,\r\n  render: h => h(App)\r\n}).$mount(\"#app\");\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/main.js b/frontend/src/main.js
+--- a/frontend/src/main.js	(revision 99e30852e80eb203bfc10716051edc368135c9c9)
++++ b/frontend/src/main.js	(date 1731664879812)
+@@ -12,7 +12,7 @@
+ import router from './router'
+ import store from './store'
+ import {loading,borderBox13,digitalFlop,capsuleChart,borderBox8} from '@jiaminghi/data-view'
+-import { Radio,Button,RadioGroup } from 'element-ui'
++import { Radio,Button,RadioGroup,Menu, Submenu, MenuItem } from 'element-ui'
+ import Echart from './components/echart/index.vue'
+ import ItemWrap from './components/item-wrap/item-wrap.vue'
+ import Message from './components/message/message.vue'
+@@ -38,6 +38,11 @@
+ Vue.use(Button);
+ Vue.use(RadioGroup)
+ Vue.use(ElementUI);
++// 单独注册需要的 Element UI 组件
++Vue.component(Menu.name, Menu)
++Vue.component(Submenu.name, Submenu)
++Vue.component(MenuItem.name, MenuItem)
++
+ 
+ // datav组件
+ Vue.use(loading)
+Index: frontend/src/views/city/Four.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><template>\r\n  <div id=\"four\">\r\n    <div class=\"center_bottom\" id=\"center_bottom\" ref=\"centerBottom\">\r\n      <!--    <Echart-->\r\n      <!--      :options=\"options\"-->\r\n      <!--      id=\"bottomLeftChart\"-->\r\n      <!--      class=\"echarts_bottom\"-->\r\n      <!--    ></Echart>-->\r\n    </div>\r\n  </div>\r\n</template>\r\n\r\n<script>\r\nimport {mylog} from \"@/utils\";\r\nimport { currentGET } from \"api\";\r\nimport { graphic } from \"echarts\";\r\nimport * as echarts from 'echarts/core';\r\nimport {\r\n  ToolboxComponent,\r\n  TooltipComponent,\r\n  GridComponent,\r\n  LegendComponent\r\n} from 'echarts/components';\r\nimport { BarChart } from 'echarts/charts';\r\nimport { CanvasRenderer } from 'echarts/renderers';\r\nexport default {\r\n  name: \"Four\",\r\n  data() {\r\n    return {\r\n      options: {},\r\n    };\r\n  },\r\n  props: {},\r\n  mounted() {\r\n    this.getData();\r\n  },\r\n  methods: {\r\n    getData() {\r\n      echarts.use([\r\n        ToolboxComponent,\r\n        TooltipComponent,\r\n        GridComponent,\r\n        LegendComponent,\r\n        BarChart,\r\n        CanvasRenderer\r\n      ]);\r\n      let app = {};\r\n\r\n      let chartDom = this.$refs.centerBottom;\r\n      let myChart = echarts.init(chartDom);\r\n      let option;\r\n\r\n      const posList = [\r\n        'left',\r\n        'right',\r\n        'top',\r\n        'bottom',\r\n        'inside',\r\n        'insideTop',\r\n        'insideLeft',\r\n        'insideRight',\r\n        'insideBottom',\r\n        'insideTopLeft',\r\n        'insideTopRight',\r\n        'insideBottomLeft',\r\n        'insideBottomRight'\r\n      ];\r\n      app.configParameters = {\r\n        rotate: {\r\n          min: -90,\r\n          max: 90\r\n        },\r\n        align: {\r\n          options: {\r\n            left: 'left',\r\n            center: 'center',\r\n            right: 'right'\r\n          }\r\n        },\r\n        verticalAlign: {\r\n          options: {\r\n            top: 'top',\r\n            middle: 'middle',\r\n            bottom: 'bottom'\r\n          }\r\n        },\r\n        position: {\r\n          options: posList.reduce(function (map, pos) {\r\n            map[pos] = pos;\r\n            return map;\r\n          }, {})\r\n        },\r\n        distance: {\r\n          min: 0,\r\n          max: 100\r\n        }\r\n      };\r\n      app.config = {\r\n        rotate: 90,\r\n        align: 'left',\r\n        verticalAlign: 'middle',\r\n        position: 'insideBottom',\r\n        distance: 15,\r\n        onChange: function () {\r\n          const labelOption = {\r\n            rotate: app.config.rotate,\r\n            align: app.config.align,\r\n            verticalAlign: app.config.verticalAlign,\r\n            position: app.config.position,\r\n            distance: app.config.distance\r\n          };\r\n          myChart.setOption({\r\n            series: [\r\n              {\r\n                label: labelOption\r\n              },\r\n              {\r\n                label: labelOption\r\n              },\r\n              {\r\n                label: labelOption\r\n              },\r\n              {\r\n                label: labelOption\r\n              }\r\n            ]\r\n          });\r\n        }\r\n      };\r\n      const labelOption = {\r\n        show: false,\r\n        position: app.config.position,\r\n        distance: app.config.distance,\r\n        align: app.config.align,\r\n        verticalAlign: app.config.verticalAlign,\r\n        rotate: app.config.rotate,\r\n        formatter: '{c}  {name|{a}}',\r\n        fontSize: 14,\r\n        rich: {\r\n          name: {}\r\n        }\r\n      };\r\n      option = {\r\n        tooltip: {\r\n          trigger: 'axis',\r\n          axisPointer: {\r\n            type: 'shadow'\r\n          }\r\n        },\r\n        legend: {\r\n          data: ['正常', '一级预警', '二级预警', '三级预警'],\r\n          textStyle: {\r\n            fontSize: 14,\r\n            color: \"white\"\r\n          }\r\n        },\r\n        toolbox: {\r\n          show: true,\r\n          orient: 'vertical',\r\n          left: 'right',\r\n          top: 'center',\r\n          // feature: {\r\n          //   mark: { show: true },\r\n          //   dataView: { show: true, readOnly: false },\r\n          //   magicType: { show: true, type: ['line', 'bar', 'stack'] },\r\n          //   restore: { show: true },\r\n          //   saveAsImage: { show: true }\r\n          // }\r\n        },\r\n        xAxis: [\r\n          {\r\n            type: 'category',\r\n            axisTick: { show: false },\r\n            data: ['小区'],\r\n            axisLabel: {\r\n              show: true,\r\n              textStyle: {\r\n                color: 'white',\r\n                fontSize: 20\r\n              }\r\n            }\r\n          }\r\n        ],\r\n        yAxis: [\r\n          {\r\n            type: 'value'\r\n          }\r\n        ],\r\n        series: [\r\n          {\r\n            name: '正常',\r\n            type: 'bar',\r\n            barGap: 0,\r\n            label: labelOption,\r\n            emphasis: {\r\n              focus: 'series'\r\n            },\r\n\r\n            data: [320]\r\n          },\r\n          {\r\n            name: '一级预警',\r\n            type: 'bar',\r\n            label: labelOption,\r\n            emphasis: {\r\n              focus: 'series'\r\n            },\r\n            data: [120]\r\n          },\r\n          {\r\n            name: '二级预警',\r\n            type: 'bar',\r\n            label: labelOption,\r\n            emphasis: {\r\n              focus: 'series'\r\n            },\r\n            data: [62]\r\n          },\r\n          {\r\n            name: '三级预警',\r\n            type: 'bar',\r\n            label: labelOption,\r\n            emphasis: {\r\n              focus: 'series'\r\n            },\r\n            data: [258]\r\n          }\r\n        ]\r\n      };\r\n\r\n      option && myChart.setOption(option);\r\n    },\r\n  },\r\n}\r\n</script>\r\n\r\n<style lang=\"scss\" scoped>\r\n.center_bottom {\r\n  padding-top: 22px;\r\n  width: 100%;\r\n  height: 350px;\r\n\r\n  .echarts_bottom {\r\n    width: 100%;\r\n    height: 100%;\r\n  }\r\n}\r\n</style>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/views/city/Four.vue b/frontend/src/views/city/Four.vue
+--- a/frontend/src/views/city/Four.vue	(revision 99e30852e80eb203bfc10716051edc368135c9c9)
++++ b/frontend/src/views/city/Four.vue	(date 1731664879817)
+@@ -1,20 +1,15 @@
+ <template>
+   <div id="four">
+     <div class="center_bottom" id="center_bottom" ref="centerBottom">
+-      <!--    <Echart-->
+-      <!--      :options="options"-->
+-      <!--      id="bottomLeftChart"-->
+-      <!--      class="echarts_bottom"-->
+-      <!--    ></Echart>-->
+     </div>
+   </div>
+ </template>
+ 
+ <script>
+-import {mylog} from "@/utils";
+-import { currentGET } from "api";
+-import { graphic } from "echarts";
++
+ import * as echarts from 'echarts/core';
++import axios from "axios";
++import { baseUrl } from "@/api/api";
+ import {
+   ToolboxComponent,
+   TooltipComponent,
+@@ -25,17 +20,49 @@
+ import { CanvasRenderer } from 'echarts/renderers';
+ export default {
+   name: "Four",
++  props: {
++    communityName: {
++      type: String,
++      required: true,
++    },
++  },
+   data() {
+     return {
+       options: {},
+     };
+   },
+-  props: {},
+   mounted() {
+     this.getData();
+   },
+   methods: {
+     getData() {
++      axios
++          .get(`${baseUrl}/city/getHealthDataByCommunity`, {
++            params: { communityName: this.communityName },
++          })
++          .then((res) => {
++            if (res.code === "200") {
++              const data = res.data;
++
++              // 将接口数据映射为图表需要的格式
++              const chartData = {
++                normal: data.normal || 0,
++                warn_level1: data.warn_level1 || 0,
++                warn_level2: data.warn_level2 || 0,
++                warn_level3: data.warn_level3 || 0,
++              };
++
++              // 调用 init 方法初始化图表
++              this.init(chartData);
++            } else {
++              console.error("数据获取失败:", res.msg);
++            }
++          })
++          .catch((error) => {
++            console.error("API Error:", error);
++          });
++    },
++    init(chartData) {
+       echarts.use([
+         ToolboxComponent,
+         TooltipComponent,
+@@ -44,103 +71,25 @@
+         BarChart,
+         CanvasRenderer
+       ]);
+-      let app = {};
+ 
+       let chartDom = this.$refs.centerBottom;
+       let myChart = echarts.init(chartDom);
+-      let option;
+ 
+-      const posList = [
+-        'left',
+-        'right',
+-        'top',
+-        'bottom',
+-        'inside',
+-        'insideTop',
+-        'insideLeft',
+-        'insideRight',
+-        'insideBottom',
+-        'insideTopLeft',
+-        'insideTopRight',
+-        'insideBottomLeft',
+-        'insideBottomRight'
+-      ];
+-      app.configParameters = {
+-        rotate: {
+-          min: -90,
+-          max: 90
+-        },
+-        align: {
+-          options: {
+-            left: 'left',
+-            center: 'center',
+-            right: 'right'
+-          }
+-        },
+-        verticalAlign: {
+-          options: {
+-            top: 'top',
+-            middle: 'middle',
+-            bottom: 'bottom'
+-          }
+-        },
+-        position: {
+-          options: posList.reduce(function (map, pos) {
+-            map[pos] = pos;
+-            return map;
+-          }, {})
+-        },
+-        distance: {
+-          min: 0,
+-          max: 100
+-        }
+-      };
+-      app.config = {
+-        rotate: 90,
+-        align: 'left',
+-        verticalAlign: 'middle',
+-        position: 'insideBottom',
+-        distance: 15,
+-        onChange: function () {
+-          const labelOption = {
+-            rotate: app.config.rotate,
+-            align: app.config.align,
+-            verticalAlign: app.config.verticalAlign,
+-            position: app.config.position,
+-            distance: app.config.distance
+-          };
+-          myChart.setOption({
+-            series: [
+-              {
+-                label: labelOption
+-              },
+-              {
+-                label: labelOption
+-              },
+-              {
+-                label: labelOption
+-              },
+-              {
+-                label: labelOption
+-              }
+-            ]
+-          });
+-        }
+-      };
+       const labelOption = {
+         show: false,
+-        position: app.config.position,
+-        distance: app.config.distance,
+-        align: app.config.align,
+-        verticalAlign: app.config.verticalAlign,
+-        rotate: app.config.rotate,
++        position: 'insideBottom',
++        distance: 15,
++        align: 'left',
++        verticalAlign: 'middle',
++        rotate: 90,
+         formatter: '{c}  {name|{a}}',
+         fontSize: 14,
+         rich: {
+           name: {}
+         }
+       };
+-      option = {
++
++      const option = {
+         tooltip: {
+           trigger: 'axis',
+           axisPointer: {
+@@ -159,13 +108,6 @@
+           orient: 'vertical',
+           left: 'right',
+           top: 'center',
+-          // feature: {
+-          //   mark: { show: true },
+-          //   dataView: { show: true, readOnly: false },
+-          //   magicType: { show: true, type: ['line', 'bar', 'stack'] },
+-          //   restore: { show: true },
+-          //   saveAsImage: { show: true }
+-          // }
+         },
+         xAxis: [
+           {
+@@ -195,8 +137,7 @@
+             emphasis: {
+               focus: 'series'
+             },
+-
+-            data: [320]
++            data: [chartData.normal]
+           },
+           {
+             name: '一级预警',
+@@ -205,7 +146,7 @@
+             emphasis: {
+               focus: 'series'
+             },
+-            data: [120]
++            data: [chartData.warn_level1]
+           },
+           {
+             name: '二级预警',
+@@ -214,7 +155,7 @@
+             emphasis: {
+               focus: 'series'
+             },
+-            data: [62]
++            data: [chartData.warn_level2]
+           },
+           {
+             name: '三级预警',
+@@ -223,13 +164,13 @@
+             emphasis: {
+               focus: 'series'
+             },
+-            data: [258]
++            data: [chartData.warn_level3]
+           }
+         ]
+       };
+ 
+       option && myChart.setOption(option);
+-    },
++    }
+   },
+ }
+ </script>
+Index: frontend/src/views/city/One.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><template>\r\n  <div id=\"one\">\r\n    <ul class=\"user_Overview flex\" v-if=\"pageflag\">\r\n      <li class=\"user_Overview-item\" style=\"color: #00fdfa\">\r\n        <div class=\"user_Overview_nums allnum \">\r\n          <dv-digital-flop :config=\"config\" style=\"width:100%;height:100%;\" />\r\n        </div>\r\n        <p>小区人数</p>\r\n      </li>\r\n      <li class=\"user_Overview-item\" style=\"color: #07f7a8\">\r\n        <div class=\"user_Overview_nums online\">\r\n          <dv-digital-flop :config=\"onlineconfig\" style=\"width:100%;height:100%;\" />\r\n        </div>\r\n        <p>总户数</p>\r\n      </li>\r\n<!--      <li class=\"user_Overview-item\" style=\"color: #e3b337\">-->\r\n<!--        <div class=\"user_Overview_nums offline\">-->\r\n<!--          <dv-digital-flop :config=\"offlineconfig\" style=\"width:100%;height:100%;\" />-->\r\n\r\n<!--        </div>-->\r\n<!--        <p>男女比例</p>-->\r\n<!--      </li>-->\r\n      <!--        <li class=\"user_Overview-item\" style=\"color: #f5023d\">-->\r\n      <!--            <div class=\"user_Overview_nums laramnum\">-->\r\n      <!--                <dv-digital-flop :config=\"laramnumconfig\" style=\"width:100%;height:100%;\" />-->\r\n      <!--            </div>-->\r\n      <!--            <p>告警次数</p>-->\r\n      <!--        </li>-->\r\n    </ul>\r\n    <Reacquire v-else @onclick=\"getData\" line-height=\"200px\">\r\n      重新获取\r\n    </Reacquire>\r\n  </div>\r\n</template>\r\n\r\n<script>\r\nimport {currentGET} from \"@/api\";\r\nlet style = {\r\n  fontSize: 24\r\n}\r\nexport default {\r\n  name: \"One\",\r\n  data() {\r\n    return {\r\n      options: {},\r\n      userOverview: {\r\n        alarmNum: 0,\r\n        offlineNum: 0,\r\n        onlineNum: 0,\r\n        totalNum: 0,\r\n      },\r\n      pageflag: true,\r\n      timer: null,\r\n      // 男生数\r\n      config: {\r\n        number: [(4579072+6467170+6615501)/10000],\r\n        content: '{nt}',\r\n        style: {\r\n          ...style,\r\n          // stroke: \"#00fdfa\",\r\n          fill: \"#00fdfa\",\r\n        },\r\n      },\r\n      onlineconfig: {\r\n        number: [(4504718+6133404+6337406)/10000],\r\n        content: '{nt}',\r\n        style: {\r\n          ...style,\r\n          // stroke: \"#07f7a8\",\r\n          fill: \"#07f7a8\",\r\n        },\r\n      },\r\n      offlineconfig: {\r\n        number: [1],\r\n        content: '{nt}',\r\n        style: {\r\n          ...style,\r\n          // stroke: \"#e3b337\",\r\n          fill: \"#e3b337\",\r\n        },\r\n      },\r\n      laramnumconfig: {\r\n        number: [0],\r\n        content: '{nt}',\r\n        style: {\r\n          ...style,\r\n          // stroke: \"#f5023d\",\r\n          fill: \"#f5023d\",\r\n        },\r\n      }\r\n\r\n    };\r\n  },\r\n  filters: {\r\n    numsFilter(msg) {\r\n      return msg || 0;\r\n    },\r\n  },\r\n  created() {\r\n    this.getData()\r\n  },\r\n  mounted() {\r\n  },\r\n  beforeDestroy() {\r\n    this.clearData()\r\n\r\n  },\r\n  methods: {\r\n    clearData() {\r\n      if (this.timer) {\r\n        clearInterval(this.timer)\r\n        this.timer = null\r\n      }\r\n    },\r\n    getData() {\r\n      this.pageflag = true;\r\n      currentGET(\"big2\").then((res) => {\r\n        if (!this.timer) {\r\n          console.log(\"设备总览\", res);\r\n        }\r\n        if (res.success) {\r\n          // this.userOverview = res.data;\r\n          // this.onlineconfig = {\r\n          //     ...this.onlineconfig,\r\n          //     number: [res.data.onlineNum]\r\n          // }\r\n          // this.config = {\r\n          //     ...this.config,\r\n          //     number: [res.data.totalNum]\r\n          // }\r\n          // this.offlineconfig = {\r\n          //     ...this.offlineconfig,\r\n          //     number: [res.data.offlineNum]\r\n          // }\r\n          // this.laramnumconfig = {\r\n          //     ...this.laramnumconfig,\r\n          //     number: [res.data.alarmNum]\r\n          // }\r\n          this.switper()\r\n        } else {\r\n          this.pageflag = false;\r\n          this.$Message.warning(res.msg);\r\n        }\r\n      });\r\n    },\r\n    //轮询\r\n    switper() {\r\n      if (this.timer) {\r\n        return\r\n      }\r\n      let looper = (a) => {\r\n        this.getData()\r\n      };\r\n      this.timer = setInterval(looper, this.$store.state.setting.echartsAutoTime);\r\n    },\r\n  },\r\n}\r\n</script>\r\n\r\n<style lang=\"scss\" scoped>\r\n.user_Overview {\r\n  position: relative;\r\n  li {\r\n    flex: 1;\r\n\r\n    p {\r\n      text-align: center;\r\n      height: 16px;\r\n      font-size: 16px;\r\n    }\r\n\r\n    .user_Overview_nums {\r\n      width: 100px;\r\n      height: 100px;\r\n      text-align: center;\r\n      line-height: 100px;\r\n      font-size: 22px;\r\n      margin: 50px auto 30px;\r\n      background-size: cover;\r\n      background-position: center center;\r\n      position: relative;\r\n\r\n      &::before {\r\n        content: '';\r\n        position: absolute;\r\n        width: 100%;\r\n        height: 100%;\r\n        top: 0;\r\n        left: 0;\r\n      }\r\n\r\n      &.bgdonghua::before {\r\n        animation: rotating 14s linear infinite;\r\n      }\r\n    }\r\n\r\n    .allnum {\r\n\r\n      // background-image: url(\"../../assets/img/left_top_lan.png\");\r\n      &::before {\r\n        background-image: url(\"../../assets/img/left_top_lan.png\");\r\n\r\n      }\r\n    }\r\n\r\n    .online {\r\n      &::before {\r\n        background-image: url(\"../../assets/img/left_top_lv.png\");\r\n\r\n      }\r\n    }\r\n\r\n    .offline {\r\n      &::before {\r\n        background-image: url(\"../../assets/img/left_top_huang.png\");\r\n\r\n      }\r\n    }\r\n\r\n    .laramnum {\r\n      &::before {\r\n        background-image: url(\"../../assets/img/left_top_hong.png\");\r\n\r\n      }\r\n    }\r\n  }\r\n}\r\n.user_Overview li {\r\n  margin-top: 50px;\r\n}\r\n</style>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/views/city/One.vue b/frontend/src/views/city/One.vue
+--- a/frontend/src/views/city/One.vue	(revision 99e30852e80eb203bfc10716051edc368135c9c9)
++++ b/frontend/src/views/city/One.vue	(date 1731664879821)
+@@ -13,19 +13,7 @@
+         </div>
+         <p>总户数</p>
+       </li>
+-<!--      <li class="user_Overview-item" style="color: #e3b337">-->
+-<!--        <div class="user_Overview_nums offline">-->
+-<!--          <dv-digital-flop :config="offlineconfig" style="width:100%;height:100%;" />-->
+ 
+-<!--        </div>-->
+-<!--        <p>男女比例</p>-->
+-<!--      </li>-->
+-      <!--        <li class="user_Overview-item" style="color: #f5023d">-->
+-      <!--            <div class="user_Overview_nums laramnum">-->
+-      <!--                <dv-digital-flop :config="laramnumconfig" style="width:100%;height:100%;" />-->
+-      <!--            </div>-->
+-      <!--            <p>告警次数</p>-->
+-      <!--        </li>-->
+     </ul>
+     <Reacquire v-else @onclick="getData" line-height="200px">
+       重新获取
+@@ -34,26 +22,27 @@
+ </template>
+ 
+ <script>
+-import {currentGET} from "@/api";
++
++import axios from "axios";
++import { baseUrl } from "@/api/api";
+ let style = {
+   fontSize: 24
+ }
+ export default {
+   name: "One",
++  props: {
++    communityName: {
++      type: String,
++      required: true,
++    },
++  },
+   data() {
+     return {
+       options: {},
+-      userOverview: {
+-        alarmNum: 0,
+-        offlineNum: 0,
+-        onlineNum: 0,
+-        totalNum: 0,
+-      },
+       pageflag: true,
+       timer: null,
+-      // 男生数
+       config: {
+-        number: [(4579072+6467170+6615501)/10000],
++        number: [],
+         content: '{nt}',
+         style: {
+           ...style,
+@@ -62,7 +51,7 @@
+         },
+       },
+       onlineconfig: {
+-        number: [(4504718+6133404+6337406)/10000],
++        number: [0],
+         content: '{nt}',
+         style: {
+           ...style,
+@@ -70,25 +59,6 @@
+           fill: "#07f7a8",
+         },
+       },
+-      offlineconfig: {
+-        number: [1],
+-        content: '{nt}',
+-        style: {
+-          ...style,
+-          // stroke: "#e3b337",
+-          fill: "#e3b337",
+-        },
+-      },
+-      laramnumconfig: {
+-        number: [0],
+-        content: '{nt}',
+-        style: {
+-          ...style,
+-          // stroke: "#f5023d",
+-          fill: "#f5023d",
+-        },
+-      }
+-
+     };
+   },
+   filters: {
+@@ -113,46 +83,19 @@
+       }
+     },
+     getData() {
+-      this.pageflag = true;
+-      currentGET("big2").then((res) => {
+-        if (!this.timer) {
+-          console.log("设备总览", res);
+-        }
+-        if (res.success) {
+-          // this.userOverview = res.data;
+-          // this.onlineconfig = {
+-          //     ...this.onlineconfig,
+-          //     number: [res.data.onlineNum]
+-          // }
+-          // this.config = {
+-          //     ...this.config,
+-          //     number: [res.data.totalNum]
+-          // }
+-          // this.offlineconfig = {
+-          //     ...this.offlineconfig,
+-          //     number: [res.data.offlineNum]
+-          // }
+-          // this.laramnumconfig = {
+-          //     ...this.laramnumconfig,
+-          //     number: [res.data.alarmNum]
+-          // }
+-          this.switper()
+-        } else {
+-          this.pageflag = false;
+-          this.$Message.warning(res.msg);
+-        }
+-      });
++        axios.get(`${baseUrl}/city/getHealthDataByCommunity`, {
++          params: { communityName: this.communityName }
++        }).then(res => {
++          if (res.code === "200") {
++            this.config = { ...this.config, number: [Number(res.data.family_num)] };
++            this.onlineconfig = { ...this.onlineconfig, number: [Number(res.data.total)] };
++          } else {
++            this.pageflag = false;
++            this.$Message.warning(res.msg);
++          }
++        })
+     },
+-    //轮询
+-    switper() {
+-      if (this.timer) {
+-        return
+-      }
+-      let looper = (a) => {
+-        this.getData()
+-      };
+-      this.timer = setInterval(looper, this.$store.state.setting.echartsAutoTime);
+-    },
++
+   },
+ }
+ </script>
+Index: frontend/src/views/indexs/right-center.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><!--\r\n * @Author: daidai\r\n * @Date: 2022-03-01 15:51:43\r\n * @LastEditors: Please set LastEditors\r\n * @LastEditTime: 2022-09-29 15:12:46\r\n * @FilePath: \\web-pc\\src\\pages\\big-screen\\view\\indexs\\right-bottom.vue\r\n-->\r\n<template>\r\n  <div class=\"right_ottom\" ref=\"rightBottom\">\r\n<!--    <dv-capsule-chart :config=\"config\" style=\"width:100%;height:260px\" />-->\r\n  </div>\r\n</template>\r\n\r\n<script>\r\nimport { currentGET } from 'api/modules'\r\nimport {mylog} from \"@/utils\";\r\nimport * as echarts from 'echarts';\r\nexport default {\r\n  props: {\r\n    province: {\r\n      type: String,\r\n      default: '',\r\n    }\r\n  },\r\n  name: \"rightCenter\",\r\n  data() {\r\n    return {\r\n      gatewayno: '',\r\n      config: {\r\n        showValue: true,\r\n        unit: \"人\",\r\n        data: []\r\n      },\r\n      dataItem: [\r\n        { value: 1048, name: '30岁以下' },\r\n        { value: 735, name: '30~40岁' },\r\n        { value: 580, name: '40~50岁' },\r\n        { value: 484, name: '50~60岁' },\r\n        { value: 300, name: '60~70岁' },\r\n        { value: 300, name: '70岁以上' }\r\n      ]\r\n    };\r\n  },\r\n  computed: {\r\n  },\r\n  mounted() {\r\n    this.getData();\r\n  },\r\n  watch: {\r\n    province(newVal, oldVal) {\r\n      this.province = newVal;\r\n      if (newVal.indexOf(\"省\") >= 0) {\r\n\r\n        this.dataItem = [\r\n          { value: 234, name: '30岁以下' },\r\n          { value: 111, name: '30~40岁' },\r\n          { value: 342, name: '40~50岁' },\r\n          { value: 212, name: '50~60岁' },\r\n          { value: 321, name: '60~70岁' },\r\n          { value: 654, name: '70岁以上' }\r\n        ]\r\n        this.getData();\r\n      }else {\r\n        this.dataItem = [\r\n          { value: 1048, name: '30岁以下' },\r\n          { value: 735, name: '30~40岁' },\r\n          { value: 580, name: '40~50岁' },\r\n          { value: 484, name: '50~60岁' },\r\n          { value: 300, name: '60~70岁' },\r\n          { value: 300, name: '70岁以上' }\r\n        ]\r\n        this.getData();\r\n      }\r\n    }\r\n  },\r\n  methods: {\r\n    getData() {\r\n      let app = {};\r\n\r\n      let chartDom = this.$refs.rightBottom;\r\n      let myChart = echarts.init(chartDom);\r\n      let option;\r\n\r\n      option = {\r\n\r\n        tooltip: {\r\n          trigger: 'item',\r\n        },\r\n        legend: {\r\n          orient: 'vertical',\r\n          left: 'left',\r\n          textStyle: {\r\n            fontSize: 12,\r\n            color: \"white\"\r\n          }\r\n        },\r\n\r\n        series: [\r\n          {\r\n            name: '年龄',\r\n            type: 'pie',\r\n            radius: '50%',\r\n            data: this.dataItem,\r\n            label: {\r\n              color: 'white',\r\n              fontSize: 14\r\n            },\r\n            emphasis: {\r\n              itemStyle: {\r\n                shadowBlur: 10,\r\n                shadowOffsetX: 0,\r\n                shadowColor: 'rgba(255,255,255,0.5)',\r\n              }\r\n            },\r\n          }\r\n        ]\r\n      };\r\n\r\n      option && myChart.setOption(option);\r\n\r\n    }\r\n  },\r\n};\r\n</script>\r\n<style lang='scss' scoped>\r\n.right_ottom {\r\n  height: 500px;\r\n}\r\n\r\n</style>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/views/indexs/right-center.vue b/frontend/src/views/indexs/right-center.vue
+--- a/frontend/src/views/indexs/right-center.vue	(revision 99e30852e80eb203bfc10716051edc368135c9c9)
++++ b/frontend/src/views/indexs/right-center.vue	(date 1731664879826)
+@@ -1,19 +1,13 @@
+-<!--
+- * @Author: daidai
+- * @Date: 2022-03-01 15:51:43
+- * @LastEditors: Please set LastEditors
+- * @LastEditTime: 2022-09-29 15:12:46
+- * @FilePath: \web-pc\src\pages\big-screen\view\indexs\right-bottom.vue
+--->
++
+ <template>
+   <div class="right_ottom" ref="rightBottom">
+-<!--    <dv-capsule-chart :config="config" style="width:100%;height:260px" />-->
++
+   </div>
+ </template>
+ 
+ <script>
+-import { currentGET } from 'api/modules'
+-import {mylog} from "@/utils";
++import axios from 'axios';  // 导入 axios 用于请求后端接口
++import { baseUrl } from "@/api/api";
+ import * as echarts from 'echarts';
+ export default {
+   props: {
+@@ -31,49 +25,91 @@
+         unit: "人",
+         data: []
+       },
+-      dataItem: [
+-        { value: 1048, name: '30岁以下' },
+-        { value: 735, name: '30~40岁' },
+-        { value: 580, name: '40~50岁' },
+-        { value: 484, name: '50~60岁' },
+-        { value: 300, name: '60~70岁' },
+-        { value: 300, name: '70岁以上' }
+-      ]
++      dataItem: []
+     };
+   },
+   computed: {
+   },
+   mounted() {
+-    this.getData();
++    this.fetchData();  // 初次加载时根据 province 获取数据
+   },
+   watch: {
+-    province(newVal, oldVal) {
+-      this.province = newVal;
+-      if (newVal.indexOf("省") >= 0) {
+-
+-        this.dataItem = [
+-          { value: 234, name: '30岁以下' },
+-          { value: 111, name: '30~40岁' },
+-          { value: 342, name: '40~50岁' },
+-          { value: 212, name: '50~60岁' },
+-          { value: 321, name: '60~70岁' },
+-          { value: 654, name: '70岁以上' }
+-        ]
+-        this.getData();
+-      }else {
+-        this.dataItem = [
+-          { value: 1048, name: '30岁以下' },
+-          { value: 735, name: '30~40岁' },
+-          { value: 580, name: '40~50岁' },
+-          { value: 484, name: '50~60岁' },
+-          { value: 300, name: '60~70岁' },
+-          { value: 300, name: '70岁以上' }
+-        ]
+-        this.getData();
+-      }
+-    }
+-  },
+-  methods: {
++    // 监听 province 属性的变化并根据新值获取相应的数据
++    province(newVal) {
++      this.fetchData();
++    }
++  },
++  methods: {
++    fetchData() {
++      if (!this.province || this.province === "中国") {
++        this.fetchNationalData();
++      } else {
++        this.fetchProvinceData(this.province);
++      }
++    },
++    // 获取全国数据并更新 dataItem
++    fetchNationalData() {
++      axios.get(`${baseUrl}/city/getHealthStatus`)
++          .then(response => {
++            if (response.code === "200") {
++              const data = response.data;
++              this.updateDataItem(data);  // 更新 dataItem
++            } else {
++              console.warn("Failed to fetch national data:", response.msg);
++            }
++          })
++          .catch(error => {
++            console.error("Error fetching national data:", error);
++          });
++    },
++
++    // 获取指定省份的数据并更新 dataItem
++    fetchProvinceData(provinceName) {
++      axios.get(`${baseUrl}/city/getHealthStatusByCity`, {
++        params: { cityName: provinceName }
++      })
++          .then(response => {
++            if (response.code === "200") {
++              const data = response.data;  // 数据已是数组格式
++              this.updateDataItem(data);  // 更新 dataItem
++            } else {
++              console.warn("Failed to fetch province data:", response.msg);
++            }
++          })
++          .catch(error => {
++            console.error("Error fetching province data:", error);
++          });
++    },
++
++    // 更新 dataItem 的数据
++    updateDataItem(data) {
++      const ageGroups = {
++        '30岁以下': 0,
++        '30~40岁': 0,
++        '40~50岁': 0,
++        '50~60岁': 0,
++        '60~70岁': 0,
++        '70岁以上': 0,
++      };
++
++      data.forEach(item => {
++        ageGroups['30岁以下'] += item.age_30 || 0;
++        ageGroups['30~40岁'] += item.age_30_40 || 0;
++        ageGroups['40~50岁'] += item.age_40_50 || 0;
++        ageGroups['50~60岁'] += item.age_50_60 || 0;
++        ageGroups['60~70岁'] += item.age_60_70 || 0;
++        ageGroups['70岁以上'] += item.age_70 || 0;
++      });
++
++      // 将数据格式更新为饼图所需的格式
++      this.dataItem = Object.keys(ageGroups).map(key => ({
++        value: ageGroups[key],
++        name: key
++      }));
++
++      // 调用 getData 方法进行渲染
++      this.getData();
++    },
+     getData() {
+       let app = {};
+ 
+Index: frontend/src/views/indexs/index.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><!--\r\n * @Author: daidai\r\n * @Date: 2022-03-04 09:23:59\r\n * @LastEditors: Please set LastEditors\r\n * @LastEditTime: 2022-05-07 11:05:02\r\n * @FilePath: \\web-pc\\src\\pages\\big-screen\\view\\indexs\\index.vue\r\n-->\r\n<template>\r\n  <div class=\"contents\">\r\n    <div class=\"contetn_left\">\r\n      <div class=\"pagetab\">\r\n        <!-- <div class=\"item\">实时监测</div> -->\r\n\r\n      </div>\r\n\r\n      <ItemWrap\r\n          class=\"contetn_left-center contetn_lr-item\"\r\n          title=\"市人数(单位万)\"\r\n          style=\"height: 460px\"\r\n      >\r\n        <LeftCenter :province=\"province\"/>\r\n      </ItemWrap>\r\n      <ItemWrap\r\n        class=\"contetn_left-bottom contetn_lr-item\"\r\n        title=\"男女比例(单位万)\"\r\n        style=\"padding: 0 10px 16px 10px; height: 500px;\"\r\n      >\r\n        <LeftTop :province=\"province\"/>\r\n      </ItemWrap>\r\n    </div>\r\n    <div class=\"contetn_center\">\r\n<!--      地图-->\r\n      <CenterMap class=\"contetn_center_top\" @childNeedChangeData=\"childNeedChangeData($event)\"/>\r\n<!--      健康状况-->\r\n      <ItemWrap class=\"contetn_center-bottom\" title=\"健康状况(单位万)\" :province=\"province\">\r\n        <CenterBottom :province=\"province\"/>\r\n      </ItemWrap>\r\n    </div>\r\n\r\n<!--    年龄分布-->\r\n    <div class=\"contetn_right\">\r\n      <ItemWrap\r\n        class=\"contetn_left-bottom contetn_lr-item\"\r\n        title=\"年龄分布(单位万)\"\r\n        style=\"padding: 0 10px 16px 10px; height: 500px;\"\r\n      >\r\n        <RightCenter :province=\"province\"/>\r\n      </ItemWrap>\r\n      <ItemWrap\r\n          class=\"contetn_left-bottom contetn_lr-item\"\r\n          title=\"健康状况\"\r\n          style=\"height: 460px\"\r\n      >\r\n        <RightTop :province=\"province\"/>\r\n      </ItemWrap>\r\n<!--      <ItemWrap-->\r\n<!--        class=\"contetn_left-bottom contetn_lr-item\"-->\r\n<!--        title=\"数据统计图 \"-->\r\n<!--      >-->\r\n<!--        <RightBottom />-->\r\n<!--      </ItemWrap>-->\r\n    </div>\r\n  </div>\r\n</template>\r\n\r\n<script>\r\nimport LeftTop from './left-top.vue'\r\nimport LeftCenter from \"./left-center.vue\";\r\nimport LeftBottom from \"./left-bottom.vue\";\r\nimport CenterMap from \"./center-map.vue\";\r\nimport CenterBottom from \"./center-bottom.vue\";\r\nimport RightTop from \"./right-top.vue\";\r\nimport RightCenter from \"./right-center.vue\";\r\nimport RightBottom from \"./right-bottom.vue\";\r\n\r\nexport default {\r\n  components: {\r\n    LeftTop,\r\n    LeftCenter,\r\n    LeftBottom,\r\n    CenterMap,\r\n    RightTop,\r\n    RightCenter,\r\n    RightBottom,\r\n    CenterBottom,\r\n  },\r\n  data() {\r\n    return {\r\n      province:'',\r\n    };\r\n  },\r\n  filters: {\r\n    numsFilter(msg) {\r\n      return msg || 0;\r\n    },\r\n  },\r\n  created() {\r\n  },\r\n\r\n  mounted() {},\r\n  methods: {\r\n    childNeedChangeData(name) {\r\n      this.province = name;\r\n      console.log(this.province);\r\n    }\r\n  },\r\n};\r\n</script>\r\n<style lang=\"scss\" scoped>\r\n// 内容\r\n.contents {\r\n  .contetn_left,\r\n  .contetn_right {\r\n    width: 540px;\r\n    box-sizing: border-box;\r\n    // padding: 16px 0;\r\n  }\r\n\r\n  .contetn_center {\r\n    width: 720px;\r\n  }\r\n\r\n  //左右两侧 三个块\r\n  .contetn_lr-item {\r\n    height: 310px;\r\n  }\r\n\r\n  .contetn_center_top {\r\n    width: 100%;\r\n  }\r\n\r\n  // 中间\r\n  .contetn_center {\r\n    display: flex;\r\n    flex-direction: column;\r\n    justify-content: space-around;\r\n  }\r\n\r\n  .contetn_center-bottom {\r\n    height: 315px;\r\n  }\r\n\r\n\r\n  //左边 右边 结构一样\r\n  .contetn_left,\r\n  .contetn_right {\r\n    display: flex;\r\n    flex-direction: column;\r\n    justify-content: space-around;\r\n    position: relative;\r\n  }\r\n}\r\n\r\n\r\n\r\n@keyframes rotating {\r\n    0% {\r\n        -webkit-transform: rotate(0) scale(1);\r\n        transform: rotate(0) scale(1);\r\n    }\r\n    50% {\r\n        -webkit-transform: rotate(180deg) scale(1.1);\r\n        transform: rotate(180deg) scale(1.1);\r\n    }\r\n    100% {\r\n        -webkit-transform: rotate(360deg) scale(1);\r\n        transform: rotate(360deg) scale(1);\r\n    }\r\n}\r\n</style>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/views/indexs/index.vue b/frontend/src/views/indexs/index.vue
+--- a/frontend/src/views/indexs/index.vue	(revision 99e30852e80eb203bfc10716051edc368135c9c9)
++++ b/frontend/src/views/indexs/index.vue	(date 1731666907922)
+@@ -1,16 +1,7 @@
+-<!--
+- * @Author: daidai
+- * @Date: 2022-03-04 09:23:59
+- * @LastEditors: Please set LastEditors
+- * @LastEditTime: 2022-05-07 11:05:02
+- * @FilePath: \web-pc\src\pages\big-screen\view\indexs\index.vue
+--->
+ <template>
+   <div class="contents">
+     <div class="contetn_left">
+       <div class="pagetab">
+-        <!-- <div class="item">实时监测</div> -->
+-
+       </div>
+ 
+       <ItemWrap
+@@ -30,7 +21,7 @@
+     </div>
+     <div class="contetn_center">
+ <!--      地图-->
+-      <CenterMap class="contetn_center_top" @childNeedChangeData="childNeedChangeData($event)"/>
++      <CenterMap class="contetn_center_top" @childNeedChangeData="childNeedChangeData($event)" :isEnvironment="isEnvironment"/>
+ <!--      健康状况-->
+       <ItemWrap class="contetn_center-bottom" title="健康状况(单位万)" :province="province">
+         <CenterBottom :province="province"/>
+@@ -53,12 +44,6 @@
+       >
+         <RightTop :province="province"/>
+       </ItemWrap>
+-<!--      <ItemWrap-->
+-<!--        class="contetn_left-bottom contetn_lr-item"-->
+-<!--        title="数据统计图 "-->
+-<!--      >-->
+-<!--        <RightBottom />-->
+-<!--      </ItemWrap>-->
+     </div>
+   </div>
+ </template>
+@@ -87,6 +72,7 @@
+   data() {
+     return {
+       province:'',
++      isEnvironment:true,
+     };
+   },
+   filters: {
+Index: frontend/src/views/indexs/right-top.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><!--\r\n * @Author: daidai\r\n * @Date: 2022-03-01 14:13:04\r\n * @LastEditors: Please set LastEditors\r\n * @LastEditTime: 2022-09-27 15:04:49\r\n * @FilePath: \\web-pc\\src\\pages\\big-screen\\view\\indexs\\right-top.vue\r\n-->\r\n<template>\r\n  <Echart\r\n    id=\"rightTop\"\r\n    :options=\"option\"\r\n    class=\"right_top_inner\"\r\n    v-if=\"pageflag\"\r\n    ref=\"charts\"\r\n  />\r\n  <Reacquire v-else @onclick=\"getData\" style=\"line-height: 200px\">\r\n    重新获取\r\n  </Reacquire>\r\n</template>\r\n\r\n<script>\r\nimport { currentGET } from \"api/modules\";\r\nimport {graphic} from \"echarts\"\r\nimport {mylog} from \"@/utils\";\r\nexport default {\r\n  props: {\r\n    province: {\r\n      type: String,\r\n      default: '',\r\n    }\r\n  },\r\n  data() {\r\n    return {\r\n      option: {},\r\n      pageflag: false,\r\n      timer: null,\r\n      dataItem: {\r\n        title: ['2021-11', '2021-12', '2022-01', '2022-02', '2022-03','2022-04'],\r\n        oneLevel: [270, 49, 670, 123, 684, 747],\r\n        twoLevel: [488, 6, 771, 465, 315, 14],\r\n        threeLevel: [120, 423, 123, 676, 342, 543]\r\n      }\r\n    };\r\n  },\r\n  created() {\r\n\r\n  },\r\n\r\n  mounted() {\r\n     this.getData();\r\n  },\r\n  beforeDestroy() {\r\n    this.clearData();\r\n  },\r\n  watch: {\r\n    province(newVal, oldVal) {\r\n      if (newVal.indexOf(\"省\") >= 0) {\r\n\r\n        this.province = newVal;\r\n        this.dataItem = {\r\n          title: ['2021-11', '2021-12', '2022-01', '2022-02', '2022-03','2022-04'],\r\n          oneLevel: [230, 149, 312, 231, 321, 111],\r\n          twoLevel: [981, 943, 315, 411, 125, 321],\r\n          threeLevel: [231, 413, 323, 376, 442, 43]\r\n        }\r\n        this.getData();\r\n      }else {\r\n        this.dataItem = {\r\n          title: ['2021-11', '2021-12', '2022-01', '2022-02', '2022-03','2022-04'],\r\n              oneLevel: [270, 49, 670, 123, 684, 747],\r\n              twoLevel: [488, 6, 771, 465, 315, 14],\r\n              threeLevel: [120, 423, 123, 676, 342, 543]\r\n        }\r\n        this.getData();\r\n      }\r\n    }\r\n  },\r\n  methods: {\r\n    clearData() {\r\n      if (this.timer) {\r\n        clearInterval(this.timer);\r\n        this.timer = null;\r\n      }\r\n    },\r\n    getData() {\r\n      this.pageflag = true;\r\n      // this.pageflag =false\r\n      currentGET(\"big4\").then((res) => {\r\n        if (!this.timer) {\r\n        }\r\n        if (res.success) {\r\n          const data = res.data;\r\n          mylog(data);\r\n          data[\"numList3\"] = [120, 423, 123, 676, 342, 543];\r\n          this.countUserNumData = res.data;\r\n          this.$nextTick(() => {\r\n            this.init()\r\n              // this.switper();\r\n          });\r\n        } else {\r\n          this.pageflag = false;\r\n          this.$Message({\r\n            text: res.msg,\r\n            type: \"warning\",\r\n          });\r\n        }\r\n      });\r\n    },\r\n    //轮询\r\n    switper() {\r\n      if (this.timer) {\r\n        return;\r\n      }\r\n      let looper = (a) => {\r\n        this.getData();\r\n      };\r\n      this.timer = setInterval(\r\n        looper,\r\n        this.$store.state.setting.echartsAutoTime\r\n      );\r\n      let myChart = this.$refs.charts.chart;\r\n      myChart.on(\"mouseover\", (params) => {\r\n        this.clearData();\r\n      });\r\n      myChart.on(\"mouseout\", (params) => {\r\n        this.timer = setInterval(\r\n          looper,\r\n          this.$store.state.setting.echartsAutoTime\r\n        );\r\n      });\r\n    },\r\n    init() {\r\n      this.option = {\r\n        xAxis: {\r\n          type: \"category\",\r\n          data: this.dataItem.title,\r\n          boundaryGap: false, // 不留白，从原点开始\r\n          splitLine: {\r\n            show: true,\r\n            lineStyle: {\r\n              color: \"rgba(31,99,163,.2)\",\r\n            },\r\n          },\r\n          axisLine: {\r\n            // show:false,\r\n            lineStyle: {\r\n              color: \"rgba(31,99,163,.1)\",\r\n            },\r\n          },\r\n          axisLabel: {\r\n            color: \"#7EB7FD\",\r\n            fontWeight: \"500\",\r\n          },\r\n        },\r\n        yAxis: {\r\n          type: \"value\",\r\n          splitLine: {\r\n            show: true,\r\n            lineStyle: {\r\n              color: \"rgba(31,99,163,.2)\",\r\n            },\r\n          },\r\n          axisLine: {\r\n            lineStyle: {\r\n              color: \"rgba(31,99,163,.1)\",\r\n            },\r\n          },\r\n          axisLabel: {\r\n            color: \"#7EB7FD\",\r\n            fontWeight: \"500\",\r\n          },\r\n        },\r\n        tooltip: {\r\n          trigger: \"axis\",\r\n          backgroundColor: \"rgba(0,0,0,.6)\",\r\n          borderColor: \"rgba(147, 235, 248, .8)\",\r\n          textStyle: {\r\n            color: \"#FFF\",\r\n          },\r\n        },\r\n        grid: {\r\n          //布局\r\n          show: true,\r\n          left: \"10px\",\r\n          right: \"30px\",\r\n          bottom: \"10px\",\r\n          top: \"28px\",\r\n          containLabel: true,\r\n          borderColor: \"#1F63A3\",\r\n        },\r\n        series: [\r\n          {\r\n            data: this.dataItem.oneLevel,\r\n            type: \"line\",\r\n            smooth: true,\r\n            symbol: \"none\", //去除点\r\n            name: \"一级预警数\",\r\n            color: \"rgba(252,144,16,.7)\",\r\n            areaStyle: {\r\n                //右，下，左，上\r\n                color: new graphic.LinearGradient(\r\n                  0,\r\n                  0,\r\n                  0,\r\n                  1,\r\n                  [\r\n                    {\r\n                      offset: 0,\r\n                      color: \"rgba(252,144,16,.7)\",\r\n                    },\r\n                    {\r\n                      offset: 1,\r\n                      color: \"rgba(252,144,16,.0)\",\r\n                    },\r\n                  ],\r\n                  false\r\n                ),\r\n            },\r\n            markPoint: {\r\n              data: [\r\n                {\r\n                  name: \"最大值\",\r\n                  type: \"max\",\r\n                  valueDim: \"y\",\r\n                  symbol: \"rect\",\r\n                  symbolSize: [60, 26],\r\n                  symbolOffset: [0, -20],\r\n                  itemStyle: {\r\n                    color: \"rgba(0,0,0,0)\",\r\n                  },\r\n                  label: {\r\n                    color: \"#FC9010\",\r\n                    backgroundColor: \"rgba(252,144,16,0.1)\",\r\n                    borderRadius: 6,\r\n                    padding: [7, 14],\r\n                    borderWidth: 0.5,\r\n                    borderColor: \"rgba(252,144,16,.5)\",\r\n                    formatter: \"一级预警：{c}\",\r\n                  },\r\n                },\r\n                {\r\n                  name: \"最大值\",\r\n                  type: \"max\",\r\n                  valueDim: \"y\",\r\n                  symbol: \"circle\",\r\n                  symbolSize: 6,\r\n                  itemStyle: {\r\n                    color: \"#FC9010\",\r\n                    shadowColor: \"#FC9010\",\r\n                    shadowBlur: 8,\r\n                  },\r\n                  label: {\r\n                    formatter: \"\",\r\n                  },\r\n                },\r\n              ],\r\n            },\r\n          },\r\n          {\r\n            data: this.dataItem.twoLevel,\r\n            type: \"line\",\r\n            smooth: true,\r\n            symbol: \"none\", //去除点\r\n            name: \"二级预警次数\",\r\n            color: \"rgba(9,202,243,.7)\",\r\n            areaStyle: {\r\n                //右，下，左，上\r\n                color: new graphic.LinearGradient(\r\n                  0,\r\n                  0,\r\n                  0,\r\n                  1,\r\n                  [\r\n                    {\r\n                      offset: 0,\r\n                      color: \"rgba(9,202,243,.7)\",\r\n                    },\r\n                    {\r\n                      offset: 1,\r\n                      color: \"rgba(9,202,243,.0)\",\r\n                    },\r\n                  ],\r\n                  false\r\n                ),\r\n            },\r\n            markPoint: {\r\n              data: [\r\n                {\r\n                  name: \"最大值\",\r\n                  type: \"max\",\r\n                  valueDim: \"y\",\r\n                  symbol: \"rect\",\r\n                  symbolSize: [60, 26],\r\n                  symbolOffset: [0, -20],\r\n                  itemStyle: {\r\n                    color: \"rgba(0,0,0,0)\",\r\n                  },\r\n                  label: {\r\n                    color: \"#09CAF3\",\r\n                    backgroundColor: \"rgba(9,202,243,0.1)\",\r\n\r\n                    borderRadius: 6,\r\n                    borderColor: \"rgba(9,202,243,.5)\",\r\n                    padding: [7, 14],\r\n                    formatter: \"二级预警：{c}\",\r\n                    borderWidth: 0.5,\r\n                  },\r\n                },\r\n                {\r\n                  name: \"最大值\",\r\n                  type: \"max\",\r\n                  valueDim: \"y\",\r\n                  symbol: \"circle\",\r\n                  symbolSize: 6,\r\n                  itemStyle: {\r\n                    color: \"#09CAF3\",\r\n                    shadowColor: \"#09CAF3\",\r\n                    shadowBlur: 8,\r\n                  },\r\n                  label: {\r\n                    formatter: \"\",\r\n                  },\r\n                },\r\n              ],\r\n            },\r\n          },\r\n          {\r\n            data: this.dataItem.threeLevel,\r\n            type: \"line\",\r\n            smooth: true,\r\n            symbol: \"none\", //去除点\r\n            name: \"三级级预警次数\",\r\n            color: \"rgba(212,0,0,0.7)\",\r\n            areaStyle: {\r\n              //右，下，左，上\r\n              color: new graphic.LinearGradient(\r\n                  0,\r\n                  0,\r\n                  0,\r\n                  1,\r\n                  [\r\n                    {\r\n                      offset: 0,\r\n                      color: \"rgba(231,22,22,0.7)\",\r\n                    },\r\n                    {\r\n                      offset: 1,\r\n                      color: \"rgba(9,202,243,.0)\",\r\n                    },\r\n                  ],\r\n                  false\r\n              ),\r\n            },\r\n            markPoint: {\r\n              data: [\r\n                {\r\n                  name: \"最大值\",\r\n                  type: \"max\",\r\n                  valueDim: \"y\",\r\n                  symbol: \"rect\",\r\n                  symbolSize: [60, 26],\r\n                  symbolOffset: [0, -20],\r\n                  itemStyle: {\r\n                    color: \"rgba(0,0,0,0)\",\r\n                  },\r\n                  label: {\r\n                    color: \"#ff276d\",\r\n                    backgroundColor: \"rgba(255,14,14,0.1)\",\r\n\r\n                    borderRadius: 6,\r\n                    borderColor: \"rgba(255,46,46,0.5)\",\r\n                    padding: [7, 14],\r\n                    formatter: \"三级预警：{c}\",\r\n                    borderWidth: 0.5,\r\n                  },\r\n                },\r\n                {\r\n                  name: \"最大值\",\r\n                  type: \"max\",\r\n                  valueDim: \"y\",\r\n                  symbol: \"circle\",\r\n                  symbolSize: 6,\r\n                  itemStyle: {\r\n                    color: \"#ff0000\",\r\n                    shadowColor: \"#ff3434\",\r\n                    shadowBlur: 8,\r\n                  },\r\n                  label: {\r\n                    formatter: \"\",\r\n                  },\r\n                },\r\n              ],\r\n            },\r\n          },\r\n        ],\r\n      };\r\n    },\r\n  },\r\n};\r\n</script>\r\n<style lang='scss' scoped>\r\n.right_top_inner {\r\n  margin-top: -8px;\r\n}\r\n</style>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/views/indexs/right-top.vue b/frontend/src/views/indexs/right-top.vue
+--- a/frontend/src/views/indexs/right-top.vue	(revision 99e30852e80eb203bfc10716051edc368135c9c9)
++++ b/frontend/src/views/indexs/right-top.vue	(date 1731664879830)
+@@ -19,7 +19,8 @@
+ </template>
+ 
+ <script>
+-import { currentGET } from "api/modules";
++import axios from 'axios';  // 导入 axios 用于请求后端接口
++import { baseUrl } from "@/api/api";
+ import {graphic} from "echarts"
+ import {mylog} from "@/utils";
+ export default {
+@@ -47,88 +48,79 @@
+   },
+ 
+   mounted() {
+-     this.getData();
++    this.updateData();
+   },
+   beforeDestroy() {
+     this.clearData();
+   },
+   watch: {
+-    province(newVal, oldVal) {
+-      if (newVal.indexOf("省") >= 0) {
+-
+-        this.province = newVal;
+-        this.dataItem = {
+-          title: ['2021-11', '2021-12', '2022-01', '2022-02', '2022-03','2022-04'],
+-          oneLevel: [230, 149, 312, 231, 321, 111],
+-          twoLevel: [981, 943, 315, 411, 125, 321],
+-          threeLevel: [231, 413, 323, 376, 442, 43]
+-        }
+-        this.getData();
+-      }else {
+-        this.dataItem = {
+-          title: ['2021-11', '2021-12', '2022-01', '2022-02', '2022-03','2022-04'],
+-              oneLevel: [270, 49, 670, 123, 684, 747],
+-              twoLevel: [488, 6, 771, 465, 315, 14],
+-              threeLevel: [120, 423, 123, 676, 342, 543]
+-        }
++    province() {
++      this.updateData();
++    }
++  },
++  methods: {
++    // 根据省份判断调用哪个接口
++    updateData() {
++      if (this.province && this.province !== "中国") {
++        this.getProvinceData();
++      } else {
+         this.getData();
+       }
+-    }
+-  },
+-  methods: {
+-    clearData() {
+-      if (this.timer) {
+-        clearInterval(this.timer);
+-        this.timer = null;
+-      }
+     },
++// 获取全国数据
+     getData() {
+       this.pageflag = true;
+-      // this.pageflag =false
+-      currentGET("big4").then((res) => {
+-        if (!this.timer) {
+-        }
+-        if (res.success) {
+-          const data = res.data;
+-          mylog(data);
+-          data["numList3"] = [120, 423, 123, 676, 342, 543];
+-          this.countUserNumData = res.data;
+-          this.$nextTick(() => {
+-            this.init()
+-              // this.switper();
+-          });
++      axios.get(`${baseUrl}/city/getHealthLevel`).then((response) => {
++        if (response.code === "200") {
++          this.updateDataItem(response.data);
+         } else {
+           this.pageflag = false;
+           this.$Message({
+-            text: res.msg,
++            text: response.msg,
+             type: "warning",
+           });
+         }
++      }).catch((error) => {
++        console.error("Error fetching data:", error);
++        this.pageflag = false;
++      });
++    },
++
++    // 获取省份数据
++    getProvinceData() {
++      this.pageflag = true;
++      axios.get(`${baseUrl}/city/getHealthLevelByCity?cityName=${this.province}`).then((response) => {
++        if (response.code === "200") {
++          this.updateDataItem(response.data);
++        } else {
++          this.pageflag = false;
++          this.$Message({
++            text: response.msg,
++            type: "warning",
++          });
++        }
++      }).catch((error) => {
++        console.error("Error fetching data:", error);
++        this.pageflag = false;
+       });
+     },
+-    //轮询
+-    switper() {
++
++    // 更新图表数据项
++    updateDataItem(data) {
++      this.dataItem.title = data.map(item => item.month);
++      this.dataItem.oneLevel = data.map(item => item.L1_count);
++      this.dataItem.twoLevel = data.map(item => item.L2_count);
++      this.dataItem.threeLevel = data.map(item => item.L3_count);
++
++      this.init(); // 调用图表初始化方法
++    },
++    clearData() {
+       if (this.timer) {
+-        return;
++        clearInterval(this.timer);
++        this.timer = null;
+       }
+-      let looper = (a) => {
+-        this.getData();
+-      };
+-      this.timer = setInterval(
+-        looper,
+-        this.$store.state.setting.echartsAutoTime
+-      );
+-      let myChart = this.$refs.charts.chart;
+-      myChart.on("mouseover", (params) => {
+-        this.clearData();
+-      });
+-      myChart.on("mouseout", (params) => {
+-        this.timer = setInterval(
+-          looper,
+-          this.$store.state.setting.echartsAutoTime
+-        );
+-      });
+     },
++
+     init() {
+       this.option = {
+         xAxis: {
+Index: frontend/src/views/people/index.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><template>\r\n  <div id=\"people\">\r\n    <div class=\"left\">\r\n      <div class=\"peopleInfo\">\r\n        <!-- <div class=\"peopleImg\">\r\n          <img src=\"../../assets/img/people/people.jpg\">\r\n        </div> -->\r\n        <div class=\"info\">\r\n          个人信息:\r\n          <div>姓名：张三</div>\r\n          <div>性别：男</div>\r\n          <div>年龄：84</div>\r\n        </div>\r\n      </div>\r\n      <div class=\"leftbox\" v-for=\"data in leftData\">\r\n\r\n        <div class=\"lefticon\">\r\n          <img :src=\"data.icon\" alt=\"\">\r\n        </div>\r\n\r\n        <div class=\"boxright\">\r\n          <div class=\"lefttitle\">{{ data.title }}</div>\r\n          <div class=\"leftdata\">\r\n            <div class=\"leftdatanumber\">{{ data.currentNumber }}</div>\r\n            <span class=\"numberunit\">{{ data.unit }}</span>\r\n          </div>\r\n          <div class=\"leftprocess\">\r\n            <!-- <el-progress :text-inside=\"false\" :stroke-width=\" 25\" :percentage=\"data.currentNumber\"\r\n                         status=\"success\"></el-progress> -->\r\n            <el-progress :text-inside=\"true\" :stroke-width=\" 25\" :percentage=\"data.currentNumber\"\r\n                         status=\"success\" :show-text=\"false\" color=\"rgb(0, 205, 255)\"></el-progress>\r\n          </div>\r\n        </div>\r\n\r\n      </div>\r\n\r\n    </div>\r\n\r\n    <div class=\"center\">\r\n<!--      <div class=\"center container\" id=\"container\" ref=\"container\"></div>-->\r\n      <div class=\"peopelGl container\" id=\"container\" ref=\"container\">\r\n\r\n      </div>\r\n      <div class=\"centerBottom\">\r\n        <div class=\"centerBottomBox\" v-for=\"d in bottomData\">\r\n          <div class=\"bottomTitle\">{{d.title}}</div>\r\n          <div class=\"bottomContextBox\">\r\n            <div class=\"bottomContext\">{{d.data}}</div>\r\n            <div class=\"bottomunit\">{{d.unit}}</div>\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n\r\n    <div class=\"right\">\r\n      <div class=\"palpitateTitle\">\r\n        <div class=\"titleOne\">节律</div>\r\n        <div class=\"titleTwo\">3</div>\r\n        <div class=\"titleThree\">s</div>\r\n      </div>\r\n      <div id=\"palpitate\" ref=\"totalFlowRate\" style=\"height: 100px\"></div>\r\n      <div class=\"leftbox\" v-for=\"data in rightData\">\r\n\r\n        <div class=\"righticon\">\r\n          <img :src=\"data.icon\" alt=\"\">\r\n        </div>\r\n\r\n        <div class=\"boxright\">\r\n          <div class=\"lefttitle\">{{ data.title }}</div>\r\n          <div class=\"leftdata\" style=\"margin-top: 40px\">\r\n            <div class=\"leftdatanumber\">{{ data.currentNumber }}</div>\r\n            <span class=\"numberunit\">{{ data.unit }}</span>\r\n          </div>\r\n        </div>\r\n\r\n      </div>\r\n    </div>\r\n  </div>\r\n</template>\r\n\r\n<script type=\"module\">\r\nimport * as echarts from \"echarts\";\r\nimport * as THREE from 'three'\r\nimport { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'\r\nimport { STLLoader } from 'three/examples/jsm/loaders/STLLoader'\r\nimport { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'\r\nimport {mylog} from \"@/utils\";\r\nexport default {\r\n  name: \"index\",\r\n  data() {\r\n    return {\r\n      publicPath: process.env.BASE_URL,\r\n      mesh: null,\r\n      camera: null,\r\n      scene: null,\r\n      renderer: null,\r\n      controls: null,\r\n      peopleName: '',\r\n      leftData: [\r\n        {\r\n          icon: require('../../assets/img/people/temperature.jpg'),\r\n          title: '体温',\r\n          currentNumber: 38.5,\r\n          unit: '℃',\r\n          maxMumber: 42\r\n        },\r\n        {\r\n          icon: require('../../assets/img/people/sleep.jpg'),\r\n          title: '睡眠呼吸暂停综合征',\r\n          currentNumber: 20,\r\n          unit: '次/小时',\r\n          maxMumber: 30\r\n        },\r\n        {\r\n          icon: require('../../assets/img/people/temperature.jpg'),\r\n          title: 'BMI',\r\n          currentNumber: 21,\r\n          unit: '',\r\n          maxMumber: 40\r\n        },\r\n        {\r\n          icon: require('../../assets/img/people/Blood sugar.jpg'),\r\n          title: '血糖',\r\n          currentNumber: 25,\r\n          unit: 'mmol/L',\r\n          maxMumber: 40\r\n        },\r\n        {\r\n          icon: require('../../assets/img/people/TC.jpg'),\r\n          title: 'TC',\r\n          currentNumber: 3,\r\n          unit: 'mmol/L',\r\n          maxMumber: 10\r\n        },\r\n      ],\r\n      rightData: [\r\n        {\r\n          icon: require('../../assets/img/people/sphygmus.jpg'),\r\n          title: '脉搏',\r\n          unit: 'bpm',\r\n          currentNumber: 70\r\n        },\r\n        {\r\n          icon: require('../../assets/img/people/Blood oxygen.jpg'),\r\n          title: '血氧',\r\n          unit: '%',\r\n          currentNumber: 90\r\n        },\r\n        {\r\n          icon: require('../../assets/img/people/SBP.jpg'),\r\n          title: '收缩压',\r\n          unit: 'mmHg',\r\n          currentNumber: 90\r\n        },\r\n        {\r\n          icon: require('../../assets/img/people/DBP.jpg'),\r\n          title: '舒张压',\r\n          unit: 'mmHg',\r\n          currentNumber: 120\r\n        },\r\n      ],\r\n      bottomData: [\r\n        {\r\n          title: 'CO₂',\r\n          data: '800',\r\n          unit: 'ppm'\r\n        },\r\n        {\r\n          title: 'TVOC',\r\n          data: '1000',\r\n          unit: 'ug/m³'\r\n        },\r\n        {\r\n          title: '光照',\r\n          data: '500',\r\n          unit: 'lx'\r\n        },\r\n        {\r\n          title: 'PM2.5',\r\n          data: '201',\r\n          unit: 'μg/m³'\r\n        },\r\n        {\r\n          title: '声音',\r\n          data: '60',\r\n          unit: '分贝'\r\n        },\r\n        {\r\n          title: '温度',\r\n          data: '25',\r\n          unit: '°C'\r\n        },\r\n        {\r\n          title: '湿度',\r\n          data: '40',\r\n          unit: '%'\r\n        },\r\n      ],\r\n    }\r\n  },\r\n  created() {\r\n    this.peopleName = this.$route.params.peopleName;\r\n    // this.getGl()\r\n  },\r\n  mounted() {\r\n    document.getElementById(\"search\").style.display = 'none';\r\n    this.getPalpitate();\r\n    this.init();\r\n  },\r\n  methods: {\r\n    init() {\r\n      this.createScene() // 创建场景\r\n      this.loadSTL() // 加载STL模型\r\n      // this.createLight() // 创建光源\r\n      this.createCamera() // 创建相机\r\n      this.createRender() // 创建渲染器\r\n      // this.createControls() // 创建控件对象\r\n      this.render() // 渲染\r\n    },\r\n    createScene() {\r\n      this.scene = new THREE.Scene()\r\n    },\r\n    // 加载STL模型\r\n    loadSTL() {\r\n      const THIS = this\r\n      const loader = new STLLoader()\r\n      loader.load(\r\n        `${THIS.publicPath}models/person.stl`,\r\n        geometry => {\r\n          // 创建材质\r\n          const material = new THREE.PointsMaterial({ \r\n            color: 0x00CCFF,\r\n            size: 3,\r\n            opacity: 1,\r\n            transparent: false,\r\n            blending: THREE.AdditiveBlending,\r\n            depthTest: true,\r\n            map: this.generateSprite()\r\n          });\r\n          this.mesh = new THREE.Points(geometry, material)\r\n          this.mesh.rotation.x = -0.5 * Math.PI\r\n          this.mesh.scale.set(20, 20, 20)\r\n          geometry.center()\r\n          this.scene.add(this.mesh)\r\n        }\r\n      )\r\n    },\r\n\r\n    // 使用canvas生成粒子的纹理\r\n    generateSprite() {\r\n      const canvas = document.createElement('canvas');\r\n      canvas.width = 16;\r\n      canvas.height = 16;\r\n\r\n      const context = canvas.getContext('2d');\r\n      const gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);\r\n      gradient.addColorStop(0, 'rgba(255,255,255,1)');\r\n      gradient.addColorStop(0.2, 'rgba(0,255,255,1)');\r\n      gradient.addColorStop(0.4, 'rgba(0,0,64,1)');\r\n      gradient.addColorStop(1, 'rgba(0,0,0,1)');\r\n\r\n      context.fillStyle = gradient;\r\n      context.fillRect(0, 0, canvas.width, canvas.height);\r\n\r\n      const texture = new THREE.Texture(canvas);\r\n      texture.needsUpdate = true;\r\n      return texture;\r\n    },\r\n\r\n    // 创建光源\r\n    createLight() {\r\n      // 环境光\r\n      const ambientLight = new THREE.AmbientLight(0xffffff, 0.1) // 创建环境光\r\n      this.scene.add(ambientLight) // 将环境光添加到场景\r\n\r\n      const spotLight = new THREE.SpotLight(0xffffff) // 创建聚光灯\r\n      spotLight.position.set(150, 150, 150)\r\n      spotLight.castShadow = true\r\n      this.scene.add(spotLight)\r\n    },\r\n    // 创建相机\r\n    createCamera() {\r\n      const element = document.getElementById('container')\r\n      const width = element.clientWidth // 窗口宽度\r\n      console.log(width)\r\n      const height = element.clientHeight // 窗口高度\r\n      console.log(height)\r\n      const k = width / height // 窗口宽高比\r\n      // PerspectiveCamera( fov, aspect, near, far )\r\n      this.camera = new THREE.PerspectiveCamera(28, k, 0.4, 2000)\r\n      this.camera.position.set(250, 120, 100) // 设置相机位置\r\n      this.camera.lookAt(new THREE.Vector3(10, 10, 0)) // 设置相机方向\r\n      this.scene.add(this.camera)\r\n    },\r\n    // 创建渲染器\r\n    createRender() {\r\n      const element = document.getElementById('container')\r\n      this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })\r\n      this.renderer.setClearAlpha(0.2);\r\n      this.renderer.setSize(element.clientWidth, element.clientHeight) // 设置渲染区域尺寸\r\n      this.renderer.shadowMap.enabled = true // 显示阴影\r\n      this.renderer.shadowMap.type = THREE.PCFSoftShadowMap\r\n      this.renderer.setClearColor(0x3f3f3f, 0) // 设置背景颜色\r\n      element.appendChild(this.renderer.domElement)\r\n    },\r\n    render() {\r\n      if (this.mesh) {\r\n        this.mesh.rotation.z += 0.006\r\n      }\r\n      this.renderer.render(this.scene, this.camera)\r\n      requestAnimationFrame(this.render)\r\n    },\r\n    // 创建控件对象\r\n    createControls() {\r\n      this.controls = new OrbitControls(this.camera, this.renderer.domElement)\r\n    },\r\n\r\n\r\n\r\n\r\n    // 节律\r\n    getPalpitate() {\r\n      var totalFlowRate = echarts.init(this.$refs.totalFlowRate);\r\n      var xAxisData = [];\r\n      var yAxisData = [];\r\n      for (var i = 500; i > 0; i--) {\r\n        xAxisData.push(i + \"秒前\");\r\n      }\r\n      for (i = 1; i < 501; i++) {\r\n        yAxisData.push(null);\r\n      }\r\n      var totalFlowRateOption = {\r\n        animation: false,\r\n        title: {\r\n          show: false,\r\n          text: '节律（s）'/*,\r\n        left:\"110px\"*/\r\n        },\r\n        tooltip: {\r\n          trigger: 'axis',\r\n          axisPointer: {type: 'cross'}\r\n        },\r\n        grid: {\r\n          left: 50/*\"50px\"*/,\r\n          right: 15/*\"15px\"*/\r\n        },\r\n        legend: {\r\n          show: false,\r\n          data: ['当前节律']\r\n        },\r\n        xAxis: {\r\n          boundaryGap: false,\r\n          data: xAxisData,\r\n          show: false\r\n        },\r\n        yAxis: {boundaryGap: false, show: false},\r\n        series: {\r\n          symbol: \"none\",/*去掉小圆点*/\r\n          name: '当前节律',\r\n          type: 'line',\r\n          data: yAxisData,/*,             smooth:true//显示为平滑的曲线*/\r\n          color: \"rgb(0, 205, 255)\"\r\n        }\r\n      };\r\n\r\n      totalFlowRate.setOption(totalFlowRateOption);\r\n\r\n      setInterval(function () {\r\n        yAxisData.push(Math.round(Math.random() * 3000));\r\n        if (yAxisData.length > 500) {\r\n          yAxisData.shift();\r\n        }\r\n        totalFlowRate.setOption(totalFlowRateOption);\r\n      }, 100);\r\n    }\r\n  }\r\n}\r\n</script>\r\n\r\n<style scoped>\r\n#container {\r\n  position: absolute;\r\n  width: 43%;\r\n  height: 60%;\r\n  margin: 0;\r\n  overflow: hidden;\r\n  /* background: url(\"../../assets/img/pageBg.png\") center no-repeat; */\r\n  background-size:cover;\r\n}\r\n.palpitateTitle {\r\n  position: absolute;\r\n  top: 4px;\r\n  left: 10px;\r\n  font-size: 24px;\r\n  text-align: center;\r\n}\r\n\r\n.right {\r\n  position: relative;\r\n  margin-top: 20px;\r\n}\r\n\r\n.rightTitle {\r\n  font-size: 20px;\r\n}\r\n\r\n.righticon img {\r\n  height: 112px;\r\n}\r\n\r\n.righticon {\r\n  height: 112px;\r\n  border: 2px solid  rgb(0, 205, 255);\r\n  border-radius: 50%;\r\n  overflow: hidden;\r\n}\r\n\r\n.leftprocess {\r\n  margin-top: 16px;\r\n}\r\n\r\n.leftdata {\r\n  display: flex;\r\n}\r\n\r\n.numberunit {\r\n  font-size: 26px;\r\n  color: white;\r\n}\r\n\r\n.leftdatanumber {\r\n  font-size: 52px;\r\n  color: white;\r\n}\r\n\r\n.lefttitle {\r\n  font-size: 26px;\r\n}\r\n\r\n.lefticon img {\r\n  height: 112px;\r\n}\r\n\r\n.lefticon {\r\n  height: 112px;\r\n  border: 2px solid rgb(0, 205, 255); \r\n}\r\n\r\n.boxright {\r\n  height: 142px;\r\n  width: 348px;\r\n}\r\n\r\n.leftbox {\r\n  width: 500px;\r\n  height: 168px;\r\n  display: flex;\r\n  justify-content: space-between;\r\n  align-items: center;\r\n}\r\n\r\n#people {\r\n  width: 100%;\r\n  height: 100%;\r\n  display: flex;\r\n  justify-content: space-between;\r\n  align-items: center;\r\n\r\n  /* background: url(\"../../assets/img/people/peopleBg.jpg\") center no-repeat; */\r\n}\r\n\r\n.left, .center, .right {\r\n  height: 80%;\r\n  width: 500px;\r\n}\r\n\r\n.peopleInfo {\r\n  font-size: 24px;\r\n  width: 344px;\r\n  height: 165px;\r\n  position: absolute;\r\n  top: 28px;\r\n  left: 18px;\r\n  display: flex;\r\n  justify-content: space-between;\r\n}\r\n\r\n.peopleImg {\r\n  height: 165px;\r\n  width: 140px;\r\n}\r\n\r\n.peopleImg img {\r\n  height: 165px;\r\n  width: 140px;\r\n\r\n}\r\n\r\n.info {\r\n  height: 165px;\r\n  width: 184px;\r\n  font-size: 26px;\r\n  line-height: 42px;\r\n}\r\n\r\n.center {\r\n  width: 800px;\r\n}\r\n.peopelGl {\r\n  width: 800px;\r\n  height: 722px;\r\n}\r\n.centerBottom {\r\n  position: absolute;\r\n  bottom: 82px;\r\n  width: 800px;\r\n  height: 120px;\r\n  display: flex;\r\n  justify-content: space-between;\r\n}\r\n.centerBottomBox {\r\n  width: 104px;\r\n}\r\n.bottomContextBox {\r\n  border: 2px solid rgb(0, 205, 255);\r\n  height: 86px;\r\n}\r\n.bottomTitle {\r\n  font-size: 22px;\r\n}\r\n.bottomContext {\r\n  font-size: 30px;\r\n  text-align: center;\r\n  color: rgb(0, 205, 255);\r\n  padding-top: 12px;\r\n}\r\n.bottomunit {\r\n  font-size: 22px;\r\n  text-align: center;\r\n  color: rgb(0, 205, 255);\r\n  margin-top: 6px;\r\n}\r\n</style>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/views/people/index.vue b/frontend/src/views/people/index.vue
+--- a/frontend/src/views/people/index.vue	(revision 99e30852e80eb203bfc10716051edc368135c9c9)
++++ b/frontend/src/views/people/index.vue	(date 1731665667881)
+@@ -1,23 +1,20 @@
+ <template>
+   <div id="people">
+-    <div class="left">
+-      <div class="peopleInfo">
+-        <!-- <div class="peopleImg">
+-          <img src="../../assets/img/people/people.jpg">
+-        </div> -->
+-        <div class="info">
++    <div class="left" >
++      <div class="peopleInfo" >
++        <div class="info" >
+           个人信息:
+-          <div>姓名：张三</div>
+-          <div>性别：男</div>
+-          <div>年龄：84</div>
++          <div>姓名：{{ peopleId }}</div>
++          <div>性别：{{ gender }}</div>
++          <div>年龄：{{ age }}</div>
++          <div>身高：{{ height}} </div>
++          <div>体重：{{ weight}} </div>
+         </div>
+       </div>
+-      <div class="leftbox" v-for="data in leftData">
+-
++      <div style="margin-top: 90px"><div class="leftbox" v-for="data in leftData" >
+         <div class="lefticon">
+           <img :src="data.icon" alt="">
+         </div>
+-
+         <div class="boxright">
+           <div class="lefttitle">{{ data.title }}</div>
+           <div class="leftdata">
+@@ -25,19 +22,16 @@
+             <span class="numberunit">{{ data.unit }}</span>
+           </div>
+           <div class="leftprocess">
+-            <!-- <el-progress :text-inside="false" :stroke-width=" 25" :percentage="data.currentNumber"
+-                         status="success"></el-progress> -->
+             <el-progress :text-inside="true" :stroke-width=" 25" :percentage="data.currentNumber"
+                          status="success" :show-text="false" color="rgb(0, 205, 255)"></el-progress>
+           </div>
+         </div>
+ 
+-      </div>
++      </div></div>
+ 
+     </div>
+ 
+     <div class="center">
+-<!--      <div class="center container" id="container" ref="container"></div>-->
+       <div class="peopelGl container" id="container" ref="container">
+ 
+       </div>
+@@ -52,19 +46,15 @@
+       </div>
+     </div>
+ 
+-    <div class="right">
+-      <div class="palpitateTitle">
+-        <div class="titleOne">节律</div>
+-        <div class="titleTwo">3</div>
+-        <div class="titleThree">s</div>
++    <div class="right" >
++      <div style="font-size: 26px;width: 400px;line-height: 40px;margin-bottom: 15px">
++        <div>个人信息测量时间：{{ p_create_time}} </div>
++        <div>环境信息测量时间：{{ e_create_time}} </div>
+       </div>
+-      <div id="palpitate" ref="totalFlowRate" style="height: 100px"></div>
+-      <div class="leftbox" v-for="data in rightData">
+-
++      <div class="leftbox" v-for="data in rightData" :key="data.title">
+         <div class="righticon">
+           <img :src="data.icon" alt="">
+         </div>
+-
+         <div class="boxright">
+           <div class="lefttitle">{{ data.title }}</div>
+           <div class="leftdata" style="margin-top: 40px">
+@@ -72,7 +62,6 @@
+             <span class="numberunit">{{ data.unit }}</span>
+           </div>
+         </div>
+-
+       </div>
+     </div>
+   </div>
+@@ -81,140 +70,143 @@
+ <script type="module">
+ import * as echarts from "echarts";
+ import * as THREE from 'three'
+-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+ import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
+ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+-import {mylog} from "@/utils";
++import axios from 'axios';
++import { baseUrl } from "@/api/api";
++
+ export default {
+   name: "index",
+   data() {
+     return {
++      peopleId:'',
+       publicPath: process.env.BASE_URL,
+       mesh: null,
+       camera: null,
+       scene: null,
+       renderer: null,
+       controls: null,
+-      peopleName: '',
+       leftData: [
+         {
+           icon: require('../../assets/img/people/temperature.jpg'),
+           title: '体温',
+-          currentNumber: 38.5,
++          currentNumber: 0,
+           unit: '℃',
+           maxMumber: 42
+         },
+         {
+           icon: require('../../assets/img/people/sleep.jpg'),
+-          title: '睡眠呼吸暂停综合征',
+-          currentNumber: 20,
++          title: '呼吸',
++          currentNumber: 0,
+           unit: '次/小时',
+           maxMumber: 30
+         },
+         {
+           icon: require('../../assets/img/people/temperature.jpg'),
+           title: 'BMI',
+-          currentNumber: 21,
++          currentNumber: 0,
+           unit: '',
+           maxMumber: 40
+         },
+         {
+           icon: require('../../assets/img/people/Blood sugar.jpg'),
+           title: '血糖',
+-          currentNumber: 25,
++          currentNumber: 0,
+           unit: 'mmol/L',
+           maxMumber: 40
+         },
+-        {
+-          icon: require('../../assets/img/people/TC.jpg'),
+-          title: 'TC',
+-          currentNumber: 3,
+-          unit: 'mmol/L',
+-          maxMumber: 10
+-        },
+       ],
+       rightData: [
+         {
+           icon: require('../../assets/img/people/sphygmus.jpg'),
+-          title: '脉搏',
++          title: '心率',
+           unit: 'bpm',
+-          currentNumber: 70
++          currentNumber: 0
+         },
+         {
+           icon: require('../../assets/img/people/Blood oxygen.jpg'),
+           title: '血氧',
+           unit: '%',
+-          currentNumber: 90
++          currentNumber: 0
+         },
+         {
+           icon: require('../../assets/img/people/SBP.jpg'),
+           title: '收缩压',
+           unit: 'mmHg',
+-          currentNumber: 90
++          currentNumber: 0
+         },
+         {
+           icon: require('../../assets/img/people/DBP.jpg'),
+           title: '舒张压',
+           unit: 'mmHg',
+-          currentNumber: 120
++          currentNumber: 0
+         },
+       ],
+       bottomData: [
+-        {
+-          title: 'CO₂',
+-          data: '800',
+-          unit: 'ppm'
+-        },
+-        {
+-          title: 'TVOC',
+-          data: '1000',
+-          unit: 'ug/m³'
+-        },
+-        {
+-          title: '光照',
+-          data: '500',
+-          unit: 'lx'
+-        },
+-        {
+-          title: 'PM2.5',
+-          data: '201',
+-          unit: 'μg/m³'
+-        },
+-        {
+-          title: '声音',
+-          data: '60',
+-          unit: '分贝'
+-        },
+-        {
+-          title: '温度',
+-          data: '25',
+-          unit: '°C'
+-        },
+-        {
+-          title: '湿度',
+-          data: '40',
+-          unit: '%'
+-        },
++        { title: 'CO₂', data: 0, unit: 'ppm' },
++        { title: 'TVOC', data: 0, unit: 'ug/m³' },
++        { title: '光照', data: 0, unit: 'lx' },
++        { title: 'PM2.5', data: 0, unit: 'μg/m³' },
++        { title: '声音', data: 0, unit: '分贝' },
++        { title: '温度', data: 0, unit: '°C' },
++        { title: '湿度', data: 0, unit: '%' }
+       ],
+     }
+   },
+   created() {
+-    this.peopleName = this.$route.params.peopleName;
+-    // this.getGl()
++    this.peopleId = this.$route.params.peopleId;
+   },
+   mounted() {
+     document.getElementById("search").style.display = 'none';
+-    this.getPalpitate();
++    // 调用接口获取个人健康数据
++    axios.get(`${baseUrl}/city/getPersonalHealthData?id=${this.peopleId}`).then(response => {
++          const data = response.data;
++          // 更新左侧数据
++          this.leftData = [
++            { icon: require('../../assets/img/people/temperature.jpg'), title: '体温', currentNumber: data.p_temperature, unit: '℃', maxMumber: 42 },
++            { icon: require('../../assets/img/people/sleep.jpg'), title: '呼吸', currentNumber: data.breath_rate, unit: '次/小时', maxMumber: 30 },
++            { icon: require('../../assets/img/people/temperature.jpg'), title: 'BMI', currentNumber: data.bmi, unit: '', maxMumber: 40 },
++            { icon: require('../../assets/img/people/Blood sugar.jpg'), title: '血糖', currentNumber: data.blood_glucose, unit: 'mmol/L', maxMumber: 40 },
++          ];
++
++          // 更新右侧数据
++          this.rightData = [
++            { icon: require('../../assets/img/people/sphygmus.jpg'), title: '心率', unit: 'bpm', currentNumber: data.heart_rate },
++            { icon: require('../../assets/img/people/Blood oxygen.jpg'), title: '血氧', unit: '%', currentNumber: data.blood_oxygen },
++            { icon: require('../../assets/img/people/SBP.jpg'), title: '收缩压', unit: 'mmHg', currentNumber: data.systolic },
++            { icon: require('../../assets/img/people/DBP.jpg'), title: '舒张压', unit: 'mmHg', currentNumber: data.diastolic },
++          ];
++
++          // 更新底部数据
++          this.bottomData = [
++            { title: 'CO₂', data: data.co2, unit: 'ppm' },
++            { title: 'TVOC', data: data.tvoc, unit: 'ug/m³' },
++            { title: '光照', data: data.light, unit: 'lx' },
++            { title: 'PM2.5', data: data.pm25, unit: 'μg/m³' },
++            { title: '声音', data: data.db, unit: '分贝' },
++            { title: '温度', data: data.e_temperature, unit: '°C' },
++            { title: '湿度', data: data.humidity, unit: '%' }
++          ];
++
++          // 更新个人信息
++          this.age = data.age;
++          this.gender = data.gender;
++          this.height = data.height;
++          this.weight = data.weight;
++          this.e_create_time = data.e_create_time ? data.e_create_time.split(' ')[0] : '';
++          this.p_create_time = data.p_create_time;
++        })
++        .catch(error => {
++          console.error("获取个人健康数据失败:", error);
++        });
+     this.init();
+   },
+   methods: {
+     init() {
+       this.createScene() // 创建场景
+       this.loadSTL() // 加载STL模型
+-      // this.createLight() // 创建光源
+       this.createCamera() // 创建相机
+       this.createRender() // 创建渲染器
+-      // this.createControls() // 创建控件对象
+       this.render() // 渲染
+     },
+     createScene() {
+@@ -225,24 +217,24 @@
+       const THIS = this
+       const loader = new STLLoader()
+       loader.load(
+-        `${THIS.publicPath}models/person.stl`,
+-        geometry => {
+-          // 创建材质
+-          const material = new THREE.PointsMaterial({ 
+-            color: 0x00CCFF,
+-            size: 3,
+-            opacity: 1,
+-            transparent: false,
+-            blending: THREE.AdditiveBlending,
+-            depthTest: true,
+-            map: this.generateSprite()
+-          });
+-          this.mesh = new THREE.Points(geometry, material)
+-          this.mesh.rotation.x = -0.5 * Math.PI
+-          this.mesh.scale.set(20, 20, 20)
+-          geometry.center()
+-          this.scene.add(this.mesh)
+-        }
++          `${THIS.publicPath}models/person.stl`,
++          geometry => {
++            // 创建材质
++            const material = new THREE.PointsMaterial({
++              color: 0x00CCFF,
++              size: 3,
++              opacity: 1,
++              transparent: false,
++              blending: THREE.AdditiveBlending,
++              depthTest: true,
++              map: this.generateSprite()
++            });
++            this.mesh = new THREE.Points(geometry, material)
++            this.mesh.rotation.x = -0.5 * Math.PI
++            this.mesh.scale.set(20, 20, 20)
++            geometry.center()
++            this.scene.add(this.mesh)
++          }
+       )
+     },
+ 
+@@ -295,7 +287,7 @@
+     // 创建渲染器
+     createRender() {
+       const element = document.getElementById('container')
+-      this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
++      this.renderer = new THREE.WebGLRenderer({antialias: true, alpha: true})
+       this.renderer.setClearAlpha(0.2);
+       this.renderer.setSize(element.clientWidth, element.clientHeight) // 设置渲染区域尺寸
+       this.renderer.shadowMap.enabled = true // 显示阴影
+@@ -314,67 +306,9 @@
+     createControls() {
+       this.controls = new OrbitControls(this.camera, this.renderer.domElement)
+     },
+-
+-
+-
+-
+-    // 节律
+-    getPalpitate() {
+-      var totalFlowRate = echarts.init(this.$refs.totalFlowRate);
+-      var xAxisData = [];
+-      var yAxisData = [];
+-      for (var i = 500; i > 0; i--) {
+-        xAxisData.push(i + "秒前");
+-      }
+-      for (i = 1; i < 501; i++) {
+-        yAxisData.push(null);
+-      }
+-      var totalFlowRateOption = {
+-        animation: false,
+-        title: {
+-          show: false,
+-          text: '节律（s）'/*,
+-        left:"110px"*/
+-        },
+-        tooltip: {
+-          trigger: 'axis',
+-          axisPointer: {type: 'cross'}
+-        },
+-        grid: {
+-          left: 50/*"50px"*/,
+-          right: 15/*"15px"*/
+-        },
+-        legend: {
+-          show: false,
+-          data: ['当前节律']
+-        },
+-        xAxis: {
+-          boundaryGap: false,
+-          data: xAxisData,
+-          show: false
+-        },
+-        yAxis: {boundaryGap: false, show: false},
+-        series: {
+-          symbol: "none",/*去掉小圆点*/
+-          name: '当前节律',
+-          type: 'line',
+-          data: yAxisData,/*,             smooth:true//显示为平滑的曲线*/
+-          color: "rgb(0, 205, 255)"
+-        }
+-      };
+-
+-      totalFlowRate.setOption(totalFlowRateOption);
++    }
++  }
+ 
+-      setInterval(function () {
+-        yAxisData.push(Math.round(Math.random() * 3000));
+-        if (yAxisData.length > 500) {
+-          yAxisData.shift();
+-        }
+-        totalFlowRate.setOption(totalFlowRateOption);
+-      }, 100);
+-    }
+-  }
+-}
+ </script>
+ 
+ <style scoped>
+@@ -477,7 +411,7 @@
+ .peopleInfo {
+   font-size: 24px;
+   width: 344px;
+-  height: 165px;
++  height: 200px;
+   position: absolute;
+   top: 28px;
+   left: 18px;
+@@ -497,10 +431,11 @@
+ }
+ 
+ .info {
+-  height: 165px;
++  height: 200px;
+   width: 184px;
+   font-size: 26px;
+   line-height: 42px;
++
+ }
+ 
+ .center {
+Index: frontend/src/views/model/index.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><!--\r\n * @Author: Author T4mako\r\n * @Date: 2024-11-05 13:23:59\r\n-->\r\n<template>\r\n  <ScaleScreen :width=\"1920\" :height=\"1080\" class=\"scale-wrap\">\r\n    <div class=\"bg\">\r\n      <dv-loading v-if=\"loading\">Loading...</dv-loading>\r\n      <div v-else class=\"host-body\">\r\n        <!-- 头部 s -->\r\n        <div class=\"d-flex jc-center title_wrap\" style=\"z-index: 999\">\r\n          <div class=\"zuojuxing\"></div>\r\n          <div class=\"youjuxing\"></div>\r\n          <div class=\"guang\"></div>\r\n          <div class=\"d-flex jc-center\">\r\n            <div class=\"title\">\r\n              <span class=\"title-text\" v-on:click=\"() => { this.$router.push({ path: '/' }) }\">数字健康家庭服务城市平台</span>\r\n            </div>\r\n          </div>\r\n          <div class=\"timers\">\r\n            {{ dateYear }} {{ dateWeek }} {{ dateDay }}\r\n          </div>\r\n        </div>\r\n\r\n        <router-view></router-view>\r\n      </div>\r\n    </div>\r\n  </ScaleScreen>\r\n\r\n</template>\r\n\r\n<script>\r\nimport { formatTime } from \"@/utils/index.js\";\r\nimport ScaleScreen from \"@/components/scale-screen/scale-screen.vue\";\r\nimport ItemWrap from \"@/components/item-wrap/item-wrap.vue\";\r\nimport ModleBtn from \"./model-btn.vue\"\r\nexport default {\r\n  components: { ScaleScreen, ModleBtn },\r\n  data() {\r\n    return {\r\n      timing: null,\r\n      loading: true,\r\n      dateDay: null,\r\n      dateYear: null,\r\n      dateWeek: null,\r\n      weekday: [\"周日\", \"周一\", \"周二\", \"周三\", \"周四\", \"周五\", \"周六\"],\r\n      input: '',\r\n      path: '',\r\n    };\r\n  },\r\n  filters: {\r\n    numsFilter(msg) {\r\n      return msg || 0;\r\n    },\r\n  },\r\n  computed: {},\r\n  created() {\r\n    this.path = this.$route.path\r\n  },\r\n  mounted() {\r\n    this.timeFn();\r\n    this.cancelLoading();\r\n  },\r\n  beforeDestroy() {\r\n    clearInterval(this.timing);\r\n  },\r\n  methods: {\r\n    timeFn() {\r\n      this.timing = setInterval(() => {\r\n        this.dateDay = formatTime(new Date(), \"HH: mm: ss\");\r\n        this.dateYear = formatTime(new Date(), \"yyyy-MM-dd\");\r\n        this.dateWeek = this.weekday[new Date().getDay()];\r\n      }, 1000);\r\n    },\r\n    cancelLoading() {\r\n      let timer = setTimeout(() => {\r\n        this.loading = false;\r\n        clearTimeout(timer);\r\n      }, 500);\r\n    },\r\n    goTo(path) {\r\n      this.$router.push(path);\r\n    }\r\n  },\r\n};\r\n</script>\r\n\r\n<style lang=\"scss\" scoped>\r\n.bg {\r\n  width: 100%;\r\n  height: 100%;\r\n  padding: 16px 16px 10px 16px;\r\n  box-sizing: border-box;\r\n  background-size: cover;\r\n  background-position: center center;\r\n}\r\n\r\n.content {\r\n  display: flex;\r\n  width: 100%;\r\n  height: 90%;\r\n\r\n  .wrap {\r\n    margin: 15px;\r\n  }\r\n\r\n  font-size: 24px;\r\n\r\n}\r\n\r\n@import \"model.scss\";\r\n</style>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/views/model/index.vue b/frontend/src/views/model/index.vue
+--- a/frontend/src/views/model/index.vue	(revision 99e30852e80eb203bfc10716051edc368135c9c9)
++++ b/frontend/src/views/model/index.vue	(date 1731664879834)
+@@ -3,7 +3,11 @@
+  * @Date: 2024-11-05 13:23:59
+ -->
+ <template>
+-  <ScaleScreen :width="1920" :height="1080" class="scale-wrap">
++  <ScaleScreen 
++  :width="1920"
++  :height="1080"
++  class="scale-wrap"
++  :selfAdaption="$store.state.setting.isScale">
+     <div class="bg">
+       <dv-loading v-if="loading">Loading...</dv-loading>
+       <div v-else class="host-body">
+@@ -14,41 +18,41 @@
+           <div class="guang"></div>
+           <div class="d-flex jc-center">
+             <div class="title">
+-              <span class="title-text" v-on:click="() => { this.$router.push({ path: '/' }) }">数字健康家庭服务城市平台</span>
++              <span class="title-text"v-on:click="()=>{this.$router.push({path:'/'})}">数字健康家庭服务城市平台</span>
+             </div>
+           </div>
+           <div class="timers">
+             {{ dateYear }} {{ dateWeek }} {{ dateDay }}
++            <i
++              class="blq-icon-shezhi02"
++              style="margin-left: 10px"
++              @click="showSetting"
++            ></i>
+           </div>
+         </div>
+-
+         <router-view></router-view>
+       </div>
+-    </div>
++  </div>
+   </ScaleScreen>
+-
++  
+ </template>
+ 
+ <script>
+-import { formatTime } from "@/utils/index.js";
+ import ScaleScreen from "@/components/scale-screen/scale-screen.vue";
+-import ItemWrap from "@/components/item-wrap/item-wrap.vue";
+-import ModleBtn from "./model-btn.vue"
+ export default {
+-  components: { ScaleScreen, ModleBtn },
+-  data() {
+-    return {
++  components: { ScaleScreen },
++  data(){
++    return{
+       timing: null,
+-      loading: true,
++      loading: false,
+       dateDay: null,
+       dateYear: null,
+       dateWeek: null,
+       weekday: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
+       input: '',
+       path: '',
+-    };
+-  },
+-  filters: {
++    }
++  },filters: {
+     numsFilter(msg) {
+       return msg || 0;
+     },
+@@ -65,6 +69,9 @@
+     clearInterval(this.timing);
+   },
+   methods: {
++    showSetting() {
++      this.$refs.setting.init();
++    },
+     timeFn() {
+       this.timing = setInterval(() => {
+         this.dateDay = formatTime(new Date(), "HH: mm: ss");
+@@ -78,35 +85,19 @@
+         clearTimeout(timer);
+       }, 500);
+     },
+-    goTo(path) {
+-      this.$router.push(path);
+-    }
+   },
+ };
+ </script>
+ 
+ <style lang="scss" scoped>
+ .bg {
+-  width: 100%;
+-  height: 100%;
+-  padding: 16px 16px 10px 16px;
+-  box-sizing: border-box;
+-  background-size: cover;
+-  background-position: center center;
+-}
++        width: 100%;
++        height: 100%;
++        padding: 16px 16px 10px 16px;
++        box-sizing: border-box;
++        background-size: cover;
++        background-position: center center;
++    }
+ 
+-.content {
+-  display: flex;
+-  width: 100%;
+-  height: 90%;
+-
+-  .wrap {
+-    margin: 15px;
+-  }
+ 
+-  font-size: 24px;
+-
+-}
+-
+-@import "model.scss";
+ </style>
+Index: frontend/src/views/model/model-index.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><template>\r\n  <ScaleScreen :width=\"1920\" :height=\"1080\" class=\"scale-wrap\">\r\n    <div class=\"bg\">\r\n      <dv-loading v-if=\"loading\">Loading...</dv-loading>\r\n      <div v-else class=\"host-body\">\r\n        <!-- 头部 s -->\r\n        <div class=\"d-flex jc-center title_wrap\" style=\"z-index: 999\">\r\n          <div class=\"zuojuxing\"></div>\r\n          <div class=\"youjuxing\"></div>\r\n          <div class=\"guang\"></div>\r\n          <div class=\"d-flex jc-center\">\r\n            <div class=\"title\">\r\n              <span class=\"title-text\" v-on:click=\"() => { this.$router.push({ path: '/' }) }\">数字健康家庭服务城市平台</span>\r\n            </div>\r\n          </div>\r\n          <div class=\"timers\">\r\n            {{ dateYear }} {{ dateWeek }} {{ dateDay }}\r\n          </div>\r\n        </div>\r\n\r\n        <!-- 主体 -->\r\n        <div class=\"content\">\r\n          <ItemWrap class=\"wrap\" title=\"老年人信息\">\r\n            <div style=\"padding: 20px;\">\r\n              <el-table ref=\"singleTable\" :data=\"tableData\" highlight-current-row @current-change=\"handleCurrentChange\"\r\n                style=\"width: 100%\" size=\"medium\" :lazy=\"true\"\r\n                :header-cell-style=\"{ background: 'rgb(0,0,0,0)', color: '#fff' }\" height=\"875\">\r\n                <el-table-column type=\"index\" width=\"60\">\r\n                </el-table-column>\r\n                <el-table-column property=\"id\" label=\"用户id\" width=\"120\">\r\n                </el-table-column>\r\n                <el-table-column property=\"gender\" label=\"性别\" width=\"120\">\r\n                </el-table-column>\r\n                <el-table-column property=\"age\" label=\"年龄\" width=\"120\">\r\n                </el-table-column>\r\n                <el-table-column property=\"family_user_id\" label=\"家庭id\">\r\n                </el-table-column>\r\n                <el-table-column property=\"city\" label=\"城市\">\r\n                </el-table-column>\r\n                <el-table-column property=\"dept_name\" label=\"社区名\">\r\n                </el-table-column>\r\n              </el-table>\r\n            </div>\r\n          </ItemWrap>\r\n          <ItemWrap class=\"wrap\" style=\"text-align: center;\" title=\"模型选择\">\r\n            <div style=\"margin-left: 160px;\">\r\n              <div @click=\"goTo('/model?id=' + userid)\">\r\n                <ModleBtn name=\"健康数据分析图\"></ModleBtn>\r\n              </div>\r\n              <div @click=\"goTo('/disease?id=' + userid)\">\r\n                <ModleBtn name=\"疾病预测\"></ModleBtn>\r\n              </div>\r\n              <ModleBtn name=\"摔倒监测报警\"></ModleBtn>\r\n              <ModleBtn name=\"健康数字人\"></ModleBtn>\r\n            </div>\r\n          </ItemWrap>\r\n        </div>\r\n        <!-- <router-view></router-view> -->\r\n      </div>\r\n    </div>\r\n  </ScaleScreen>\r\n</template>\r\n\r\n<script>\r\nimport { formatTime } from \"@/utils/index.js\";\r\nimport ScaleScreen from \"@/components/scale-screen/scale-screen.vue\";\r\nimport ItemWrap from \"@/components/item-wrap/item-wrap.vue\";\r\nimport ModleBtn from \"./model-btn.vue\";\r\nimport axios from \"axios\";\r\nimport { baseUrl } from \"@/api/api\";\r\n\r\nexport default {\r\n  components: { ScaleScreen, ItemWrap, ModleBtn },\r\n  data() {\r\n    return {\r\n      timing: null,\r\n      loading: true,\r\n      dateDay: null,\r\n      dateYear: null,\r\n      dateWeek: null,\r\n      weekday: [\"周日\", \"周一\", \"周二\", \"周三\", \"周四\", \"周五\", \"周六\"],\r\n      input: '',\r\n      path: '',\r\n      tableData: [\r\n        { id: 98, gender: '女', age: '59', family_user_id: '211', dept_name: '永安社区', city: '徐州' },\r\n        { id: 99, gender: '女', age: '59', family_user_id: '211', dept_name: '永安社区', city: '徐州' },\r\n        { id: 100, gender: '女', age: '59', family_user_id: '211', dept_name: '永安社区', city: '徐州' },\r\n        { id: 101, gender: '女', age: '59', family_user_id: '211', dept_name: '永安社区', city: '徐州' }\r\n      ],\r\n      currentRow: null,\r\n      userid: null,\r\n    };\r\n  },\r\n  created() {\r\n    this.path = this.$route.path;\r\n    axios.get(`${baseUrl}/user/allUserBaseInfo`).then(response => {\r\n\r\n      if (response.code === \"200\") {\r\n        const data = response.data;\r\n        this.tableData = data\r\n\r\n      } else {\r\n        this.pageflag = false;\r\n        this.$Message({\r\n          text: response.data.msg,\r\n          type: 'warning'\r\n        });\r\n      }\r\n    })\r\n      .catch(error => {\r\n        console.error(error);\r\n        this.pageflag = false;\r\n        this.$Message({\r\n          text: '获取数据失败',\r\n          type: 'error'\r\n        });\r\n      });\r\n  },\r\n  mounted() {\r\n    this.timeFn();\r\n    this.cancelLoading();\r\n  },\r\n  beforeDestroy() {\r\n    clearInterval(this.timing);\r\n  },\r\n  methods: {\r\n    timeFn() {\r\n      this.timing = setInterval(() => {\r\n        this.dateDay = formatTime(new Date(), \"HH: mm: ss\");\r\n        this.dateYear = formatTime(new Date(), \"yyyy-MM-dd\");\r\n        this.dateWeek = this.weekday[new Date().getDay()];\r\n      }, 1000);\r\n    },\r\n    cancelLoading() {\r\n      let timer = setTimeout(() => {\r\n        this.loading = false;\r\n        clearTimeout(timer);\r\n      }, 500);\r\n    },\r\n    goTo(path) {\r\n      if (this.userid) {\r\n        this.$router.push(path);\r\n      } else {\r\n        this.$Message.warning(\"请选择用户\")\r\n      }\r\n    },\r\n    handleCurrentChange(row) {\r\n      this.userid = row.id; // Update userid with selected user's id\r\n\r\n    }\r\n  }\r\n};\r\n</script>\r\n\r\n<style lang=\"scss\" scoped>\r\n.bg {\r\n  width: 100%;\r\n  height: 100%;\r\n  padding: 16px 16px 10px 16px;\r\n  box-sizing: border-box;\r\n  background-size: cover;\r\n  background-position: center center;\r\n}\r\n\r\n.content {\r\n  display: flex;\r\n  width: 100%;\r\n  height: 90%;\r\n\r\n  .wrap {\r\n    margin: 15px;\r\n  }\r\n\r\n  font-size: 24px;\r\n}\r\n\r\n@import \"model.scss\";\r\n</style>\r\n\r\n<style lang=\"scss\">\r\n/* Most outer transparent layer */\r\n.el-table,\r\n.el-table__expanded-cell{\r\n  color: #ffffff;\r\n  background-color: transparent;\r\n}\r\n\r\n.el-table th.gutter {\r\n  display: none;\r\n  width: 0;\r\n}\r\n.el-table colgroup col[name='gutter'] {\r\n  display: none;\r\n  width: 0;\r\n}\r\n\r\n/* Background color for table cells */\r\n.el-table th,\r\n.el-table tr,\r\n.el-table td {\r\n  background-color: transparent;\r\n}\r\n\r\n/* Font color for table headers */\r\n.el-table thead {\r\n  color: #ffffff;\r\n  font-weight: 500;\r\n}\r\n\r\n.el-table--enable-row-hover .el-table__body tr:hover>td {\r\n  background-color: rgba(174, 209, 249, 0.25) !important;\r\n}\r\n\r\n.el-table__body tr.current-row>td {\r\n  background-color: rgba(48, 141, 247, 0.75) !important;\r\n}\r\n\r\n/* 删除表格下最底层的横线 */\r\n.el-table::before {\r\n  left: 0;\r\n  bottom: 0;\r\n  width: 100%;\r\n  height: 0px;\r\n}\r\n\r\n.el-table {\r\n  border-bottom: 0;\r\n\r\n  ::-webkit-scrollbar {\r\n    width: 8px;\r\n    height: 10px;\r\n  }\r\n\r\n  ::-webkit-scrollbar-track {\r\n    background-color: transparent;\r\n    -webkit-border-radius: 2em;\r\n    -moz-border-radius: 2em;\r\n    border-radius: 2em;\r\n  }\r\n\r\n  ::-webkit-scrollbar-thumb {\r\n    background-color: rgb(1, 179, 255, 1);\r\n    -webkit-border-radius: 2em;\r\n    -moz-border-radius: 2em;\r\n    border-radius: 2em;\r\n  }\r\n}\r\n\r\n\r\n</style>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/views/model/model-index.vue b/frontend/src/views/model/model-index.vue
+--- a/frontend/src/views/model/model-index.vue	(revision 99e30852e80eb203bfc10716051edc368135c9c9)
++++ b/frontend/src/views/model/model-index.vue	(date 1731664879839)
+@@ -174,7 +174,7 @@
+   font-size: 24px;
+ }
+ 
+-@import "model.scss";
++//@import "model.scss";
+ </style>
+ 
+ <style lang="scss">
+Index: frontend/src/views/HomeIndex.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><template>\r\n  <div class=\"platform-container\">\r\n    <!-- 背景图片容器 -->\r\n    <div class=\"background\">\r\n      <!-- 标题 -->\r\n      <h1 class=\"title-text\">数字健康家庭服务城市平台</h1>\r\n\r\n      <!-- 图片展示区 -->\r\n      <div class=\"images-row\">\r\n        <div class=\"image-container\" v-for=\"(image, index) in images\" :key=\"index\" @click=\"goTo(image.path)\">\r\n          <img :src=\"image.src\" :alt=\"image.alt\" class=\"image-item\" />\r\n          <p class=\"image-caption\">{{ image.caption }}</p>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</template>\r\n\r\n<script>\r\nexport default {\r\n  name: \"HomeIndex\",\r\n  data() {\r\n    return {\r\n      images: [\r\n        { src: require('@/assets/img/back1.png'), alt: \"City Health - Person\", caption: \"城市家庭人员健康\", path: \"/index\" },\r\n        { src: require('@/assets/img/back2.png'), alt: \"City Health - Building\", caption: \"城市健康建筑环境\" },\r\n        { src: require('@/assets/img/back3.png'), alt: \"Active Health - City Map\", caption: \"主动健康城市图谱\",path: \"/Atlas\" },\r\n        { src: require('@/assets/img/back4.png'), alt: \"Active Health - Model\", caption: \"主动健康模型\",path:\"/modelIndex\" },\r\n      ]\r\n    };\r\n  },\r\n  methods: {\r\n    goTo(path) {\r\n      this.$router.push(path);\r\n    }\r\n  }\r\n};\r\n</script>\r\n\r\n<style scoped>\r\n.platform-container {\r\n  position: relative;\r\n  display: flex;\r\n  flex-direction: column;\r\n  align-items: center;\r\n  height: 100vh;\r\n  overflow: hidden;\r\n}\r\n\r\n.background {\r\n  position: relative;\r\n  width: 100%;\r\n  height: 100%;\r\n  background-image: url('~@/assets/img/home-background.png');\r\n  background-size: cover;\r\n  background-position: center;\r\n  background-repeat: no-repeat;\r\n  display: flex;\r\n  flex-direction: column;\r\n  align-items: center;\r\n  justify-content: center;\r\n}\r\n\r\n.title {\r\n  color: white;\r\n  font-size: 2.5rem;\r\n  text-align: center;\r\n  margin-top: 1rem;\r\n}\r\n\r\n.images-row {\r\n  display: flex;\r\n  justify-content: space-around; /* 修改为 space-around，使图片均匀分布在容器内 */\r\n  width: 80%; /* 设置宽度，确保图片容器左右留出足够空间 */\r\n  margin-top: 10rem;\r\n}\r\n\r\n.image-container {\r\n  display: flex;\r\n  flex-direction: column;\r\n  align-items: center;\r\n  margin: 0 1rem;\r\n}\r\n\r\n.image-item {\r\n  width: 250px;\r\n  height: 250px;\r\n  object-fit: cover;\r\n  margin-bottom: 0.5rem;\r\n  cursor: pointer;\r\n  border-radius: 10px;\r\n}\r\n\r\n.image-caption {\r\n  margin-top: 5px;\r\n  color: white;\r\n  font-size: 1.25rem;\r\n  text-align: center;\r\n  width: 100%; /* 使文字在图片下方居中 */\r\n  background: linear-gradient(92deg, #0072FF 0%, #00EAFF 48.8525390625%, #01AAFF 100%);\r\n  -webkit-background-clip: text;\r\n  -webkit-text-fill-color: transparent;\r\n}\r\n.title-text {\r\n  font-size: 38px;\r\n  font-weight: 900;\r\n  background: linear-gradient(92deg, #0072FF 0%, #00EAFF 48.8525390625%, #01AAFF 100%);\r\n  -webkit-background-clip: text;\r\n  -webkit-text-fill-color: transparent;\r\n}\r\n</style>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/views/HomeIndex.vue b/frontend/src/views/HomeIndex.vue
+--- a/frontend/src/views/HomeIndex.vue	(revision 99e30852e80eb203bfc10716051edc368135c9c9)
++++ b/frontend/src/views/HomeIndex.vue	(date 1731664879844)
+@@ -23,7 +23,7 @@
+     return {
+       images: [
+         { src: require('@/assets/img/back1.png'), alt: "City Health - Person", caption: "城市家庭人员健康", path: "/index" },
+-        { src: require('@/assets/img/back2.png'), alt: "City Health - Building", caption: "城市健康建筑环境" },
++        { src: require('@/assets/img/back2.png'), alt: "City Health - Building", caption: "城市健康建筑环境",path: "/environment" },
+         { src: require('@/assets/img/back3.png'), alt: "Active Health - City Map", caption: "主动健康城市图谱",path: "/Atlas" },
+         { src: require('@/assets/img/back4.png'), alt: "Active Health - Model", caption: "主动健康模型",path:"/modelIndex" },
+       ]
+Index: frontend/src/views/environment/EnvironmentIndex.vue
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/views/environment/EnvironmentIndex.vue b/frontend/src/views/environment/EnvironmentIndex.vue
+new file mode 100644
+--- /dev/null	(date 1731668497812)
++++ b/frontend/src/views/environment/EnvironmentIndex.vue	(date 1731668497812)
+@@ -0,0 +1,202 @@
++<template>
++  <div class="contents">
++
++    <div class="contetn_left">
++      <!--      地图-->
++      <CenterMap class="contetn_left_top" @childNeedChangeData="childNeedChangeData($event)"
++                 :isEnvironment="isEnvironment" @communityClick="handleCommunityClick"/>
++
++    </div>
++    <div class="content-right">
++      <!--环境数据-->
++      <div class="env">
++        <span class="titletext">环境数据</span>
++        <div class="env-data">
++          <div class="data-item">
++            <span class="data-label">CO₂</span>
++            <span class="data-value">800</span>
++            <span class="data-unit">ppm</span>
++          </div>
++          <div class="data-item">
++            <span class="data-label">TVOC</span>
++            <span class="data-value">1000</span>
++            <span class="data-unit">µg/m³</span>
++          </div>
++          <div class="data-item">
++            <span class="data-label">光照</span>
++            <span class="data-value">500</span>
++            <span class="data-unit">lx</span>
++          </div>
++          <div class="data-item">
++            <span class="data-label">PM2.5</span>
++            <span class="data-value">201</span>
++            <span class="data-unit">µg/m³</span>
++          </div>
++          <div class="data-item">
++            <span class="data-label">声音</span>
++            <span class="data-value">60</span>
++            <span class="data-unit">分贝</span>
++          </div>
++          <div class="data-item">
++            <span class="data-label">温度</span>
++            <span class="data-value">25</span>
++            <span class="data-unit">°C</span>
++          </div>
++          <div class="data-item">
++            <span class="data-label">湿度</span>
++            <span class="data-value">40</span>
++            <span class="data-unit">%</span>
++          </div>
++        </div>
++        <span class="hint">{{ hintMessage }}</span>
++      </div>
++      <div class="analysis">
++        <span class="titletext">数据评估与分析</span>
++      </div>
++    </div>
++  </div>
++</template>
++
++<script>
++
++import CenterMap from "../indexs/center-map.vue";
++
++export default {
++  components: {
++    CenterMap,
++  },
++  computed: {
++    hintMessage() {
++      // 如果 province 为空，显示默认提示，否则显示具体省份名称
++      return this.province ? `此数据是 ${this.province} 数据的平均值` : '此数据是 中国 数据的平均值';
++    },
++  },
++  data() {
++    return {
++      province:'',
++      isEnvironment:false, //控制地图是否跳转
++    };
++  },
++  filters: {
++    numsFilter(msg) {
++      return msg || 0;
++    },
++  },
++  created() {
++  },
++
++  mounted() {},
++  methods: {
++    handleCommunityClick(communityName) {
++      // 在这里更新数据，例如记录当前选中的社区名
++      this.province = communityName;
++      console.log(this.selectedCommunity)
++
++    },
++    childNeedChangeData(name) {
++      this.province = name;
++      console.log(this.province);
++    }
++  },
++};
++</script>
++<style lang="scss" scoped>
++.contents {
++  display: flex;
++  justify-content: space-between;
++  align-items: flex-start;
++
++  .contetn_left {
++    width: 720px;
++    box-sizing: border-box;
++
++  }
++
++  .content-right {
++    width: 1400px;
++    box-sizing: border-box;
++    padding: 16px;
++    margin-top: 52px;
++    display: flex;
++    flex-direction: column;
++    justify-content: center; /* 垂直居中 */
++    align-items: flex-start; /* 左对齐 */
++    gap: 20px; /* 两部分之间的间距 */
++  }
++
++  .env, .analysis {
++    width: 98%;
++    padding: 20px;
++    border-radius: 10px;
++    position: relative;
++    border: 1px solid #6586ec;
++    display: flex;
++    flex-direction: column;
++    align-items: center; /* 水平居中内容 */
++
++    .titletext {
++      font-size: 24px;
++      font-weight: 900;
++      letter-spacing: 4px;
++      background: linear-gradient(92deg, #0072ff 0%, #00eaff 48.85%, #01aaff 100%);
++      -webkit-background-clip: text;
++      -webkit-text-fill-color: transparent;
++      margin-bottom: 16px;
++    }
++  }
++}
++.hint{
++  margin-top: 15px;
++  letter-spacing: 4px;
++  background: linear-gradient(92deg, #0072ff 0%, #00eaff 48.85%, #01aaff 100%);
++  -webkit-background-clip: text;
++  -webkit-text-fill-color: transparent;
++  margin-bottom: 5px;
++}
++.env-data {
++  display: flex;
++  gap: 15px;
++  margin-top: 15px;
++}
++.data-item {
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  padding: 15px;
++  border: 1px solid #00eded;
++  border-radius: 5px;
++  min-width: 80px;
++  text-align: center;
++
++  .data-label {
++    font-size: 14px;
++    color: #00eded;
++    margin-bottom: 5px;
++  }
++
++  .data-value {
++    font-size: 24px;
++    font-weight: bold;
++    color: #00eded;
++  }
++
++  .data-unit {
++    font-size: 12px;
++    color: #00eded;
++  }
++}
++@keyframes rotating {
++  0% {
++    -webkit-transform: rotate(0) scale(1);
++    transform: rotate(0) scale(1);
++  }
++  50% {
++    -webkit-transform: rotate(180deg) scale(1.1);
++    transform: rotate(180deg) scale(1.1);
++  }
++  100% {
++    -webkit-transform: rotate(360deg) scale(1);
++    transform: rotate(360deg) scale(1);
++  }
++}
++</style>
+diff --git a/frontend/src/views/model/model.scss b/frontend/src/views/environment/env.scss
+rename from frontend/src/views/model/model.scss
+rename to frontend/src/views/environment/env.scss

@@ -17,18 +17,20 @@
 </template>
 
 <script>
-import {currentGET} from "@/api";
+import axios from "axios";
+import { baseUrl } from "@/api/api";
 export default {
   name: "Two",
+  props: {
+    communityName: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       options: {},
-      countUserNumData: {
-        lockNum: 902.8,
-        onlineNum: 1316.3,
-        // offlineNum: 1274.2,
-        totalNum: 0
-      },
+      countUserNumData: {},
       pageflag: true,
       timer: null
     };
@@ -50,49 +52,30 @@ export default {
       }
     },
     getData() {
-      this.pageflag = true
-      // this.pageflag =false
-
-      currentGET('big1').then(res => {
-        //只打印一次
-        if (!this.timer) {
-          console.log("设备总览", res);
-        }
-        if (res.success) {
-          // this.countUserNumData = res.data
-          let data = this.countUserNumData;
-          data.totalNum = data.lockNum + data.onlineNum;
-          this.countUserNumData = data
-          this.$nextTick(() => {
-            this.init()
-            this.switper()
+      axios.get(`${baseUrl}/city/getHealthDataByCommunity`, {
+            params: {communityName: this.communityName}
           })
+          .then((res) => {
+            if (res.code === "200") {
+              const data = res.data;
+              // 将接口返回的男性和女性数据赋值给 countUserNumData
+              this.countUserNumData = {
+                lockNum: data.male, // 男性人数
+                onlineNum: data.female, // 女性人数
+                totalNum: data.male + data.female, // 总人数
+              };
+              // 调用 init 方法初始化图表
+              this.init();
 
-        } else {
-          this.pageflag = false
-          this.$Message({
-            text: res.msg,
-            type: 'warning'
+            } else {
+              this.pageflag = false;
+              this.$Message.warning(res.msg);
+            }
           })
-        }
-      })
-    },
-    //轮询
-    switper() {
-      if (this.timer) {
-        return
-      }
-      let looper = (a) => {
-        this.getData()
-      };
-      this.timer = setInterval(looper, this.$store.state.setting.echartsAutoTime);
-      let myChart = this.$refs.charts.chart
-      myChart.on('mouseover', params => {
-        this.clearData()
-      });
-      myChart.on('mouseout', params => {
-        this.timer = setInterval(looper, this.$store.state.setting.echartsAutoTime);
-      });
+          .catch((error) => {
+            console.error("API Error:", error);
+            this.pageflag = false;
+          });
     },
     init() {
       let total = this.countUserNumData.totalNum;
@@ -110,13 +93,6 @@ export default {
 
         color: colors,
         data: [
-          // {
-          //   value: 0,
-          //   name: "告警",
-          //   label: {
-          //     shadowColor: colors[0],
-          //   },
-          // },
           {
             value: this.countUserNumData.lockNum,
             name: "男性",

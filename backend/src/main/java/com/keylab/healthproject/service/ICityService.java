@@ -42,4 +42,13 @@ public interface ICityService {
 
     // 返回指定城市的环境数据
     Map<String, Object> getEnvironmentDataByCity(String cityName);
+
+    List<Map<String, Object>> getHealthDataAllByCityName(String name);
+
+    List<Map<String, Object>> getHealthDataAll();
+
+    Map<String, Object> getEnviromentByUserId(Integer id);
+
+    // 返回指定小区的环境数据
+    Map<String, Object> getCommunityEnvironmentDataByCity(String communityName);
 }

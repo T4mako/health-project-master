@@ -52,8 +52,9 @@
               </div>
               <div @click="goTo('/video?id='+ userid)">
               <ModleBtn name="摔倒监测报警"></ModleBtn>
-              </div>
+              <div @click="goTo('/medic')">
               <ModleBtn name="健康数字人"></ModleBtn>
+              </div>
             </div>
           </ItemWrap>
         </div>
@@ -100,6 +101,7 @@ export default {
       if (response.code === "200") {
         const data = response.data;
         this.tableData = data
+
       } else {
         this.pageflag = false;
         this.$Message({

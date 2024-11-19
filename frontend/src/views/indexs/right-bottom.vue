@@ -1,52 +1,35 @@
-<!--
- * @Author: daidai
- * @Date: 2022-03-01 15:27:58
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2022-05-07 11:24:14
- * @FilePath: \web-pc\src\pages\big-screen\view\indexs\right-center.vue
--->
 <template>
   <div v-if="pageflag" class="right_center_wrap beautify-scroll-def" :class="{ 'overflow-y-auto': !sbtxSwiperFlag }" style="padding-top: 20px;">
     <component :is="components" :data="list" :class-option="defaultOption">
-      <ul class="right_center ">
-        <li class="right_center_item" v-for="(item, i) in list" :key="i" v-on:click="toPeople(item.gatewayno)">
+      <ul class="right_center">
+        <li class="right_center_item" v-for="(item, i) in list" :key="i" v-on:click="toPeople(item.id)">
           <span class="orderNum">{{ i + 1 }}</span>
           <div class="inner_right">
             <div class="dibu"></div>
             <div class="flex">
               <div class="info">
-                <span class="labels ">姓名：</span>
-                <span class="contents zhuyao"> {{ item.gatewayno }}</span>
+                <span class="labels ">ID：</span>
+                <span class="contents zhuyao">{{ item.id }}</span>
               </div>
               <div class="info">
                 <span class="labels">性别：</span>
-                <span class="contents "> {{ item.terminalno }}</span>
+                <span class="contents">{{ item.gender }}</span>
               </div>
               <div class="info">
                 <span class="labels">年龄：</span>
-                <span class="contents warning"> {{ item.alertvalue | montionFilter }}</span>
+                <span class="contents warning">{{ item.age }}</span>
               </div>
             </div>
-
-
             <div class="flex">
-
               <div class="info">
-                <span class="labels"> 住址：</span>
-                <span class="contents ciyao" style="font-size:12px"> {{ item.provinceName }}/{{ item.cityName }}/{{ item.countyName }}</span>
+                <span class="labels">住址：</span>
+                <span class="contents ciyao" style="font-size:12px">{{ item.address }}</span>
               </div>
-              <div class="info time">
-                <span class="labels">时间：</span>
-                <span class="contents" style="font-size:12px"> {{ item.createtime }}</span>
-              </div>
-
             </div>
             <div class="flex">
-
               <div class="info">
                 <span class="labels">身体状况：</span>
-                <span class="contents ciyao" :class="{ warning: item.alertdetail }"> {{ item.alertdetail || '无'
-                }}</span>
+                <span class="contents ciyao" :class="{ warning: item.alertLevel }">{{ item.alertLevel || '无' }}</span>
               </div>
             </div>
           </div>
@@ -55,16 +38,22 @@
     </component>
   </div>
   <Reacquire v-else @onclick="getData" style="line-height:200px" />
-
 </template>
 
 <script>
-import { currentGET } from 'api/modules'
-import vueSeamlessScroll from 'vue-seamless-scroll'  // vue2引入方式
-import Kong from '../../components/kong.vue'
+import axios from "axios";
+import vueSeamlessScroll from 'vue-seamless-scroll';
+import Kong from '../../components/kong.vue';
+import { baseUrl } from "@/api/api";
+
 export default {
   components: { vueSeamlessScroll, Kong },
-
+  props: {
+    communityName: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       list: [],
@@ -73,52 +62,62 @@ export default {
         ...this.$store.state.setting.defaultOption,
         limitMoveNum: 3,
         singleHeight: 250,
-        step:0,
-      }
-
+        step: 0,
+      },
     };
   },
   computed: {
     sbtxSwiperFlag() {
-      let ssyjSwiper = this.$store.state.setting.ssyjSwiper
-      if (ssyjSwiper) {
-        this.components = vueSeamlessScroll
-      } else {
-        this.components = Kong
-      }
-      return ssyjSwiper
+      let ssyjSwiper = this.$store.state.setting.ssyjSwiper;
+      this.components = ssyjSwiper ? vueSeamlessScroll : Kong;
+      return ssyjSwiper;
     }
   },
   created() {
-    this.getData()
+    this.getData();
   },
-
-  mounted() { },
   methods: {
     getData() {
-      this.pageflag = true
-      // this.pageflag =false
-      currentGET('big5', { limitNum: 50 }).then(res => {
-        console.log('实时预警', res);
-        if (res.success) {
-          this.list = res.data.list
-          let timer = setTimeout(() => {
-              clearTimeout(timer)
-              this.defaultOption.step=this.$store.state.setting.defaultOption.step
-          }, this.$store.state.setting.defaultOption.waitTime);
-        } else {
-          this.pageflag = false
-          this.$Message.warning(res.msg)
-        }
-      })
+      axios.get(`${baseUrl}/city/getHealthDataByCommunityAll`, {
+            params: { communityName: this.communityName }
+          })
+          .then((res) => {
+            if (res.code === "200") {
+              // 格式化数据
+              this.list = res.data.map(item => ({
+                id: item.id,
+                gender: item.gender,
+                age: item.age,
+                address: item.address,
+                // 将 L1, L2, L3 拼接成身体状况显示
+                alertLevel: [
+                  item.L1.length ? `${item.L1.join(', ')} 处于一级预警状态` : '',
+                  item.L2.length ? `${item.L2.join(', ')} 处于二级预警状态` : '',
+                  item.L3.length ? `${item.L3.join(', ')} 处于三级预警状态` : ''
+                ].filter(Boolean).join('；') || '无'
+              }));
+
+              let timer = setTimeout(() => {
+                clearTimeout(timer);
+                this.defaultOption.step = this.$store.state.setting.defaultOption.step;
+              }, this.$store.state.setting.defaultOption.waitTime);
+            } else {
+              this.pageflag = false;
+              this.$Message.warning(res.msg);
+            }
+          })
+          .catch((error) => {
+            console.error("API Error:", error);
+            this.pageflag = false;
+          });
     },
-    // 跳转到具体人
-    toPeople(peopleName) {
-      this.$router.push({path:'/people/'+peopleName})
+    toPeople(peopleId) {
+      this.$router.push({ path: '/people/' + peopleId });
     }
-  },
+  }
 };
 </script>
+
 <style lang='scss' scoped>
 .right_center {
   width: 100%;
@@ -127,17 +126,16 @@ export default {
   .right_center_item {
     display: flex;
     align-items: center;
-    //justify-content: center;
     margin-left: 40px;
     height: auto;
     padding: 10px;
     font-size: 14px;
     color: #fff;
     text-align: left;
+
     .orderNum {
       margin: 0 20px 0 -20px;
     }
-
 
     .inner_right {
       position: relative;
@@ -182,7 +180,6 @@ export default {
         font-size: 15px;
       }
     }
-
   }
 }
 

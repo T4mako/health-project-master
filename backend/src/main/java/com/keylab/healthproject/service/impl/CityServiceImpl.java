@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class CityServiceImpl implements ICityService {
@@ -31,14 +28,12 @@ public class CityServiceImpl implements ICityService {
             return cityMapper.getNumByCityId(10);
         else
             return 0;
-
     }
 
     @Override
     public List<Map<String, Object>> getSexCount() {
         List<Map<String, Object>> list = cityMapper.getSexCount();
         Map<String, Object> data = list.get(0);
-        // 确保键存在，并直接使用 BigDecimal
         BigDecimal maleCountBD = (BigDecimal) data.get("男");
         BigDecimal femaleCountBD = (BigDecimal) data.get("女");
         Integer maleCount = maleCountBD.intValue();
@@ -48,7 +43,6 @@ public class CityServiceImpl implements ICityService {
         if (femaleCount != 0) {
             ratio = maleCount.doubleValue() / femaleCount.doubleValue();
         }
-        // 将比例添加到结果中
         Map<String, Object> ratioMap = new HashMap<>();
         ratioMap.put("男", maleCount);
         ratioMap.put("女", femaleCount);
@@ -60,7 +54,7 @@ public class CityServiceImpl implements ICityService {
 
     @Override
     public List<Map<String, Object>> getSexCountByCity(String cityName) {
-        List<Map<String, Object>> list = new ArrayList();
+        List<Map<String, Object>> list;
         if (cityName.equals("西安市") || cityName.equals("陕西省")) {
             list = cityMapper.getSexCountByCity(12);
         } else if (cityName.equals("郑州市") || cityName.equals("河南省")) {
@@ -69,18 +63,12 @@ public class CityServiceImpl implements ICityService {
             list = cityMapper.getSexCountByCity(10);
         else
             return null;
-        // 将男女比例作为键值对加入list
-        // 将男女比例作为键值对加入 list
         Map<String, Object> data = list.get(0);
-
-
-        // 确保键存在，并直接使用 BigDecimal
         BigDecimal maleCountBD = (BigDecimal) data.get("男");
         BigDecimal femaleCountBD = (BigDecimal) data.get("女");
 
         Integer maleCount = maleCountBD.intValue();
         Integer femaleCount = femaleCountBD.intValue();
-        // 计算比例
         Double ratio = 0.0;
         if (femaleCount != 0) {
             ratio = maleCount.doubleValue() / femaleCount.doubleValue();
@@ -102,7 +90,7 @@ public class CityServiceImpl implements ICityService {
 
     @Override
     public List<Map<String, Object>> getHealthStatusByCity(String cityName) {
-        List<Map<String, Object>> list = new ArrayList();
+        List<Map<String, Object>> list;
         if (cityName.equals("西安市") || cityName.equals("陕西省")) {
             list = cityMapper.getHealthStatusByCity(12);
         } else if (cityName.equals("郑州市") || cityName.equals("河南省")) {
@@ -186,15 +174,11 @@ public class CityServiceImpl implements ICityService {
         return "L3"; // ≥30 或 <3
     }
 
-    @Override
-    public List<Map<String, Object>> getDataByCommunityAll(String communityName) {
-        List<Map<String, Object>> healthDataList = cityMapper.getDataByCommunityAll(communityName);
-        // 用于存储最终结果
+    //封装个人健康数据
+    private List<Map<String, Object>> packagePersonalHealthData(List<Map<String, Object>> healthDataList) {
         List<Map<String, Object>> resultList = new ArrayList<>();
         for (Map<String, Object> healthData : healthDataList) {
-            // 创建一个新的 Map 用于存储每个人的健康等级信息
             Map<String, Object> personHealthInfo = new HashMap<>();
-            // 复制基本信息
             personHealthInfo.put("id", healthData.get("person_id"));
             personHealthInfo.put("gender", healthData.get("gender"));
             personHealthInfo.put("age", healthData.get("age"));
@@ -208,13 +192,11 @@ public class CityServiceImpl implements ICityService {
                 address = "陕西省/西安市/" + healthData.get("dept_name");
             }
             personHealthInfo.put("address", address);
-            // 存储各等级对应的健康指标
             Map<String, List<String>> levelMap = new HashMap<>();
             levelMap.put("L0", new ArrayList<>());
             levelMap.put("L1", new ArrayList<>());
             levelMap.put("L2", new ArrayList<>());
             levelMap.put("L3", new ArrayList<>());
-            // 获取各项健康数据的平均值
             Double breathRate = Double.parseDouble(String.valueOf(healthData.get("breath_rate")));
             Double systolic = Double.parseDouble(String.valueOf(healthData.get("systolic")));
             Double diastolic = Double.parseDouble(String.valueOf(healthData.get("diastolic")));
@@ -222,7 +204,6 @@ public class CityServiceImpl implements ICityService {
             Double temperature = Double.parseDouble(String.valueOf(healthData.get("temperature")));
             Double heartRate = Double.parseDouble(String.valueOf(healthData.get("heart_rate")));
             Double bloodGlucose = Double.parseDouble(String.valueOf(healthData.get("blood_glucose")));
-            // 计算各项健康数据的等级
             String breathRateLevel = calculateBreathRateLevel(breathRate);
             String systolicLevel = calculateSystolicLevel(systolic);
             String diastolicLevel = calculateDiastolicLevel(diastolic);
@@ -230,7 +211,6 @@ public class CityServiceImpl implements ICityService {
             String temperatureLevel = calculateTemperatureLevel(temperature);
             String heartRateLevel = calculateHeartRateLevel(heartRate);
             String bloodGlucoseLevel = calculateBloodGlucoseLevel(bloodGlucose);
-            // 封装到对应等级中，仅存储指标名称
             levelMap.get(breathRateLevel).add("呼吸率");
             levelMap.get(systolicLevel).add("收缩压");
             levelMap.get(diastolicLevel).add("舒张压");
@@ -238,12 +218,17 @@ public class CityServiceImpl implements ICityService {
             levelMap.get(temperatureLevel).add("体温");
             levelMap.get(heartRateLevel).add("心率");
             levelMap.get(bloodGlucoseLevel).add("血糖");
-            // 将等级信息添加到 personHealthInfo 中
             personHealthInfo.putAll(levelMap);
-            // 将每个人的健康信息添加到结果列表中
             resultList.add(personHealthInfo);
         }
-        // 返回最终结果列表
+        return resultList;
+    }
+
+    //获取小区全部健康数据
+    @Override
+    public List<Map<String, Object>> getDataByCommunityAll(String communityName) {
+        List<Map<String, Object>> healthDataList = cityMapper.getDataByCommunityAll(communityName);
+        List<Map<String, Object>> resultList = packagePersonalHealthData(healthDataList);
         return resultList;
     }
 
@@ -270,6 +255,47 @@ public class CityServiceImpl implements ICityService {
             return null;
         return map;
     }
+    @Override
+    public Map<String, Object> getCommunityEnvironmentDataByCity(String communityName) {
+        return cityMapper.getCommunityEnvironmentDataByCity(communityName);
+    }
+    //根据城市名查询健康数据
+    private List<Map<String, Object>> getHealthDataByCity(Integer id) {
+        List<Map<String, Object>> fiftyData;
+        if (id == null) {
+            fiftyData = cityMapper.getHealthDataRandomFifty();
+        } else {
+            fiftyData = cityMapper.getHealthDataRandomFiftyByCity(id);
+        }
+        fiftyData = packagePersonalHealthData(fiftyData);
+        Collections.shuffle(fiftyData);
+        return fiftyData;
+    }
 
+    @Override
+    public List<Map<String, Object>> getHealthDataAllByCityName(String name) {
+        //1. 如果是空参或者中国
+        if (name.isEmpty() || name.equals("中国")) {
+            return getHealthDataByCity(null);
+        } else {//2. 如果是省市
+            if (name.equals("西安市") || name.equals("陕西省")) {
+                return getHealthDataByCity(12);
+            } else if (name.equals("郑州市") || name.equals("河南省")) {
+                return getHealthDataByCity(11);
+            } else if (name.equals("徐州市") || name.equals("江苏省"))
+                return getHealthDataByCity(10);
+            else
+                return null;
+        }
+    }
 
+    @Override
+    public List<Map<String, Object>> getHealthDataAll() {
+        return getHealthDataByCity(null);
+    }
+
+    @Override
+    public Map<String, Object> getEnviromentByUserId(Integer id) {
+        return cityMapper.getEnviromentByUserId(id);
+    }
 }

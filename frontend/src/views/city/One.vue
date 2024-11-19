@@ -13,19 +13,7 @@
         </div>
         <p>总户数</p>
       </li>
-<!--      <li class="user_Overview-item" style="color: #e3b337">-->
-<!--        <div class="user_Overview_nums offline">-->
-<!--          <dv-digital-flop :config="offlineconfig" style="width:100%;height:100%;" />-->
 
-<!--        </div>-->
-<!--        <p>男女比例</p>-->
-<!--      </li>-->
-      <!--        <li class="user_Overview-item" style="color: #f5023d">-->
-      <!--            <div class="user_Overview_nums laramnum">-->
-      <!--                <dv-digital-flop :config="laramnumconfig" style="width:100%;height:100%;" />-->
-      <!--            </div>-->
-      <!--            <p>告警次数</p>-->
-      <!--        </li>-->
     </ul>
     <Reacquire v-else @onclick="getData" line-height="200px">
       重新获取
@@ -34,26 +22,27 @@
 </template>
 
 <script>
-import {currentGET} from "@/api";
+
+import axios from "axios";
+import { baseUrl } from "@/api/api";
 let style = {
   fontSize: 24
 }
 export default {
   name: "One",
+  props: {
+    communityName: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       options: {},
-      userOverview: {
-        alarmNum: 0,
-        offlineNum: 0,
-        onlineNum: 0,
-        totalNum: 0,
-      },
       pageflag: true,
       timer: null,
-      // 男生数
       config: {
-        number: [(4579072+6467170+6615501)/10000],
+        number: [],
         content: '{nt}',
         style: {
           ...style,
@@ -62,7 +51,7 @@ export default {
         },
       },
       onlineconfig: {
-        number: [(4504718+6133404+6337406)/10000],
+        number: [0],
         content: '{nt}',
         style: {
           ...style,
@@ -70,25 +59,6 @@ export default {
           fill: "#07f7a8",
         },
       },
-      offlineconfig: {
-        number: [1],
-        content: '{nt}',
-        style: {
-          ...style,
-          // stroke: "#e3b337",
-          fill: "#e3b337",
-        },
-      },
-      laramnumconfig: {
-        number: [0],
-        content: '{nt}',
-        style: {
-          ...style,
-          // stroke: "#f5023d",
-          fill: "#f5023d",
-        },
-      }
-
     };
   },
   filters: {
@@ -113,46 +83,19 @@ export default {
       }
     },
     getData() {
-      this.pageflag = true;
-      currentGET("big2").then((res) => {
-        if (!this.timer) {
-          console.log("设备总览", res);
-        }
-        if (res.success) {
-          // this.userOverview = res.data;
-          // this.onlineconfig = {
-          //     ...this.onlineconfig,
-          //     number: [res.data.onlineNum]
-          // }
-          // this.config = {
-          //     ...this.config,
-          //     number: [res.data.totalNum]
-          // }
-          // this.offlineconfig = {
-          //     ...this.offlineconfig,
-          //     number: [res.data.offlineNum]
-          // }
-          // this.laramnumconfig = {
-          //     ...this.laramnumconfig,
-          //     number: [res.data.alarmNum]
-          // }
-          this.switper()
-        } else {
-          this.pageflag = false;
-          this.$Message.warning(res.msg);
-        }
-      });
+        axios.get(`${baseUrl}/city/getHealthDataByCommunity`, {
+          params: { communityName: this.communityName }
+        }).then(res => {
+          if (res.code === "200") {
+            this.config = { ...this.config, number: [Number(res.data.family_num)] };
+            this.onlineconfig = { ...this.onlineconfig, number: [Number(res.data.total)] };
+          } else {
+            this.pageflag = false;
+            this.$Message.warning(res.msg);
+          }
+        })
     },
-    //轮询
-    switper() {
-      if (this.timer) {
-        return
-      }
-      let looper = (a) => {
-        this.getData()
-      };
-      this.timer = setInterval(looper, this.$store.state.setting.echartsAutoTime);
-    },
+
   },
 }
 </script>

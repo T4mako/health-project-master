@@ -19,7 +19,8 @@
 </template>
 
 <script>
-import { currentGET } from "api/modules";
+import axios from 'axios';  // 导入 axios 用于请求后端接口
+import { baseUrl } from "@/api/api";
 import {graphic} from "echarts"
 import {mylog} from "@/utils";
 export default {
@@ -47,88 +48,79 @@ export default {
   },
 
   mounted() {
-     this.getData();
+    this.updateData();
   },
   beforeDestroy() {
     this.clearData();
   },
   watch: {
-    province(newVal, oldVal) {
-      if (newVal.indexOf("省") >= 0) {
-
-        this.province = newVal;
-        this.dataItem = {
-          title: ['2021-11', '2021-12', '2022-01', '2022-02', '2022-03','2022-04'],
-          oneLevel: [230, 149, 312, 231, 321, 111],
-          twoLevel: [981, 943, 315, 411, 125, 321],
-          threeLevel: [231, 413, 323, 376, 442, 43]
-        }
-        this.getData();
-      }else {
-        this.dataItem = {
-          title: ['2021-11', '2021-12', '2022-01', '2022-02', '2022-03','2022-04'],
-              oneLevel: [270, 49, 670, 123, 684, 747],
-              twoLevel: [488, 6, 771, 465, 315, 14],
-              threeLevel: [120, 423, 123, 676, 342, 543]
-        }
-        this.getData();
-      }
+    province() {
+      this.updateData();
     }
   },
   methods: {
+    // 根据省份判断调用哪个接口
+    updateData() {
+      if (this.province && this.province !== "中国") {
+        this.getProvinceData();
+      } else {
+        this.getData();
+      }
+    },
+// 获取全国数据
+    getData() {
+      this.pageflag = true;
+      axios.get(`${baseUrl}/city/getHealthLevel`).then((response) => {
+        if (response.code === "200") {
+          this.updateDataItem(response.data);
+        } else {
+          this.pageflag = false;
+          this.$Message({
+            text: response.msg,
+            type: "warning",
+          });
+        }
+      }).catch((error) => {
+        console.error("Error fetching data:", error);
+        this.pageflag = false;
+      });
+    },
+
+    // 获取省份数据
+    getProvinceData() {
+      this.pageflag = true;
+      axios.get(`${baseUrl}/city/getHealthLevelByCity?cityName=${this.province}`).then((response) => {
+        if (response.code === "200") {
+          this.updateDataItem(response.data);
+        } else {
+          this.pageflag = false;
+          this.$Message({
+            text: response.msg,
+            type: "warning",
+          });
+        }
+      }).catch((error) => {
+        console.error("Error fetching data:", error);
+        this.pageflag = false;
+      });
+    },
+
+    // 更新图表数据项
+    updateDataItem(data) {
+      this.dataItem.title = data.map(item => item.month);
+      this.dataItem.oneLevel = data.map(item => item.L1_count);
+      this.dataItem.twoLevel = data.map(item => item.L2_count);
+      this.dataItem.threeLevel = data.map(item => item.L3_count);
+
+      this.init(); // 调用图表初始化方法
+    },
     clearData() {
       if (this.timer) {
         clearInterval(this.timer);
         this.timer = null;
       }
     },
-    getData() {
-      this.pageflag = true;
-      // this.pageflag =false
-      currentGET("big4").then((res) => {
-        if (!this.timer) {
-        }
-        if (res.success) {
-          const data = res.data;
-          mylog(data);
-          data["numList3"] = [120, 423, 123, 676, 342, 543];
-          this.countUserNumData = res.data;
-          this.$nextTick(() => {
-            this.init()
-              // this.switper();
-          });
-        } else {
-          this.pageflag = false;
-          this.$Message({
-            text: res.msg,
-            type: "warning",
-          });
-        }
-      });
-    },
-    //轮询
-    switper() {
-      if (this.timer) {
-        return;
-      }
-      let looper = (a) => {
-        this.getData();
-      };
-      this.timer = setInterval(
-        looper,
-        this.$store.state.setting.echartsAutoTime
-      );
-      let myChart = this.$refs.charts.chart;
-      myChart.on("mouseover", (params) => {
-        this.clearData();
-      });
-      myChart.on("mouseout", (params) => {
-        this.timer = setInterval(
-          looper,
-          this.$store.state.setting.echartsAutoTime
-        );
-      });
-    },
+
     init() {
       this.option = {
         xAxis: {
