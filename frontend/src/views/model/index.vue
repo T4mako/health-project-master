@@ -90,6 +90,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "model.scss";
 .bg {
         width: 100%;
         height: 100%;

@@ -176,7 +176,7 @@ export default {
   font-size: 24px;
 }
 
-//@import "model.scss";
+@import "model.scss";
 </style>
 
 <style lang="scss">
