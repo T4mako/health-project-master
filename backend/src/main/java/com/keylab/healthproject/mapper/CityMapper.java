@@ -285,6 +285,36 @@ public interface CityMapper {
     List<Map<String, Object>> getDataByCommunityAll(String communityName);
 
     @Select("""
+            WITH latest_health AS (
+                SELECT 
+                    h.researched_person_id,
+                    h.breath_rate,
+                    h.systolic,
+                    h.diastolic,
+                    h.blood_oxygen,
+                    h.temperature,
+                    h.heart_rate,
+                    h.blood_glucose,
+                    h.create_time,
+                    ROW_NUMBER() OVER (PARTITION BY h.researched_person_id ORDER BY h.create_time DESC) AS rn
+                FROM 
+                    health_data h
+            ),
+            latest_env AS (
+                SELECT 
+                    e.family_user_id,
+                    e.co2,
+                    e.tvoc,
+                    e.light,
+                    e.pm25,
+                    e.db,
+                    e.humidity,
+                    e.temperature,
+                    e.create_time,
+                    ROW_NUMBER() OVER (PARTITION BY e.family_user_id ORDER BY e.create_time DESC) AS rn
+                FROM 
+                    env_val e
+            )
             SELECT
                 pd.id,
                 pd.gender,
@@ -311,58 +341,10 @@ public interface CityMapper {
                 ev.create_time AS e_create_time
             FROM
                 person_data pd
-            LEFT JOIN (
-                SELECT
-                    h.researched_person_id,
-                    h.breath_rate,
-                    h.systolic,
-                    h.diastolic,
-                    h.blood_oxygen,
-                    h.temperature,
-                    h.heart_rate,
-                    h.blood_glucose,
-                    h.create_time
-                FROM
-                    health_data h
-                JOIN (
-                    SELECT
-                        researched_person_id,
-                        MAX(create_time) AS max_time
-                    FROM
-                        health_data
-                    GROUP BY
-                        researched_person_id
-                ) AS latest_health
-                ON h.researched_person_id = latest_health.researched_person_id
-                AND h.create_time = latest_health.max_time
-            ) AS hd ON pd.id = hd.researched_person_id
-            LEFT JOIN (
-                SELECT
-                    e.family_user_id,
-                    e.co2,
-                    e.tvoc,
-                    e.light,
-                    e.pm25,
-                    e.db,
-                    e.humidity,
-                    e.temperature,
-                    e.create_time
-                FROM
-                    env_val e
-                JOIN (
-                    SELECT
-                        family_user_id,
-                        MAX(create_time) AS max_time
-                    FROM
-                        env_val
-                    GROUP BY
-                        family_user_id
-                ) AS latest_env
-                ON e.family_user_id = latest_env.family_user_id
-                AND e.create_time = latest_env.max_time
-            ) AS ev ON pd.family_user_id = ev.family_user_id
+            LEFT JOIN latest_health hd ON pd.id = hd.researched_person_id AND hd.rn = 1
+            LEFT JOIN latest_env ev ON pd.family_user_id = ev.family_user_id AND ev.rn = 1
             WHERE
-                pd.id = #{id}
+                pd.id = #{id};
             """)
     Map<String, Object> getPersonalHealthData(Integer id);
 
@@ -516,6 +498,4 @@ public interface CityMapper {
             LIMIT 1;
             """)
     Map<String, Object> getEnviromentByUserId(Integer id);
-
-
 }
