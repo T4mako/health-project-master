@@ -17,7 +17,7 @@
         <HWarning></HWarning>
       </ItemWrap>
       <ItemWrap class="block-1-area area-3" title="BMI">
-        <BMIChart :bmi="this.bmi"></BMIChart>
+        <BMIChart :bmi="this.userInfo.bmi"></BMIChart>
       </ItemWrap>
     </div>
 

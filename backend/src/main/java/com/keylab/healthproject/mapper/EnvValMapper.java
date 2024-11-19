@@ -17,9 +17,4 @@ import java.util.List;
  */
 @Mapper
 public interface EnvValMapper extends BaseMapper<EnvVal> {
-    @Select("SELECT e.* FROM env_val e " +
-            "JOIN person_data p ON e.family_user_id = p.family_user_id " +
-            "WHERE p.id = #{id} " +
-            "AND DATE(e.create_time) = CURDATE()")
-    List<EnvVal> findTodayEnvDataByFamilyId(long id);
 }

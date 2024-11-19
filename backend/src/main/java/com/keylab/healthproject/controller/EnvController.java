@@ -19,17 +19,17 @@ import java.util.List;
 @RequestMapping("/env")
 public class EnvController {
     @Autowired
-    IEnvValService iEnvValServicel;
+    IEnvValService iEnvValService;
 
 
     @GetMapping("/all")
     public Result getAllEnvVal() {
-        List<EnvVal> list = iEnvValServicel.list();
+        List<EnvVal> list = iEnvValService.list();
         return Result.success(list);
     }
     @GetMapping("/userEnv")
     public Result getTodayEnvDataByUserId(@RequestParam long id) {
-        List<EnvVal> list = iEnvValServicel.getTodayEnvDataByUserId(id);
-        return Result.success(list);
+        EnvVal res = iEnvValService.getTodayEnvDataByUserId(id);
+        return Result.success(res);
     }
 }

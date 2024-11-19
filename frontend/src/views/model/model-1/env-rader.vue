@@ -83,26 +83,38 @@ export default {
   },
   created() {
     this.userId = this.$route.query.id
-    // axios.get(`${baseUrl}/env/userEnv`, { params: { id: this.userId } }).then(response => {
-    //   if (response.code === "200") {
-    //     const data = response.data;
+    axios.get(`${baseUrl}/env/userEnv`, { params: { id: this.userId } }).then(response => {
+      if (response.code === "200") {
+        const data = response.data;
         
-    //   } else {
-    //     this.pageflag = false;
-    //     this.$Message({
-    //       text: response.data.msg,
-    //       type: 'warning'
-    //     });
-    //   }
-    // })
-    //   .catch(error => {
-    //     console.error(error);
-    //     this.pageflag = false;
-    //     this.$Message({
-    //       text: '获取数据失败',
-    //       type: 'error'
-    //     });
-    //   });
+        // 将数据映射到雷达图的value
+        const radarValues = [
+            data.co2 + 650,          // CO2
+            data.tvoc + 400,         // TVOC
+            data.light + 30000,        // 光照
+            data.pm25 + 50,         // PM2.5
+            data.db,           // 声音
+            data.temperature,  // 温度
+            data.humidity      // 湿度
+          ];
+
+          this.option.series[0].data[0].value = radarValues;
+      } else {
+        this.pageflag = false;
+        this.$Message({
+          text: response.data.msg,
+          type: 'warning'
+        });
+      }
+    })
+      .catch(error => {
+        console.error(error);
+        this.pageflag = false;
+        this.$Message({
+          text: '获取数据失败',
+          type: 'error'
+        });
+      });
   }
 };
 </script>

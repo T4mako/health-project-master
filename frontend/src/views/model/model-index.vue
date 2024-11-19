@@ -21,7 +21,7 @@
         <!-- 主体 -->
         <div class="content">
           <ItemWrap class="wrap" title="老年人信息">
-            <div style="padding: 20px;">
+            <div style="padding: 10px;">
               <el-table ref="singleTable" :data="tableData" highlight-current-row @current-change="handleCurrentChange"
                 style="width: 100%" size="medium" :lazy="true"
                 :header-cell-style="{ background: 'rgb(0,0,0,0)', color: '#fff' }" height="875">
@@ -50,9 +50,11 @@
               <div @click="goTo('/disease?id=' + userid)">
                 <ModleBtn name="疾病预测"></ModleBtn>
               </div>
-              <ModleBtn name="摔倒监测报警"></ModleBtn>
+              <div @click="goTo('/video?id=' + userid)">
+                <ModleBtn name="摔倒监测报警"></ModleBtn>
+              </div>
               <div @click="goTo('/medic')">
-              <ModleBtn name="健康数字人"></ModleBtn>
+                <ModleBtn name="健康数字人"></ModleBtn>
               </div>
             </div>
           </ItemWrap>
@@ -182,7 +184,7 @@ export default {
 <style lang="scss">
 /* Most outer transparent layer */
 .el-table,
-.el-table__expanded-cell{
+.el-table__expanded-cell {
   color: #ffffff;
   background-color: transparent;
 }
@@ -191,6 +193,7 @@ export default {
   display: none;
   width: 0;
 }
+
 .el-table colgroup col[name='gutter'] {
   display: none;
   width: 0;
@@ -247,6 +250,4 @@ export default {
     border-radius: 2em;
   }
 }
-
-
 </style>
