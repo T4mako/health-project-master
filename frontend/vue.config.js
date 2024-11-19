@@ -120,6 +120,12 @@ module.exports = {
     open: true,
     port: 8080, // 前端服务端口
     proxy: {
+      '/medicModel': {
+        target: 'http://192.168.108.198:11434', // Ollama API 服务地址
+        changeOrigin: true, // 确保跨域时 Host 头信息正确
+        pathRewrite: { '^/medicModel': '' }, // 可选：如果需要重写路径
+        logLevel: 'debug', // 打印代理调试日志
+      },
       '/api': { // 代理路径，指向8000端口的服务
         target: 'http://localhost:8000',
         changeOrigin: true,
