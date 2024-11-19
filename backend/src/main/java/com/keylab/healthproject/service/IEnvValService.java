@@ -14,5 +14,5 @@ import java.util.List;
  * @since 2024-10-24
  */
 public interface IEnvValService extends IService<EnvVal> {
-    List<EnvVal> getTodayEnvDataByUserId(long id);
+    EnvVal getTodayEnvDataByUserId(long id);
 }

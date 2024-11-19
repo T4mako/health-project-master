@@ -52,11 +52,11 @@
               </div>
               <div @click="goTo('/video?id=' + userid)">
                 <ModleBtn name="摔倒监测报警"></ModleBtn>
-                <div @click="goTo('/medic')">
-                  <ModleBtn name="健康数字人"></ModleBtn>
-                </div>
               </div>
+              <div @click="goTo('/medic')">
+                <ModleBtn name="健康数字人"></ModleBtn>
               </div>
+            </div>
           </ItemWrap>
         </div>
         <!-- <router-view></router-view> -->
