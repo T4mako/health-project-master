@@ -70,8 +70,10 @@ export default {
       this.dialogue.push(aiMessage);
 
       try {
-        const result = await axios.post('http://192.168.108.198:11434/predict', {
-          prompt: this.prompt
+        const result = await axios.post('/medicModel/api/generate', {
+          model: "Llama3.1-8B-Chinese-Chat-Medic:latest",
+          prompt: this.prompt,
+          stream:false
         });
 
         // 替换占位消息为真实内容
