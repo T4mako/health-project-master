@@ -185,7 +185,7 @@ public class cityController {
         return Result.success(map);
     }
 
-    //根据参数，返回全国或整省50条健康信息
+    //返回指定城市的健康数据，根据市名
     @RequestMapping("/getHealthDataAllByCityName")
     public Result getHealthDataAllByCityName(@RequestParam String cityName) {
         List<Map<String, Object>> list = indexService.getHealthDataAllByCityName(cityName);
@@ -194,6 +194,7 @@ public class cityController {
         return Result.success(list);
     }
 
+    //返回全国或整省所有健康信息
     @RequestMapping("/getHealthDataAll")
     public Result getHealthDataAll() {
         List<Map<String, Object>> list = indexService.getHealthDataAll();
