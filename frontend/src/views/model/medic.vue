@@ -70,7 +70,7 @@ export default {
       this.dialogue.push(aiMessage);
 
       try {
-        const result = await axios.post('http://127.0.0.1:5000/predict', {
+        const result = await axios.post('http://192.168.108.198:11434/predict', {
           prompt: this.prompt
         });
 

@@ -4,28 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a9893b25-86d0-4bf6-a875-6c226ea1fa5d" name="Changes" comment="EnvironmentIndex.vue">
-      <change afterPath="$PROJECT_DIR$/frontend/src/views/environment/Environment.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/views/environment/EnvironmentIndex.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/views/model/medic.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/router/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/router/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/HomeIndex.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/HomeIndex.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/city/Four.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/city/Four.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/city/One.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/city/One.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/city/Three.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/city/Three.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/city/Two.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/city/Two.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/city/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/city/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/indexs/center-map.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/indexs/center-map.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/indexs/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/indexs/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/indexs/right-bottom.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/indexs/right-bottom.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/indexs/right-center.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/indexs/right-center.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/indexs/right-top.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/indexs/right-top.vue" afterDir="false" />
+    <list default="true" id="a9893b25-86d0-4bf6-a875-6c226ea1fa5d" name="Changes" comment="完成两个模块的编写">
+      <change afterPath="$PROJECT_DIR$/frontend/src/views/model/model.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/model/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/model/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/model/medic.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/model/medic.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/model/model-index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/model/model-index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/model/model.scss" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/environment/env.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/people/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/people/index.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,40 +64,41 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;Spring Boot.BackendApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;wkw&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/software/Java&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;npm.serve.executor&quot;: &quot;Run&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;D:\\software\\IntelliJ IDEA 2024.1.7\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "Spring Boot.BackendApplication.executor": "Run",
+    "git-widget-placeholder": "wkw",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/Project/JavaProject/health-project-master/frontend/src/views/model",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.serve.executor": "Run",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "D:\\software\\IntelliJ IDEA 2024.1.7\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;vue.recent.templates&quot;: [
-      &quot;Vue Options API Component&quot;
+  "keyToStringList": {
+    "vue.recent.templates": [
+      "Vue Options API Component"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\Project\JavaProject\health-project-master\frontend\src\views\model" />
       <recent name="D:\Project\JavaProject\health-project-master\frontend\src\views\environment" />
+      <recent name="D:\Project\JavaProject\health-project-master\frontend\src\assets\css\env" />
+      <recent name="D:\Project\JavaProject\health-project-master\frontend\src\views\model" />
     </key>
   </component>
   <component name="RunManager" selected="npm.serve">
@@ -166,7 +151,9 @@
       <workItem from="1731660902786" duration="8358000" />
       <workItem from="1731761492081" duration="6452000" />
       <workItem from="1731814649549" duration="13591000" />
-      <workItem from="1731926526975" duration="1109000" />
+      <workItem from="1731926526975" duration="5727000" />
+      <workItem from="1731939907139" duration="9144000" />
+      <workItem from="1731984832314" duration="642000" />
     </task>
     <task id="LOCAL-00001" summary="center-bottom修改">
       <option name="closed" value="true" />
@@ -176,7 +163,31 @@
       <option name="project" value="LOCAL" />
       <updated>1730808181851</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="EnvironmentIndex.vue">
+      <option name="closed" value="true" />
+      <created>1731927671996</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1731927671996</updated>
+    </task>
+    <task id="LOCAL-00003" summary="EnvironmentIndex.vue">
+      <option name="closed" value="true" />
+      <created>1731927776295</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1731927776295</updated>
+    </task>
+    <task id="LOCAL-00004" summary="完成两个模块的编写">
+      <option name="closed" value="true" />
+      <created>1731951240097</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1731951240097</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -196,6 +207,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="center-bottom修改" />
     <MESSAGE value="EnvironmentIndex.vue" />
-    <option name="LAST_COMMIT_MESSAGE" value="EnvironmentIndex.vue" />
+    <MESSAGE value="完成两个模块的编写" />
+    <option name="LAST_COMMIT_MESSAGE" value="完成两个模块的编写" />
   </component>
 </project>

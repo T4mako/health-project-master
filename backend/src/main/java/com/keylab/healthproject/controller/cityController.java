@@ -78,7 +78,7 @@ public class cityController {
             return Result.error(ResultCodeEnum.PARAM_ERROR);
         } else {
             List<Map<String, Object>> list = indexService.getHealthStatusByCity(cityName);
-            if (list == null){
+            if (list == null) {
                 return Result.error(ResultCodeEnum.PARAM_ERROR);
             }
             return Result.success(list);
@@ -102,7 +102,7 @@ public class cityController {
             return Result.error(ResultCodeEnum.PARAM_ERROR);
         } else {
             List<Map<String, Object>> list = indexService.getHealthLevelByCity(cityName);
-            if (list == null){
+            if (list == null) {
                 return Result.error(ResultCodeEnum.PARAM_ERROR);
             }
             return Result.success(list);
@@ -111,25 +111,26 @@ public class cityController {
 
     //返回指定小区相关健康数据
     @RequestMapping("/getHealthDataByCommunity")
-    public Result getHealthDataByCommunity(@RequestParam String communityName){
-        if (communityName.isEmpty()){
+    public Result getHealthDataByCommunity(@RequestParam String communityName) {
+        if (communityName.isEmpty()) {
             return Result.error(ResultCodeEnum.PARAM_ERROR);
-        }else {
+        } else {
             Map<String, Object> map = indexService.getHealthDataByCommunity(communityName);
-            if (map == null){
+            if (map == null) {
                 return Result.error(ResultCodeEnum.PARAM_ERROR);
             }
             return Result.success(map);
         }
     }
+
     // 返回小区全员健康信息
     @RequestMapping("/getHealthDataByCommunityAll")
-    public Result getDataByCommunityAll(@RequestParam String communityName){
-        if (communityName.isEmpty()){
+    public Result getDataByCommunityAll(@RequestParam String communityName) {
+        if (communityName.isEmpty()) {
             return Result.error(ResultCodeEnum.PARAM_ERROR);
-        }else {
+        } else {
             List<Map<String, Object>> list = indexService.getDataByCommunityAll(communityName);
-            if (list.isEmpty()){
+            if (list.isEmpty()) {
                 return Result.error(ResultCodeEnum.PARAM_ERROR);
             }
             return Result.success(list);
@@ -138,12 +139,12 @@ public class cityController {
 
     //返回个人健康信息及环境数据
     @RequestMapping("/getPersonalHealthData")
-    public Result getPersonalHealthData(@RequestParam Integer id){
-        if (id==null){
+    public Result getPersonalHealthData(@RequestParam Integer id) {
+        if (id == null) {
             return Result.error(ResultCodeEnum.PARAM_ERROR);
-        }else {
+        } else {
             Map<String, Object> map = indexService.getPersonalHealthData(id);
-            if (map==null){
+            if (map == null) {
                 return Result.error(ResultCodeEnum.PARAM_ERROR);
             }
             return Result.success(map);
@@ -152,7 +153,7 @@ public class cityController {
 
     //查询所有环境数据，返回近一个周的环境平均值
     @RequestMapping("/getEnvironmentData")
-    public Result getEnvironmentData(){
+    public Result getEnvironmentData() {
         Map<String, Object> map = indexService.getEnvironmentData();
         return Result.success(map);
     }
@@ -167,18 +168,48 @@ public class cityController {
             return Result.error(ResultCodeEnum.PARAM_ERROR);
         } else {
             Map<String, Object> map = indexService.getEnvironmentDataByCity(cityName);
-            if (map == null){
+            if (map == null) {
                 return Result.error(ResultCodeEnum.PARAM_ERROR);
             }
             return Result.success(map);
         }
     }
+    // 返回指定小区的健康数据，返回近一个周的数据
+    @RequestMapping("/getCommunityEnvironmentDataByCity")
+    public Result getCommunityEnvironmentDataByCity(@RequestParam String communityName) {
+        if (communityName.isEmpty())
+            return Result.error(ResultCodeEnum.PARAM_ERROR);
+        Map<String, Object> map = indexService.getCommunityEnvironmentDataByCity(communityName);
+        if (map == null)
+            return Result.error(ResultCodeEnum.PARAM_ERROR);
+        return Result.success(map);
+    }
+
     //根据参数，返回全国或整省50条健康信息
-    @RequestMapping("/getHealthDataAll")
-    public Result getHealthDataAll(@RequestParam String name){
-        List<Map<String, Object>> list = indexService.getHealthDataAll(name);
-        if (list==null)
+    @RequestMapping("/getHealthDataAllByCityName")
+    public Result getHealthDataAllByCityName(@RequestParam String cityName) {
+        List<Map<String, Object>> list = indexService.getHealthDataAllByCityName(cityName);
+        if (list == null)
             return Result.error(ResultCodeEnum.PARAM_ERROR);
         return Result.success(list);
+    }
+
+    @RequestMapping("/getHealthDataAll")
+    public Result getHealthDataAll() {
+        List<Map<String, Object>> list = indexService.getHealthDataAll();
+        if (list == null)
+            return Result.error(ResultCodeEnum.PARAM_ERROR);
+        return Result.success(list);
+    }
+
+    //根据用户id，返回该用户的环境数据
+    @RequestMapping("/getEnviromentByUserId")
+    public Result getEnviromentByUserId(@RequestParam Integer Id) {
+        if (Id == null)
+            return Result.error(ResultCodeEnum.PARAM_ERROR);
+        Map<String, Object> map = indexService.getEnviromentByUserId(Id);
+        if (map == null)
+            return Result.error(ResultCodeEnum.PARAM_ERROR);
+        return Result.success(map);
     }
 }

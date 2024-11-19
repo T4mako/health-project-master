@@ -408,6 +408,27 @@ public interface CityMapper {
         //COUNT(DISTINCT ev.family_user_id) AS family_count
     Map<String, Object> getEnvironmentDataByCity(Integer Id);
 
+    @Select("""
+            SELECT 
+                ROUND(AVG(ev.co2), 2) AS co2,
+                ROUND(AVG(ev.tvoc), 2) AS tvoc,
+                ROUND(AVG(ev.light), 2) AS light,
+                ROUND(AVG(ev.pm25), 2) AS pm25,
+                ROUND(AVG(ev.db), 2) AS db,
+                ROUND(AVG(ev.humidity), 2) AS humidity,
+                ROUND(AVG(ev.temperature), 2) AS temperature,
+                DATE(MAX(ev.create_time)) AS latest_date
+            FROM 
+                env_val ev
+            WHERE 
+                ev.dept_id IN (
+                    SELECT c.id
+                    FROM community c
+                    WHERE c.name = #{cityName}
+                )
+                AND ev.create_time >= NOW() - INTERVAL 7 DAY;
+            """)
+    Map<String, Object> getCommunityEnvironmentDataByCity(String cityName);
 
     @Select("""
             SELECT
@@ -473,4 +494,28 @@ public interface CityMapper {
                 pd.id, pd.gender, pd.age, pd.dept_name, c.dep_id;
             """)
     List<Map<String, Object>> getHealthDataRandomFiftyByCity(Integer id);
+
+    @Select("""
+            SELECT 
+                e.co2, 
+                e.tvoc, 
+                e.light, 
+                e.pm25, 
+                e.db, 
+                e.humidity, 
+                e.temperature,
+                DATE_FORMAT(e.create_time, '%Y-%m-%d') AS latest_date  -- 格式化日期
+            FROM 
+                env_val e
+            JOIN 
+                person_data p ON e.family_user_id = p.family_user_id
+            WHERE 
+                p.id = #{id}
+            ORDER BY 
+                e.create_time DESC
+            LIMIT 1;
+            """)
+    Map<String, Object> getEnviromentByUserId(Integer id);
+
+
 }
