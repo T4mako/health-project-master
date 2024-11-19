@@ -98,7 +98,6 @@ export default {
       if (response.code === "200") {
         const data = response.data;
         this.tableData = data
-
       } else {
         this.pageflag = false;
         this.$Message({
