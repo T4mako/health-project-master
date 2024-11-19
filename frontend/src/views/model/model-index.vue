@@ -50,7 +50,9 @@
               <div @click="goTo('/disease?id=' + userid)">
                 <ModleBtn name="疾病预测"></ModleBtn>
               </div>
+              <div @click="goTo('/video?id='+ userid)">
               <ModleBtn name="摔倒监测报警"></ModleBtn>
+              </div>
               <ModleBtn name="健康数字人"></ModleBtn>
             </div>
           </ItemWrap>
