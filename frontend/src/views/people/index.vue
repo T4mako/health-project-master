@@ -4,7 +4,7 @@
       <div class="peopleInfo" >
         <div class="info" >
           个人信息:
-          <div>姓名：{{ peopleId }}</div>
+          <div>ID ：{{ peopleId }}</div>
           <div>性别：{{ gender }}</div>
           <div>年龄：{{ age }}</div>
           <div>身高：{{ height}} </div>
@@ -68,7 +68,6 @@
 </template>
 
 <script type="module">
-import * as echarts from "echarts";
 import * as THREE from 'three'
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
@@ -79,7 +78,13 @@ export default {
   name: "index",
   data() {
     return {
-      peopleId:'',
+      peopleId: '',
+      gender: '', // 性别初始化
+      age: 0, // 年龄初始化
+      height: 0, // 身高初始化
+      weight: 0, // 体重初始化
+      p_create_time: '', // 个人测量时间初始化
+      e_create_time: '', // 环境测量时间初始化
       publicPath: process.env.BASE_URL,
       mesh: null,
       camera: null,
@@ -157,7 +162,6 @@ export default {
     this.peopleId = this.$route.params.peopleId;
   },
   mounted() {
-    document.getElementById("search").style.display = 'none';
     // 调用接口获取个人健康数据
     axios.get(`${baseUrl}/city/getPersonalHealthData?id=${this.peopleId}`).then(response => {
           const data = response.data;
