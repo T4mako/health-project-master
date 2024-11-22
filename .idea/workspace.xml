@@ -4,10 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a9893b25-86d0-4bf6-a875-6c226ea1fa5d" name="Changes" comment="EnvironmentIndex.vue">
+    <list default="true" id="a9893b25-86d0-4bf6-a875-6c226ea1fa5d" name="Changes" comment="大模型调试">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_11_13_9_21_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_11_13_9_21__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/model/medic.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/model/medic.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vue.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/vue.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/city/Two.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/city/Two.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/indexs/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/indexs/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/indexs/left-top.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/indexs/left-top.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/people/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/people/index.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -152,6 +158,8 @@
       <workItem from="1731814649549" duration="13591000" />
       <workItem from="1731926526975" duration="5727000" />
       <workItem from="1731939907139" duration="9116000" />
+      <workItem from="1732004119589" duration="145000" />
+      <workItem from="1732258536739" duration="3601000" />
     </task>
     <task id="LOCAL-00001" summary="center-bottom修改">
       <option name="closed" value="true" />
@@ -177,7 +185,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731927776295</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="大模型调试">
+      <option name="closed" value="true" />
+      <created>1731992740550</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1731992740550</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -197,6 +213,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="center-bottom修改" />
     <MESSAGE value="EnvironmentIndex.vue" />
-    <option name="LAST_COMMIT_MESSAGE" value="EnvironmentIndex.vue" />
+    <MESSAGE value="大模型调试" />
+    <option name="LAST_COMMIT_MESSAGE" value="大模型调试" />
   </component>
 </project>

@@ -6,14 +6,14 @@
 
       <ItemWrap
           class="contetn_left-center contetn_lr-item"
-          title="市人数(单位万)"
+          title="市人数(单位人)"
           style="height: 460px"
       >
         <LeftCenter :province="province"/>
       </ItemWrap>
       <ItemWrap
         class="contetn_left-bottom contetn_lr-item"
-        title="男女比例(单位万)"
+        title="男女比例(单位人)"
         style="padding: 0 10px 16px 10px; height: 500px;"
       >
         <LeftTop :province="province"/>
@@ -23,7 +23,7 @@
 <!--      地图-->
       <CenterMap class="contetn_center_top" @childNeedChangeData="childNeedChangeData($event)" :isEnvironment="isEnvironment"/>
 <!--      健康状况-->
-      <ItemWrap class="contetn_center-bottom" title="健康状况(单位万)" :province="province">
+      <ItemWrap class="contetn_center-bottom" title="健康状况(单位人)" :province="province">
         <CenterBottom :province="province"/>
       </ItemWrap>
     </div>
@@ -32,7 +32,7 @@
     <div class="contetn_right">
       <ItemWrap
         class="contetn_left-bottom contetn_lr-item"
-        title="年龄分布(单位万)"
+        title="年龄分布(单位人)"
         style="padding: 0 10px 16px 10px; height: 500px;"
       >
         <RightCenter :province="province"/>
