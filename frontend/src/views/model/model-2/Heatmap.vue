@@ -146,7 +146,6 @@ export default {
       // Update the heatmap option with the new data
       this.option.yAxis.data = userIds;  // Set user IDs as yAxis labels
       this.option.series[0].data = heatmapData;  // Set the heatmap data
-      console.log(this.option.series[0].data);
       
     }
   },

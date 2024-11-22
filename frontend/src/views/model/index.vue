@@ -38,7 +38,10 @@
 </template>
 
 <script>
+import { formatTime } from "@/utils/index.js";
 import ScaleScreen from "@/components/scale-screen/scale-screen.vue";
+import ItemWrap from "@/components/item-wrap/item-wrap.vue";
+import ModleBtn from "./model-btn.vue"
 export default {
   components: { ScaleScreen },
   data(){

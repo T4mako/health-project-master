@@ -67,6 +67,10 @@ const routes = [
                 path: '/atlas',
                 name: 'atlas',
                 component: () => import('../views/atlas/index.vue')
+            },{
+                path: '/video',
+                name: 'video',
+                component: () => import('../views/model/video/index.vue')
             },
             {
                 path: '/medic',

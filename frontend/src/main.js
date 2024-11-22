@@ -21,6 +21,10 @@ import Messages from './components/message/message'
 import "vue-easytable/libs/theme-default/index.css";
 import  '@/assets/css/public.scss'
 import "@/assets/css/index.scss"
+import VideoPlayer from 'vue-video-player'
+import 'vue-video-player/src/custom-theme.css'
+import 'video.js/dist/video-js.css'
+import 'videojs-contrib-hls'
 
 
 import * as filters from '@/directives/filters'
@@ -50,6 +54,10 @@ Vue.use(borderBox13)
 Vue.use(borderBox8)
 Vue.use(digitalFlop)
 Vue.use(capsuleChart)
+
+// 视频播放
+Vue.use(VideoPlayer)
+
 // 全局数据过滤器
 Object.keys(filters).forEach(k => Vue.filter(k, filters[k]));
 new Vue({
