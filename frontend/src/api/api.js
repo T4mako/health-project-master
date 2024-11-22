@@ -5,7 +5,6 @@
  */
 import axios from 'axios';
 import UtilVar from "@/config/UtilVar";
-import router from '@/router'
 
 let baseUrl = UtilVar.baseUrl
 const CancelToken = axios.CancelToken;

@@ -21,9 +21,10 @@
         </li>
         <li class="user_Overview-item" style="color: #e3b337">
             <div class="user_Overview_nums offline">
-                <dv-digital-flop :config="proportion" style="width:100%;height:100%;" />
+              <div>{{ proportion.number[0] }}</div>
             </div>
             <p>男女比例</p>
+
         </li>
     </ul>
     <Reacquire v-else @onclick="getData" line-height="200px">
@@ -138,7 +139,7 @@ export default {
             // 更新男女比例
             this.proportion = {
               ...this.proportion,
-              number: [data.ratio]
+              number: [parseFloat(data.ratio).toFixed(2)] // 保留两位小数
             };
           } else {
             this.pageflag = false;
@@ -174,7 +175,7 @@ export default {
                 // 更新男女比例
                 this.proportion = {
                   ...this.proportion,
-                  number: [data.ratio]
+                  number: [parseFloat(data.ratio).toFixed(2)] // 保留两位小数
                 };
               } else {
                 this.pageflag = false;
