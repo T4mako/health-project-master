@@ -1,10 +1,10 @@
 <template>
   <div class="city-index">
     <div class="left">
-      <ItemWrap class="one" title="人数比例(单位万)"><One :communityName="communityName"/></ItemWrap>
-      <ItemWrap class="two" title="男女比例(单位万)"><Two :communityName="communityName"/></ItemWrap>
-      <ItemWrap class="three" title="年龄分布(单位万)"><Three :communityName="communityName"/></ItemWrap>
-      <ItemWrap class="four" title="健康状况(单位万)"><Four :communityName="communityName"/></ItemWrap>
+      <ItemWrap class="one" title="人数比例(单位人)"><One :communityName="communityName"/></ItemWrap>
+      <ItemWrap class="two" title="男女比例(单位人)"><Two :communityName="communityName"/></ItemWrap>
+      <ItemWrap class="three" title="年龄分布(单位人)"><Three :communityName="communityName"/></ItemWrap>
+      <ItemWrap class="four" title="健康状况(单位人)"><Four :communityName="communityName"/></ItemWrap>
     </div>
     <div class="right">
       <ItemWrap title="已检测人信息">

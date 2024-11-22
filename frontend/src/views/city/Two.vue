@@ -53,20 +53,18 @@ export default {
     },
     getData() {
       axios.get(`${baseUrl}/city/getHealthDataByCommunity`, {
-            params: {communityName: this.communityName}
-          })
+        params: { communityName: this.communityName }
+      })
           .then((res) => {
             if (res.code === "200") {
               const data = res.data;
-              // 将接口返回的男性和女性数据赋值给 countUserNumData
+              console.log("Fetched Data:", data); // 调试用
               this.countUserNumData = {
-                lockNum: data.male, // 男性人数
-                onlineNum: data.female, // 女性人数
-                totalNum: data.male + data.female, // 总人数
+                lockNum: parseInt(data.male) || 0, // 确保为整数
+                onlineNum: parseInt(data.female) || 0, // 确保为整数
+                totalNum: (parseInt(data.male) || 0) + (parseInt(data.female) || 0), // 确保总数正确
               };
-              // 调用 init 方法初始化图表
               this.init();
-
             } else {
               this.pageflag = false;
               this.$Message.warning(res.msg);
@@ -77,9 +75,10 @@ export default {
             this.pageflag = false;
           });
     },
+
     init() {
       let total = this.countUserNumData.totalNum;
-      let colors = ["#ECA444", "#33A1DB"];
+      let colors = ["#ECA444", "#33A1DB"]; // 男性和女性颜色
       let piedata = {
         name: "用户总览",
         type: "pie",
@@ -90,28 +89,27 @@ export default {
           borderColor: "rgba(0,0,0,0)",
           borderWidth: 2,
         },
-
         color: colors,
         data: [
           {
             value: this.countUserNumData.lockNum,
             name: "男性",
             label: {
-              shadowColor: colors[0],
+              shadowColor: colors[0], // 修复颜色访问
             },
           },
           {
             value: this.countUserNumData.onlineNum,
             name: "女性",
             label: {
-              shadowColor: colors[2],
+              shadowColor: colors[1], // 修复颜色访问
             },
           },
         ],
       };
+
       this.options = {
         title: {
-          // zlevel: 0,
           text: ["{value|" + total + "}", "{name|总数}"].join("\n"),
           top: "center",
           left: "center",
@@ -144,13 +142,11 @@ export default {
           left: "center",
         },
         series: [
-          //展示圆点
           {
             ...piedata,
             tooltip: { show: true },
             label: {
               formatter: "{per|{d}%}",
-              //   position: "outside",
               rich: {
                 b: {
                   color: "#fff",
@@ -168,38 +164,15 @@ export default {
               },
             },
             labelLine: {
-              length: 20, // 第一段线 长度
-              length2: 36, // 第二段线 长度
-              show: false,
-
-            },
-            emphasis: {
-              show: true,
-            },
-          },
-          {
-            ...piedata,
-            tooltip: { show: true },
-            itemStyle: {},
-            label: {
-              backgroundColor: "inherit", //圆点颜色，auto：映射的系列色
-              height: 0,
-              width: 0,
-              lineHeight: 0,
-              borderRadius: 2.5,
-              shadowBlur: 8,
-              shadowColor: "auto",
-              padding: [2.5, -2.5, 2.5, -2.5],
-            },
-            labelLine: {
-              length: 20, // 第一段线 长度
-              length2: 36, // 第二段线 长度
+              length: 20,
+              length2: 36,
               show: false,
             },
           },
         ],
       };
     },
+
   },
 }
 </script>
