@@ -228,6 +228,7 @@ public class CityServiceImpl implements ICityService {
     @Override
     public List<Map<String, Object>> getDataByCommunityAll(String communityName) {
         List<Map<String, Object>> healthDataList = cityMapper.getDataByCommunityAll(communityName);
+        System.out.println(healthDataList);
         List<Map<String, Object>> resultList = packagePersonalHealthData(healthDataList);
         return resultList;
     }

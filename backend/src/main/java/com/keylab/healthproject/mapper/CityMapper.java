@@ -303,11 +303,11 @@ public interface CityMapper {
             latest_env AS (
                 SELECT 
                     e.family_user_id,
-                    e.co2,
-                    e.tvoc,
+                    e.co,
+                    e.pressure,
                     e.light,
                     e.pm25,
-                    e.db,
+                    e.pm10,
                     e.humidity,
                     e.temperature,
                     e.create_time,
@@ -330,11 +330,11 @@ public interface CityMapper {
                 hd.temperature AS p_temperature,
                 hd.heart_rate,
                 hd.blood_glucose,
-                ev.co2,
-                ev.tvoc,
+                ev.co,
+                ev.pressure,
                 ev.light,
                 ev.pm25,
-                ev.db,
+                ev.pm10,
                 ev.humidity,
                 ev.temperature AS e_temperature,
                 hd.create_time AS p_create_time,
@@ -350,11 +350,11 @@ public interface CityMapper {
 
     @Select("""
             SELECT 
-                ROUND(AVG(co2), 2) AS co2,
-                ROUND(AVG(tvoc), 2) AS tvoc,
+                ROUND(AVG(co), 2) AS co,
+                ROUND(AVG(pressure), 2) AS pressure,
                 ROUND(AVG(light), 2) AS light,
                 ROUND(AVG(pm25), 2) AS pm25,
-                ROUND(AVG(db), 2) AS db,
+                ROUND(AVG(pm10), 2) AS pm10,
                 ROUND(AVG(humidity), 2) AS humidity,
                 ROUND(AVG(temperature), 2) AS temperature,
                 DATE(MAX(create_time)) AS latest_date
@@ -369,11 +369,11 @@ public interface CityMapper {
 
     @Select("""
             SELECT 
-                ROUND(AVG(ev.co2), 2) AS co2,
-                ROUND(AVG(ev.tvoc), 2) AS tvoc,
+                ROUND(AVG(ev.co), 2) AS co,
+                ROUND(AVG(ev.pressure), 2) AS pressure,
                 ROUND(AVG(ev.light), 2) AS light,
                 ROUND(AVG(ev.pm25), 2) AS pm25,
-                ROUND(AVG(ev.db), 2) AS db,
+                ROUND(AVG(ev.pm10), 2) AS pm10,
                 ROUND(AVG(ev.humidity), 2) AS humidity,
                 ROUND(AVG(ev.temperature), 2) AS temperature,
                 DATE(MAX(ev.create_time)) AS latest_date
@@ -392,11 +392,11 @@ public interface CityMapper {
 
     @Select("""
             SELECT 
-                ROUND(AVG(ev.co2), 2) AS co2,
-                ROUND(AVG(ev.tvoc), 2) AS tvoc,
+                ROUND(AVG(ev.co), 2) AS co,
+                ROUND(AVG(ev.pressure), 2) AS pressure,
                 ROUND(AVG(ev.light), 2) AS light,
                 ROUND(AVG(ev.pm25), 2) AS pm25,
-                ROUND(AVG(ev.db), 2) AS db,
+                ROUND(AVG(ev.pm10), 2) AS pm10,
                 ROUND(AVG(ev.humidity), 2) AS humidity,
                 ROUND(AVG(ev.temperature), 2) AS temperature,
                 DATE(MAX(ev.create_time)) AS latest_date
@@ -479,11 +479,11 @@ public interface CityMapper {
 
     @Select("""
             SELECT 
-                e.co2, 
-                e.tvoc, 
+                e.co, 
+                e.pressure, 
                 e.light, 
                 e.pm25, 
-                e.db, 
+                e.pm10, 
                 e.humidity, 
                 e.temperature,
                 DATE_FORMAT(e.create_time, '%Y-%m-%d') AS latest_date  -- 格式化日期
