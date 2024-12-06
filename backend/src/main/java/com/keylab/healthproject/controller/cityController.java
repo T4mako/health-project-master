@@ -127,9 +127,12 @@ public class cityController {
     @RequestMapping("/getHealthDataByCommunityAll")
     public Result getDataByCommunityAll(@RequestParam String communityName) {
         if (communityName.isEmpty()) {
+//            System.out.println("空");
             return Result.error(ResultCodeEnum.PARAM_ERROR);
         } else {
+//            System.out.println("非空");
             List<Map<String, Object>> list = indexService.getDataByCommunityAll(communityName);
+//            System.out.println(list);
             if (list.isEmpty()) {
                 return Result.error(ResultCodeEnum.PARAM_ERROR);
             }

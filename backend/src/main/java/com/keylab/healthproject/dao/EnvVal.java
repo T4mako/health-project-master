@@ -8,18 +8,17 @@ public class EnvVal {
 
   private String id;
   private String deviceUuid;
-  private double co2;
-  private double tvoc;
-  private double light;
+  private double co;
+  private double pressure;
+  private String light;
   private double pm25;
-  private double db;
+  private double pm10;
   private double humidity;
   private double temperature;
   private long familyUserId;
   private long researchedPersonId;
   private long deptId;
   private String createTime;
-
 
   public String getId() {
     return id;
@@ -29,7 +28,6 @@ public class EnvVal {
     this.id = id;
   }
 
-
   public String getDeviceUuid() {
     return deviceUuid;
   }
@@ -38,33 +36,29 @@ public class EnvVal {
     this.deviceUuid = deviceUuid;
   }
 
-
-  public double getCo2() {
-    return co2;
+  public double getCo() {
+    return co;
   }
 
-  public void setCo2(double co2) {
-    this.co2 = co2;
+  public void setCo(double co) {
+    this.co = co;
   }
 
-
-  public double getTvoc() {
-    return tvoc;
+  public double getPressure() {
+    return pressure;
   }
 
-  public void setTvoc(double tvoc) {
-    this.tvoc = tvoc;
+  public void setPressure(double pressure) {
+    this.pressure = pressure;
   }
 
-
-  public double getLight() {
+  public String getLight() {
     return light;
   }
 
-  public void setLight(double light) {
+  public void setLight(String light) {
     this.light = light;
   }
-
 
   public double getPm25() {
     return pm25;
@@ -74,15 +68,13 @@ public class EnvVal {
     this.pm25 = pm25;
   }
 
-
-  public double getDb() {
-    return db;
+  public double getPm10() {
+    return pm10;
   }
 
-  public void setDb(double db) {
-    this.db = db;
+  public void setPm10(double pm10) {
+    this.pm10 = pm10;
   }
-
 
   public double getHumidity() {
     return humidity;
@@ -92,7 +84,6 @@ public class EnvVal {
     this.humidity = humidity;
   }
 
-
   public double getTemperature() {
     return temperature;
   }
@@ -100,7 +91,6 @@ public class EnvVal {
   public void setTemperature(double temperature) {
     this.temperature = temperature;
   }
-
 
   public long getFamilyUserId() {
     return familyUserId;
@@ -110,7 +100,6 @@ public class EnvVal {
     this.familyUserId = familyUserId;
   }
 
-
   public long getResearchedPersonId() {
     return researchedPersonId;
   }
@@ -118,7 +107,6 @@ public class EnvVal {
   public void setResearchedPersonId(long researchedPersonId) {
     this.researchedPersonId = researchedPersonId;
   }
-
 
   public long getDeptId() {
     return deptId;
@@ -128,7 +116,6 @@ public class EnvVal {
     this.deptId = deptId;
   }
 
-
   public String getCreateTime() {
     return createTime;
   }
@@ -136,5 +123,4 @@ public class EnvVal {
   public void setCreateTime(String createTime) {
     this.createTime = createTime;
   }
-
 }
