@@ -170,7 +170,6 @@ public class cityController {
         } else if (cityName.isEmpty()) {
             return Result.error(ResultCodeEnum.PARAM_ERROR);
         } else {
-//            System.out.println(cityName);
             Map<String, Object> map = indexService.getEnvironmentDataByCity(cityName);
             if (map == null) {
                 return Result.error(ResultCodeEnum.PARAM_ERROR);
