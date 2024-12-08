@@ -396,45 +396,36 @@ public interface CityMapper {
 
 
     @Select("""
-            
-             -- 假设传入的参数为 dep_id = 10
-            WITH CommunityData AS (
-                SELECT id
-                FROM community
-                WHERE dep_id = #{dep_id}
-            ),
-            LatestDate AS (
-                SELECT MAX(create_time) AS max_date
-                FROM env_val
-                WHERE dept_id IN (SELECT id FROM CommunityData)
-            ),
-            FilteredData AS (
-                SELECT *
-                FROM env_val
-                WHERE dept_id IN (SELECT id FROM CommunityData)
-            )
-            SELECT
-                COALESCE(ROUND(AVG(co), 2), 0) AS co,
-                COALESCE(ROUND(AVG(pressure), 2), 0) AS pressure,
-                COALESCE((
-                    SELECT light
-                    FROM FilteredData
-                    WHERE create_time >= (SELECT DATE_SUB(max_date, INTERVAL 7 DAY) FROM LatestDate)
-                    AND create_time <= (SELECT max_date FROM LatestDate)
-                    GROUP BY light
-                    ORDER BY COUNT(*) DESC
-                    LIMIT 1
-                ), '') AS light,
-                COALESCE(ROUND(AVG(pm25), 2), 0) AS pm25,
-                COALESCE(ROUND(AVG(pm10), 2), 0) AS pm10,
-                COALESCE(ROUND(AVG(humidity), 2), 0) AS humidity,
-                COALESCE(ROUND(AVG(temperature), 2), -999) AS temperature,
-                COALESCE(DATE(MAX(create_time)), '1970-01-01') AS latest_date
-            FROM
-                FilteredData
-            WHERE
-                create_time >= (SELECT DATE_SUB(max_date, INTERVAL 7 DAY) FROM LatestDate)
-                AND create_time <= (SELECT max_date FROM LatestDate);
+           
+            WITH LatestDate AS (
+               SELECT MAX(create_time) AS max_date
+               FROM env_val
+               WHERE dept_id = #{dep_id}
+           )
+           SELECT
+               COALESCE(ROUND(AVG(co), 2), 0) AS co,
+               COALESCE(ROUND(AVG(pressure), 2), 0) AS pressure,
+               COALESCE((
+                   SELECT light
+                   FROM env_val
+                   WHERE dept_id = #{dep_id}
+                   AND create_time >= (SELECT DATE_SUB(max_date, INTERVAL 7 DAY) FROM LatestDate)
+                   AND create_time <= (SELECT max_date FROM LatestDate)
+                   GROUP BY light
+                   ORDER BY COUNT(*) DESC
+                   LIMIT 1
+               ), '0') AS light,
+               COALESCE(ROUND(AVG(pm25), 2), 0) AS pm25,
+               COALESCE(ROUND(AVG(pm10), 2), 0) AS pm10,
+               COALESCE(ROUND(AVG(humidity), 2), 0) AS humidity,
+               COALESCE(ROUND(AVG(temperature), 2), -999) AS temperature,
+               COALESCE(DATE(MAX(create_time)), '1970-01-01') AS latest_date
+           FROM
+               env_val
+           WHERE
+               dept_id = #{dep_id}
+               AND create_time >= (SELECT DATE_SUB(max_date, INTERVAL 7 DAY) FROM LatestDate)
+               AND create_time <= (SELECT max_date FROM LatestDate);
             """)
     Map<String, Object> getEnvironmentDataByCity(Integer dep_id);
 
