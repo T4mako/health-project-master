@@ -256,19 +256,27 @@ public interface CityMapper {
     Map<String, Object> getHealthDataByCommunity(String communityName);
 
     @Select("""
+            WITH LatestDate AS (
+                SELECT MAX(hd.create_time) AS max_date
+                FROM health_data hd
+                JOIN person_data pd ON hd.researched_person_id = pd.id
+                JOIN community c ON pd.dept_id = c.id
+                WHERE c.name = #{communityName}
+            )
+            
             SELECT
                 pd.id AS person_id,
                 pd.gender,
                 pd.age,
                 pd.dept_name,
                 c.dep_id,
-                FORMAT(AVG(hd.breath_rate), 1) AS breath_rate,
-                FORMAT(AVG(hd.systolic), 1) AS systolic,
-                FORMAT(AVG(hd.diastolic), 1) AS diastolic,
-                FORMAT(AVG(hd.blood_oxygen), 1) AS blood_oxygen,
-                FORMAT(AVG(hd.temperature), 1) AS temperature,
-                FORMAT(AVG(hd.heart_rate), 1) AS heart_rate,
-                FORMAT(AVG(hd.blood_glucose), 1) AS blood_glucose
+                COALESCE(FORMAT(AVG(hd.breath_rate), 1), 0) AS breath_rate,
+                COALESCE(FORMAT(AVG(hd.systolic), 1), 0) AS systolic,
+                COALESCE(FORMAT(AVG(hd.diastolic), 1), 0) AS diastolic,
+                COALESCE(FORMAT(AVG(hd.blood_oxygen), 1), 0) AS blood_oxygen,
+                COALESCE(FORMAT(AVG(hd.temperature), 1), 0) AS temperature,
+                COALESCE(FORMAT(AVG(hd.heart_rate), 1), 0) AS heart_rate,
+                COALESCE(FORMAT(AVG(hd.blood_glucose), 1), 0) AS blood_glucose
             FROM
                 community c
             JOIN
@@ -277,16 +285,17 @@ public interface CityMapper {
                 health_data hd ON pd.id = hd.researched_person_id
             WHERE
                 c.name = #{communityName}
-                AND hd.create_time >= DATE_FORMAT(NOW() - INTERVAL 1 MONTH, '%Y-%m-01')
-                AND hd.create_time < DATE_FORMAT(NOW(), '%Y-%m-01')
+                AND hd.create_time >= DATE_SUB((SELECT max_date FROM LatestDate), INTERVAL 1 MONTH)
+                AND hd.create_time < (SELECT max_date FROM LatestDate)
             GROUP BY
                 pd.id, pd.gender, pd.age, pd.dept_name, c.dep_id;
             """)
+//    返回指定小区全员健康数据
     List<Map<String, Object>> getDataByCommunityAll(String communityName);
 
     @Select("""
             WITH latest_health AS (
-                SELECT 
+                SELECT
                     h.researched_person_id,
                     h.breath_rate,
                     h.systolic,
@@ -297,11 +306,11 @@ public interface CityMapper {
                     h.blood_glucose,
                     h.create_time,
                     ROW_NUMBER() OVER (PARTITION BY h.researched_person_id ORDER BY h.create_time DESC) AS rn
-                FROM 
+                FROM
                     health_data h
             ),
             latest_env AS (
-                SELECT 
+                SELECT
                     e.family_user_id,
                     e.co,
                     e.pressure,
@@ -312,7 +321,7 @@ public interface CityMapper {
                     e.temperature,
                     e.create_time,
                     ROW_NUMBER() OVER (PARTITION BY e.family_user_id ORDER BY e.create_time DESC) AS rn
-                FROM 
+                FROM
                     env_val e
             )
             SELECT
@@ -323,22 +332,22 @@ public interface CityMapper {
                 pd.height,
                 pd.weight,
                 pd.bmi,
-                hd.breath_rate,
-                hd.systolic,
-                hd.diastolic,
-                hd.blood_oxygen,
-                hd.temperature AS p_temperature,
-                hd.heart_rate,
-                hd.blood_glucose,
-                ev.co,
-                ev.pressure,
-                ev.light,
-                ev.pm25,
-                ev.pm10,
-                ev.humidity,
-                ev.temperature AS e_temperature,
-                hd.create_time AS p_create_time,
-                ev.create_time AS e_create_time
+                COALESCE(hd.breath_rate, 0) AS breath_rate,
+                COALESCE(hd.systolic, 0) AS systolic,
+                COALESCE(hd.diastolic, 0) AS diastolic,
+                COALESCE(hd.blood_oxygen, 0) AS blood_oxygen,
+                COALESCE(hd.temperature, 0) AS p_temperature,
+                COALESCE(hd.heart_rate, 0) AS heart_rate,
+                COALESCE(hd.blood_glucose, 0) AS blood_glucose,
+                COALESCE(ev.co, 0) AS co,
+                COALESCE(ev.pressure, 0) AS pressure,
+                COALESCE(ev.light, 0) AS light,
+                COALESCE(ev.pm25, 0) AS pm25,
+                COALESCE(ev.pm10, 0) AS pm10,
+                COALESCE(ev.humidity, 0) AS humidity,
+                COALESCE(ev.temperature, -999) AS e_temperature,
+                COALESCE(hd.create_time, '1970-01-01') AS p_create_time,  -- 使用默认日期
+                COALESCE(ev.create_time, '1970-01-01') AS e_create_time   -- 使用默认日期
             FROM
                 person_data pd
             LEFT JOIN latest_health hd ON pd.id = hd.researched_person_id AND hd.rn = 1
@@ -349,83 +358,157 @@ public interface CityMapper {
     Map<String, Object> getPersonalHealthData(Integer id);
 
     @Select("""
-            SELECT 
-                ROUND(AVG(co), 2) AS co,
-                ROUND(AVG(pressure), 2) AS pressure,
-                ROUND(AVG(light), 2) AS light,
-                ROUND(AVG(pm25), 2) AS pm25,
-                ROUND(AVG(pm10), 2) AS pm10,
-                ROUND(AVG(humidity), 2) AS humidity,
-                ROUND(AVG(temperature), 2) AS temperature,
-                DATE(MAX(create_time)) AS latest_date
-            FROM 
+            WITH LatestDate AS (
+                SELECT MAX(create_time) AS max_date
+                FROM env_val
+            ),
+            LightFrequency AS (
+                SELECT
+                    light,
+                    COUNT(*) AS frequency
+                FROM
+                    env_val
+                WHERE
+                    create_time >= (SELECT DATE_SUB(max_date, INTERVAL 7 DAY) FROM LatestDate)
+                    AND create_time <= (SELECT max_date FROM LatestDate)
+                GROUP BY
+                    light
+                ORDER BY
+                    frequency DESC
+                LIMIT 1
+            )
+            SELECT
+                COALESCE(ROUND(AVG(co), 2), 0) AS co,
+                COALESCE(ROUND(AVG(pressure), 2), 0) AS pressure,
+                COALESCE((SELECT light FROM LightFrequency), '') AS light,
+                COALESCE(ROUND(AVG(pm25), 2), 0) AS pm25,
+                COALESCE(ROUND(AVG(pm10), 2), 0) AS pm10,
+                COALESCE(ROUND(AVG(humidity), 2), 0) AS humidity,
+                COALESCE(ROUND(AVG(temperature), 2), -999) AS temperature,
+                COALESCE(DATE(MAX(create_time)), '1970-01-01') AS latest_date
+            FROM
                 env_val
-            WHERE 
-                create_time >= NOW() - INTERVAL 7 DAY;
+            WHERE
+                create_time >= (SELECT DATE_SUB(max_date, INTERVAL 7 DAY) FROM LatestDate)
+                AND create_time <= (SELECT max_date FROM LatestDate);
             """)
-        //COUNT(DISTINCT family_user_id) AS family_count
     Map<String, Object> getEnvironmentData();
 
 
     @Select("""
-            SELECT 
-                ROUND(AVG(ev.co), 2) AS co,
-                ROUND(AVG(ev.pressure), 2) AS pressure,
-                ROUND(AVG(ev.light), 2) AS light,
-                ROUND(AVG(ev.pm25), 2) AS pm25,
-                ROUND(AVG(ev.pm10), 2) AS pm10,
-                ROUND(AVG(ev.humidity), 2) AS humidity,
-                ROUND(AVG(ev.temperature), 2) AS temperature,
-                DATE(MAX(ev.create_time)) AS latest_date
-            FROM 
-                env_val ev
-            WHERE 
-                ev.dept_id IN (
-                    SELECT c.id
-                    FROM community c
-                    WHERE c.dep_id = #{Id}
-                )
-                AND ev.create_time >= NOW() - INTERVAL 7 DAY;
+            
+             -- 假设传入的参数为 dep_id = 10
+            WITH CommunityData AS (
+                SELECT id
+                FROM community
+                WHERE dep_id = #{dep_id}
+            ),
+            LatestDate AS (
+                SELECT MAX(create_time) AS max_date
+                FROM env_val
+                WHERE dept_id IN (SELECT id FROM CommunityData)
+            ),
+            FilteredData AS (
+                SELECT *
+                FROM env_val
+                WHERE dept_id IN (SELECT id FROM CommunityData)
+            )
+            SELECT
+                COALESCE(ROUND(AVG(co), 2), 0) AS co,
+                COALESCE(ROUND(AVG(pressure), 2), 0) AS pressure,
+                COALESCE((
+                    SELECT light
+                    FROM FilteredData
+                    WHERE create_time >= (SELECT DATE_SUB(max_date, INTERVAL 7 DAY) FROM LatestDate)
+                    AND create_time <= (SELECT max_date FROM LatestDate)
+                    GROUP BY light
+                    ORDER BY COUNT(*) DESC
+                    LIMIT 1
+                ), '') AS light,
+                COALESCE(ROUND(AVG(pm25), 2), 0) AS pm25,
+                COALESCE(ROUND(AVG(pm10), 2), 0) AS pm10,
+                COALESCE(ROUND(AVG(humidity), 2), 0) AS humidity,
+                COALESCE(ROUND(AVG(temperature), 2), -999) AS temperature,
+                COALESCE(DATE(MAX(create_time)), '1970-01-01') AS latest_date
+            FROM
+                FilteredData
+            WHERE
+                create_time >= (SELECT DATE_SUB(max_date, INTERVAL 7 DAY) FROM LatestDate)
+                AND create_time <= (SELECT max_date FROM LatestDate);
             """)
-        //COUNT(DISTINCT ev.family_user_id) AS family_count
-    Map<String, Object> getEnvironmentDataByCity(Integer Id);
+    Map<String, Object> getEnvironmentDataByCity(Integer dep_id);
 
     @Select("""
-            SELECT 
+            WITH LatestDate AS (
+                SELECT MAX(ev.create_time) AS max_date
+                FROM env_val ev
+                WHERE ev.dept_id IN (
+                    SELECT c.id
+                    FROM community c
+                    WHERE c.name = #{cityName}
+                )
+            ),
+            LightFrequency AS (
+                SELECT
+                    ev.light,
+                    COUNT(*) AS frequency
+                FROM
+                    env_val ev
+                WHERE
+                    ev.dept_id IN (
+                        SELECT c.id
+                        FROM community c
+                        WHERE c.name = #{cityName}
+                    )
+                    AND ev.create_time >= DATE_SUB((SELECT max_date FROM LatestDate), INTERVAL 7 DAY)
+                    AND ev.create_time < (SELECT max_date FROM LatestDate)
+                GROUP BY
+                    ev.light
+                ORDER BY
+                    frequency DESC
+                LIMIT 1
+            )
+            SELECT
                 ROUND(AVG(ev.co), 2) AS co,
                 ROUND(AVG(ev.pressure), 2) AS pressure,
-                ROUND(AVG(ev.light), 2) AS light,
+                (SELECT light FROM LightFrequency) AS light,
                 ROUND(AVG(ev.pm25), 2) AS pm25,
                 ROUND(AVG(ev.pm10), 2) AS pm10,
                 ROUND(AVG(ev.humidity), 2) AS humidity,
                 ROUND(AVG(ev.temperature), 2) AS temperature,
                 DATE(MAX(ev.create_time)) AS latest_date
-            FROM 
+            FROM
                 env_val ev
-            WHERE 
+            WHERE
                 ev.dept_id IN (
                     SELECT c.id
                     FROM community c
                     WHERE c.name = #{cityName}
                 )
-                AND ev.create_time >= NOW() - INTERVAL 7 DAY;
+                AND ev.create_time >= DATE_SUB((SELECT max_date FROM LatestDate), INTERVAL 7 DAY)
+                AND ev.create_time < (SELECT max_date FROM LatestDate);
             """)
     Map<String, Object> getCommunityEnvironmentDataByCity(String cityName);
 
     @Select("""
+            WITH LatestDate AS (
+                SELECT MAX(hd.create_time) AS max_date
+                FROM health_data hd
+            )
+            
             SELECT
                 pd.id AS person_id,
                 pd.gender,
                 pd.age,
                 pd.dept_name,
                 c.dep_id,
-                FORMAT(AVG(hd.breath_rate), 1) AS breath_rate,
-                FORMAT(AVG(hd.systolic), 1) AS systolic,
-                FORMAT(AVG(hd.diastolic), 1) AS diastolic,
-                FORMAT(AVG(hd.blood_oxygen), 1) AS blood_oxygen,
-                FORMAT(AVG(hd.temperature), 1) AS temperature,
-                FORMAT(AVG(hd.heart_rate), 1) AS heart_rate,
-                FORMAT(AVG(hd.blood_glucose), 1) AS blood_glucose
+                FORMAT(COALESCE(AVG(hd.breath_rate), 0), 1) AS breath_rate,
+                FORMAT(COALESCE(AVG(hd.systolic), 0), 1) AS systolic,
+                FORMAT(COALESCE(AVG(hd.diastolic), 0), 1) AS diastolic,
+                FORMAT(COALESCE(AVG(hd.blood_oxygen), 0), 1) AS blood_oxygen,
+                FORMAT(COALESCE(AVG(hd.temperature), 0), 1) AS temperature,
+                FORMAT(COALESCE(AVG(hd.heart_rate), 0), 1) AS heart_rate,
+                FORMAT(COALESCE(AVG(hd.blood_glucose), 0), 1) AS blood_glucose
             FROM
                 community c
             JOIN
@@ -433,8 +516,8 @@ public interface CityMapper {
             LEFT JOIN
                 health_data hd ON pd.id = hd.researched_person_id
             WHERE
-                hd.create_time >= DATE_FORMAT(NOW() - INTERVAL 1 MONTH, '%Y-%m-01')
-                AND hd.create_time < DATE_FORMAT(NOW(), '%Y-%m-01')
+                hd.create_time >= DATE_SUB((SELECT max_date FROM LatestDate), INTERVAL 1 MONTH)
+                AND hd.create_time < (SELECT max_date FROM LatestDate)
             GROUP BY
                 pd.id, pd.gender, pd.age, pd.dept_name, c.dep_id
             ORDER BY
@@ -444,7 +527,14 @@ public interface CityMapper {
     List<Map<String, Object>> getHealthDataRandomFifty();
 
     @Select("""
-            WITH RandomIDs AS (
+            WITH LatestDate AS (
+                SELECT MAX(hd.create_time) AS max_date
+                FROM health_data hd
+                JOIN person_data pd ON hd.researched_person_id = pd.id
+                JOIN community c ON pd.dept_id = c.id
+                WHERE c.dep_id = #{id}
+            ),
+            RandomIDs AS (
                 SELECT pd.id
                 FROM person_data pd
                 JOIN community c ON c.id = pd.dept_id
@@ -457,43 +547,43 @@ public interface CityMapper {
                 pd.age,
                 pd.dept_name,
                 c.dep_id,
-                FORMAT(AVG(hd.breath_rate), 1) AS breath_rate,
-                FORMAT(AVG(hd.systolic), 1) AS systolic,
-                FORMAT(AVG(hd.diastolic), 1) AS diastolic,
-                FORMAT(AVG(hd.blood_oxygen), 1) AS blood_oxygen,
-                FORMAT(AVG(hd.temperature), 1) AS temperature,
-                FORMAT(AVG(hd.heart_rate), 1) AS heart_rate,
-                FORMAT(AVG(hd.blood_glucose), 1) AS blood_glucose
+                FORMAT(COALESCE(AVG(hd.breath_rate), 0), 1) AS breath_rate,
+                FORMAT(COALESCE(AVG(hd.systolic), 0), 1) AS systolic,
+                FORMAT(COALESCE(AVG(hd.diastolic), 0), 1) AS diastolic,
+                FORMAT(COALESCE(AVG(hd.blood_oxygen), 0), 1) AS blood_oxygen,
+                FORMAT(COALESCE(AVG(hd.temperature), 0), 1) AS temperature,
+                FORMAT(COALESCE(AVG(hd.heart_rate), 0), 1) AS heart_rate,
+                FORMAT(COALESCE(AVG(hd.blood_glucose), 0), 1) AS blood_glucose
             FROM
                 RandomIDs ri
             JOIN person_data pd ON ri.id = pd.id
             LEFT JOIN health_data hd ON pd.id = hd.researched_person_id
             LEFT JOIN community c ON c.id = pd.dept_id
             WHERE
-                hd.create_time >= DATE_FORMAT(NOW() - INTERVAL 1 MONTH, '%Y-%m-01')
-                AND hd.create_time < DATE_FORMAT(NOW(), '%Y-%m-01')
+                hd.create_time >= DATE_SUB((SELECT max_date FROM LatestDate), INTERVAL 1 MONTH)
+                AND hd.create_time < (SELECT max_date FROM LatestDate)
             GROUP BY
                 pd.id, pd.gender, pd.age, pd.dept_name, c.dep_id;
             """)
     List<Map<String, Object>> getHealthDataRandomFiftyByCity(Integer id);
 
     @Select("""
-            SELECT 
-                e.co, 
-                e.pressure, 
-                e.light, 
-                e.pm25, 
-                e.pm10, 
-                e.humidity, 
-                e.temperature,
-                DATE_FORMAT(e.create_time, '%Y-%m-%d') AS latest_date  -- 格式化日期
-            FROM 
+            SELECT
+                COALESCE(e.co, 0) AS co,
+                COALESCE(e.pressure, 0) AS pressure,
+                COALESCE(e.light, '0') AS light,
+                COALESCE(e.pm25, 0) AS pm25,
+                COALESCE(e.pm10, 0) AS pm10,
+                COALESCE(e.humidity, 0) AS humidity,
+                COALESCE(e.temperature, -999) AS temperature,
+                DATE_FORMAT(COALESCE(e.create_time, NOW()), '%Y-%m-%d') AS latest_date  -- 如果没有数据，使用当前时间
+            FROM
                 env_val e
-            JOIN 
+            JOIN
                 person_data p ON e.family_user_id = p.family_user_id
-            WHERE 
+            WHERE
                 p.id = #{id}
-            ORDER BY 
+            ORDER BY
                 e.create_time DESC
             LIMIT 1;
             """)
