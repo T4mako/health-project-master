@@ -336,7 +336,7 @@ public interface CityMapper {
                 COALESCE(hd.systolic, 0) AS systolic,
                 COALESCE(hd.diastolic, 0) AS diastolic,
                 COALESCE(hd.blood_oxygen, 0) AS blood_oxygen,
-                COALESCE(hd.temperature, 0) AS p_temperature,
+                COALESCE(hd.temperature, -999) AS p_temperature,
                 COALESCE(hd.heart_rate, 0) AS heart_rate,
                 COALESCE(hd.blood_glucose, 0) AS blood_glucose,
                 COALESCE(ev.co, 0) AS co,
@@ -346,8 +346,8 @@ public interface CityMapper {
                 COALESCE(ev.pm10, 0) AS pm10,
                 COALESCE(ev.humidity, 0) AS humidity,
                 COALESCE(ev.temperature, -999) AS e_temperature,
-                COALESCE(hd.create_time, '1970-01-01') AS p_create_time,  -- 使用默认日期
-                COALESCE(ev.create_time, '1970-01-01') AS e_create_time   -- 使用默认日期
+                COALESCE(hd.create_time, '0') AS p_create_time,
+                COALESCE(ev.create_time, '0') AS e_create_time
             FROM
                 person_data pd
             LEFT JOIN latest_health hd ON pd.id = hd.researched_person_id AND hd.rn = 1
@@ -385,7 +385,7 @@ public interface CityMapper {
                 COALESCE(ROUND(AVG(pm10), 2), 0) AS pm10,
                 COALESCE(ROUND(AVG(humidity), 2), 0) AS humidity,
                 COALESCE(ROUND(AVG(temperature), 2), -999) AS temperature,
-                COALESCE(DATE(MAX(create_time)), '1970-01-01') AS latest_date
+                COALESCE(DATE(MAX(create_time)), '0') AS latest_date
             FROM
                 env_val
             WHERE
@@ -419,7 +419,7 @@ public interface CityMapper {
                COALESCE(ROUND(AVG(pm10), 2), 0) AS pm10,
                COALESCE(ROUND(AVG(humidity), 2), 0) AS humidity,
                COALESCE(ROUND(AVG(temperature), 2), -999) AS temperature,
-               COALESCE(DATE(MAX(create_time)), '1970-01-01') AS latest_date
+               COALESCE(DATE(MAX(create_time)), '0') AS latest_date
            FROM
                env_val
            WHERE
@@ -430,54 +430,36 @@ public interface CityMapper {
     Map<String, Object> getEnvironmentDataByCity(Integer dep_id);
 
     @Select("""
-            WITH LatestDate AS (
-                SELECT MAX(ev.create_time) AS max_date
-                FROM env_val ev
-                WHERE ev.dept_id IN (
-                    SELECT c.id
-                    FROM community c
-                    WHERE c.name = #{cityName}
-                )
-            ),
-            LightFrequency AS (
+            WITH latest_data AS (
                 SELECT
-                    ev.light,
-                    COUNT(*) AS frequency
+                    e.*,
+                    ROW_NUMBER() OVER (PARTITION BY e.family_user_id ORDER BY e.create_time DESC) AS rn
                 FROM
-                    env_val ev
+                    env_val e
+                INNER JOIN
+                    person_data p ON e.family_user_id = p.family_user_id
                 WHERE
-                    ev.dept_id IN (
-                        SELECT c.id
-                        FROM community c
-                        WHERE c.name = #{cityName}
-                    )
-                    AND ev.create_time >= DATE_SUB((SELECT max_date FROM LatestDate), INTERVAL 7 DAY)
-                    AND ev.create_time < (SELECT max_date FROM LatestDate)
-                GROUP BY
-                    ev.light
-                ORDER BY
-                    frequency DESC
-                LIMIT 1
+                    p.dept_name IN (SELECT dept_name FROM person_data WHERE dept_name = #{cityName})
+                    AND e.create_time >= DATE_SUB((SELECT MAX(create_time) FROM env_val), INTERVAL 7 DAY)
             )
             SELECT
-                ROUND(AVG(ev.co), 2) AS co,
-                ROUND(AVG(ev.pressure), 2) AS pressure,
-                (SELECT light FROM LightFrequency) AS light,
-                ROUND(AVG(ev.pm25), 2) AS pm25,
-                ROUND(AVG(ev.pm10), 2) AS pm10,
-                ROUND(AVG(ev.humidity), 2) AS humidity,
-                ROUND(AVG(ev.temperature), 2) AS temperature,
-                DATE(MAX(ev.create_time)) AS latest_date
+                CASE WHEN COUNT(*) > 0 THEN ROUND(AVG(co), 2) ELSE NULL END AS co,
+                CASE WHEN COUNT(*) > 0 THEN ROUND(AVG(pressure), 2) ELSE NULL END AS pressure,
+                CASE WHEN COUNT(*) > 0 THEN ROUND(AVG(pm25), 2) ELSE NULL END AS pm25,
+                CASE WHEN COUNT(*) > 0 THEN ROUND(AVG(pm10), 2) ELSE NULL END AS pm10,
+                CASE WHEN COUNT(*) > 0 THEN ROUND(AVG(humidity), 2) ELSE NULL END AS humidity,
+                CASE WHEN COUNT(*) > 0 THEN ROUND(AVG(temperature), 2) ELSE NULL END AS temperature,
+                (SELECT light FROM (
+                    SELECT light, COUNT(*) AS cnt
+                    FROM latest_data
+                    GROUP BY light
+                    ORDER BY cnt DESC
+                    LIMIT 1
+                ) AS light_freq) AS light
             FROM
-                env_val ev
+                latest_data
             WHERE
-                ev.dept_id IN (
-                    SELECT c.id
-                    FROM community c
-                    WHERE c.name = #{cityName}
-                )
-                AND ev.create_time >= DATE_SUB((SELECT max_date FROM LatestDate), INTERVAL 7 DAY)
-                AND ev.create_time < (SELECT max_date FROM LatestDate);
+                rn = 1;
             """)
     Map<String, Object> getCommunityEnvironmentDataByCity(String cityName);
 
@@ -567,7 +549,7 @@ public interface CityMapper {
                 COALESCE(e.pm10, 0) AS pm10,
                 COALESCE(e.humidity, 0) AS humidity,
                 COALESCE(e.temperature, -999) AS temperature,
-                DATE_FORMAT(COALESCE(e.create_time, NOW()), '%Y-%m-%d') AS latest_date  -- 如果没有数据，使用当前时间
+                DATE_FORMAT(COALESCE(e.create_time, NOW()), '%Y-%m-%d') AS latest_date
             FROM
                 env_val e
             JOIN
