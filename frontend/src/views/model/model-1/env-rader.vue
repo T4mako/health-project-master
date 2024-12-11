@@ -1,7 +1,10 @@
 <template>
   <div>
+    <!-- 第一个空的 div，用于显示警告文字 -->
+    <div style="font-size: 18px;color: rgb(255, 220, 96); margin: 8px;">天气：{{ this.wealth }}
+    </div>
     <Echart id="leftCenter" :options="option" class="left_center_inner" v-if="true" ref="charts" width="600px"
-      height="380px" />
+      height="360px" />
   </div>
 </template>
 
@@ -11,7 +14,8 @@ import { baseUrl } from "@/api/api";
 export default {
   data() {
     return {
-      option:{
+      wealth: '',
+      option: {
         legend: {
           bottom: 5,
           data: ['环境数值'],
@@ -26,13 +30,13 @@ export default {
         },
         radar: {
           indicator: [
-            { name: 'CO2', max: 1500, min: 400 },
-            { name: 'TVOC', max: 1000, min: 0 },
-            { name: '光照', max: 60000, min: 0 },
-            { name: 'PM2.5', max: 500, min: 0 },
-            { name: '声音', max: 100, min: 0 },
-            { name: '温度', max: 50, min: 0 },
-            { name: '湿度', max: 95, min: 20 },
+            { name: 'CO', max: 2, min: 0 },
+            { name: '气压', max: 2000, min: 0 },
+            { name: '天气', max: 60000, min: 0 },
+            { name: 'PM2.5', max: 100, min: 0 },
+            { name: 'PM10', max: 500, min: 0 },
+            { name: '温度', max: 50, min: -20 },
+            { name: '湿度', max: 100, min: 0 },
           ],
           splitNumber: 5,
           axisName: {
@@ -65,7 +69,7 @@ export default {
             type: 'radar',
             data: [
               {
-                value: [518, 170, 28695, 38, 36, 26, 80],
+                value: [0, 0, 0, 0, 0, 0, 0],
                 name: '环境数值',
                 itemStyle: {
                   color: '#F9713C'
@@ -86,19 +90,23 @@ export default {
     axios.get(`${baseUrl}/env/userEnv`, { params: { id: this.userId } }).then(response => {
       if (response.code === "200") {
         const data = response.data;
+        console.log(data);
         
-        // 将数据映射到雷达图的value
-        const radarValues = [
-            data.co2 + 650,          // CO2
-            data.tvoc + 400,         // TVOC
-            data.light + 30000,        // 光照
-            data.pm25 + 50,         // PM2.5
-            data.db,           // 声音
-            data.temperature,  // 温度
-            data.humidity      // 湿度
+        if (data != null) {
+          // 将数据映射到雷达图的value
+          const radarValues = [
+            data.co,
+            data.pressure=0?800:data.pressure,
+            0,    // 日照   
+            data.pm25,
+            data.pm10,
+            data.temperature=0?-20:data.temperature,
+            data.humidity
           ];
-
+          this.wealth = data.light
           this.option.series[0].data[0].value = radarValues;
+        }
+
       } else {
         this.pageflag = false;
         this.$Message({

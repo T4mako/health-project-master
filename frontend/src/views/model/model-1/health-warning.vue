@@ -62,11 +62,14 @@ export default {
     this.userId = this.$route.query.id    
     axios.get(`${baseUrl}/user/warning`,{  params:{id:this.userId}}).then(response => {
         const warningData = response.data;
+        console.log(warningData);
+        
         const counts = {
             '安全': 0,
             '一级预警': 0,
             '二级预警': 0,
-            '紧急预警': 0
+            '三级预警': 0,
+            '数据缺失':0
           };
 
           // 统计每种预警级别的数量
@@ -82,7 +85,9 @@ export default {
             { value: counts['安全'], name: '安全' },
             { value: counts['一级预警'], name: '一级预警' },
             { value: counts['二级预警'], name: '二级预警' },
-            { value: counts['紧急预警'], name: '紧急预警' }
+            { value: counts['三级预警'], name: '紧急预警' },
+            { value: counts['数据缺失'], name: '数据未测量' },
+
           ];
             
         if (response.code === "200") {

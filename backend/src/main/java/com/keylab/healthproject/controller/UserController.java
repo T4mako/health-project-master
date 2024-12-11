@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -84,15 +85,7 @@ public class UserController {
 
     @GetMapping("/allDayInfo")
     public Result allDayInfo(@RequestParam long id) {
-        Map<String, Object> res = new HashMap<>();
-        LambdaQueryWrapper<PersonData> queryWrapper1 = new LambdaQueryWrapper<>();
-        queryWrapper1.eq(PersonData::getId, id);
-        PersonData personData = iPersonDataService.getOne(queryWrapper1);
-        LambdaQueryWrapper<HealthData> queryWrapper2 = new LambdaQueryWrapper<>();
-        queryWrapper2.eq(HealthData::getResearchedPersonId,id).eq(HealthData::getCreateTime,"2024-10-31");
-        HealthData healthData = iHealthDataService.getOne(queryWrapper2);
-        res.put("pd", personData);
-        res.put("hd", healthData);
+        List<Map<String, Object>> res = iHealthDataService.getLatestFullHData(id);
         return Result.success(res);
     }
 

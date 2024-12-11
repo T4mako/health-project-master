@@ -23,4 +23,7 @@ public interface PersonDataMapper extends BaseMapper<PersonData> {
             "on h.dept_id = " +
             "(select dep_id from community c where id = pd.dept_id)")
     List<Map<String, Object>> allUserBaseInfo();
+
+    @Select("SELECT * FROM person_data WHERE dept_id = #{deptId}")
+    List<PersonData> selectByDeptId(long deptId);
 }

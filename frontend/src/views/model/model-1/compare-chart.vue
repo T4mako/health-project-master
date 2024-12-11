@@ -71,7 +71,7 @@ export default {
         { value: 'systolic', label: '收缩压' },
         { value: 'diastolic', label: '舒张压' },
         { value: 'blood_oxygen', label: '血氧' },
-        { value: 'temperature', label: '温度' },
+        // { value: 'temperature', label: '温度' },
         { value: 'heart_rate', label: '心率' },
         { value: 'blood_glucose', label: '血糖' }
       ],

@@ -25,13 +25,20 @@ export default {
         },
         radar: {
           indicator: [
-            { name: '呼吸率', max: 50, min: 0 },
-            { name: '收缩压', max: 200, min: 50 },
-            { name: '舒张压', max: 160, min: 30 },
-            { name: '血氧', max: 100, min: 80 },
-            { name: '温度', max: 45, min: 32 },
-            { name: '心率', max: 220, min: 50 },
-            { name: '血糖', max: 20, min: 0 }
+            // { name: '呼吸率', max: 50, min: 0 },
+            // { name: '收缩压', max: 200, min: 50 },
+            // { name: '舒张压', max: 160, min: 30 },
+            // { name: '血氧', max: 100, min: 80 },
+            // { name: '温度', max: 45, min: 32 },
+            // { name: '心率', max: 220, min: 50 },
+            // { name: '血糖', max: 20, min: 0 }
+            { name: "呼吸率", max: 35, min: 0 },
+            { name: "收缩压", max: 200, min: 0 },
+            { name: "舒张压", max: 160, min: 0 },
+            { name: "血氧", max: 100, min: 0 },
+            { name: "温度", max: 45, min: 0 },
+            { name: "心率", max: 220, min: 0 },
+            { name: "血糖", max: 33, min: 0 }
           ],
           splitNumber: 5,
           axisName: {
@@ -84,22 +91,24 @@ export default {
     };
   },
   created() {
+    
     this.userId = this.$route.query.id;
     axios
         .get(`${baseUrl}/user/dayHData`, { params: { id: this.userId } })
         .then(response => {
           if (response.code === "200") {
           const healthData = response.data;
+          
           // 使用返回的数据填充“实际指标”值
           this.option.series[0].data[1].value = [
-              healthData[0].breath_rate,
-              healthData[0].systolic,
-              healthData[0].diastolic,
-              healthData[0].blood_oxygen,
-              healthData[0].temperature,
-              healthData[0].heart_rate,
-              healthData[0].blood_glucose
-            ];
+            healthData[0].breath_rate,
+            healthData[0].systolic < 50 ? 50 : healthData[0].systolic,
+            healthData[0].diastolic < 30 ? 30 : healthData[0].diastolic,
+            healthData[0].blood_oxygen < 80 ? 80 : healthData[0].blood_oxygen,
+            healthData[0].temperature < 32 ? 32 : healthData[0].temperature,
+            healthData[0].heart_rate < 50 ? 50 :  healthData[0].heart_rate,
+            healthData[0].blood_glucose
+          ];
 
           } else {
             this.$Message({
