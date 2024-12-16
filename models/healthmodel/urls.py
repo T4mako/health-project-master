@@ -19,4 +19,5 @@ from django.urls import path,include
 
 urlpatterns = [
     path("", include('predictions.urls')),  # 将预测路由包含在 API 路由下
+    path('admin/', admin.site.urls),
 ]

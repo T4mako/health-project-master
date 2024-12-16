@@ -99,6 +99,8 @@ export default {
           });
       }))
         .then(results => {
+          console.log(results);
+          
           // Extract prediction data for each disease
           const heartDiseaseData = results[0]; // Heart disease prediction data
           const diabetesData = results[1]; // Diabetes prediction data

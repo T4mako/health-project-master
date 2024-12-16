@@ -3,32 +3,48 @@ from django.views.decorators.csrf import csrf_exempt
 import joblib
 import numpy as np
 import os
+import joblib
+from django.conf import settings
 
-# 获取当前文件的绝对路径
-current_dir = os.path.dirname(os.path.abspath(__file__))
 
-# 构建模型文件的绝对路径
-stroke_model_path = os.path.join(current_dir, '..', 'models', 'stroke', 'stroke_model.pkl')
+# 加载中风模型、Scaler 和 Label Encoder
+stroke_model_path = os.path.join(settings.BASE_DIR, 'models', 'stroke', 'stroke_model.pkl')
+if not os.path.exists(stroke_model_path):
+    raise FileNotFoundError(f"File not found: {stroke_model_path}")
 stroke_model = joblib.load(stroke_model_path)
 
-scaler_path = os.path.join(current_dir, '..', 'models', 'stroke', 'scaler_stroke.pkl')
+scaler_path = os.path.join(settings.BASE_DIR, 'models', 'stroke', 'scaler_stroke.pkl')
+if not os.path.exists(scaler_path):
+    raise FileNotFoundError(f"File not found: {scaler_path}")
 scaler = joblib.load(scaler_path)
 
-label_encoder_path = os.path.join(current_dir, '..', 'models', 'stroke', 'label_encoder.pkl')
+label_encoder_path = os.path.join(settings.BASE_DIR, 'models', 'stroke', 'label_encoder.pkl')
+if not os.path.exists(label_encoder_path):
+    raise FileNotFoundError(f"File not found: {label_encoder_path}")
 label_encoder = joblib.load(label_encoder_path)
 
-diabetes_features_path = os.path.join(current_dir, '..', 'models', 'diabetes', 'diabetes_features.pkl')
+# 加载糖尿病特征和模型
+diabetes_features_path = os.path.join(settings.BASE_DIR, 'models', 'diabetes', 'diabetes_features.pkl')
+if not os.path.exists(diabetes_features_path):
+    raise FileNotFoundError(f"File not found: {diabetes_features_path}")
 diabetes_features = joblib.load(diabetes_features_path)
 
-diabetes_logreg_model_path = os.path.join(current_dir, '..', 'models', 'diabetes', 'diabetes_logreg_model.pkl')
+diabetes_logreg_model_path = os.path.join(settings.BASE_DIR, 'models', 'diabetes', 'diabetes_logreg_model.pkl')
+if not os.path.exists(diabetes_logreg_model_path):
+    raise FileNotFoundError(f"File not found: {diabetes_logreg_model_path}")
 diabetes_logreg_model = joblib.load(diabetes_logreg_model_path)
 
-heart_disease_features_path = os.path.join(current_dir, '..', 'models', 'heart_disease', 'heart_disease_features.pkl')
-heart_disease_features = joblib.load(heart_disease_features_path)
+# 加载 heart_disease_features.pkl 文件
+features_file_path = os.path.join(settings.BASE_DIR, 'models', 'heart', 'heart_disease_features.pkl')
+if not os.path.exists(features_file_path):
+    raise FileNotFoundError(f"File not found: {features_file_path}")
+heart_disease_features = joblib.load(features_file_path)
 
-heart_disease_rf_model_path = os.path.join(current_dir, '..', 'models', 'heart_disease', 'heart_disease_rf_model.pkl')
-heart_disease_rf_model = joblib.load(heart_disease_rf_model_path)
-
+# 加载 heart_disease_rf_model.pkl 文件
+model_file_path = os.path.join(settings.BASE_DIR, 'models', 'heart', 'heart_disease_rf_model.pkl')
+if not os.path.exists(model_file_path):
+    raise FileNotFoundError(f"File not found: {model_file_path}")
+heart_disease_rf_model = joblib.load(model_file_path)
 
 # Preprocessing function
 def preprocess_input_and_standardize(systolic, diastolic, blood_glucose_mmol_L, gender, bmi, age):
