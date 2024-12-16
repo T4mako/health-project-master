@@ -125,10 +125,7 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # 添加 Celery 配置
-CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Redis 作为任务队列
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'Asia/Shanghai'
-
-INSTALLED_APPS += ['django_celery_beat']
+# settings.py
+CELERY_BROKER_URL = 'memory://'  # 使用内存队列
+CELERY_RESULT_BACKEND = 'rpc://'  # 使用 RPC 后端，支持任务结果存储
 
