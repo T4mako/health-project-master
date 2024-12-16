@@ -52,9 +52,7 @@ export default {
         if (response.code === "200") {
           const data = response.data;
           const mergedData = [{
-            id: data.pd.id,
-            ...data.pd,
-            ...data.hd,
+            ...data[0]
           }];
           this.getPredictData(mergedData);
         } else {

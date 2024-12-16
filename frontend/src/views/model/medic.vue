@@ -107,7 +107,7 @@ export default {
 .model-query {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 90vh;
   background-color: transparent;
   color: white;
   overflow: hidden;

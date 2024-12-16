@@ -61,20 +61,20 @@ export default {
           }
         },
         series: [
-          { name: '呼吸率', type: 'line', data: [] },
-          { name: '收缩压', type: 'line', data: [] },
-          { name: '舒张压', type: 'line', data: [] },
-          { name: '血氧', type: 'line', data: [] },
-          { name: '温度', type: 'line', data: [] },
-          { name: '心率', type: 'line', data: [] },
-          { name: '血糖', type: 'line', data: [] }
+          { name: '呼吸率', type: 'line', smooth: true, data: [] },
+          { name: '收缩压', type: 'line', smooth: true, data: [] },
+          { name: '舒张压', type: 'line', smooth: true, data: [] },
+          { name: '血氧', type: 'line', smooth: true, data: [] },
+          { name: '温度', type: 'line', smooth: true, data: [] },
+          { name: '心率', type: 'line', smooth: true, data: [] },
+          { name: '血糖', type: 'line', smooth: true, data: [] }
         ]
       },
       timeOptions: [
         { value: 'week', label: '过去一周' },
         { value: 'month', label: '过去一月' },
         { value: 'year', label: '过去一年' },
-        { value: 'all', label: '全部' },
+        // { value: 'all', label: '全部' },
       ],
       timeChoose: 'week',
     };
@@ -84,7 +84,7 @@ export default {
   },
   methods: {
     fetchData() {
-      this.userId = this.$route.query.id  
+      this.userId = this.$route.query.id
       axios.get(`${baseUrl}/user/dateHData`, { params: { id: this.userId, date: this.timeChoose } })
         .then(response => {
           if (response.code === "200") {

@@ -13,7 +13,7 @@
           <p>体重：{{ userInfo.weight }} kg</p>
         </div>
       </ItemWrap>
-      <ItemWrap class="block-1-area area-2" title="今日健康预警">
+      <ItemWrap class="block-1-area area-2" title=" 健康预警">
         <HWarning></HWarning>
       </ItemWrap>
       <ItemWrap class="block-1-area area-3" title="BMI">

@@ -38,7 +38,10 @@ public class EnvValServiceImpl extends ServiceImpl<EnvValMapper, EnvVal> impleme
         queryWrapper2.eq(EnvVal::getFamilyUserId, familyUserId);
         queryWrapper2.orderByDesc(EnvVal::getCreateTime);
         List<EnvVal> envVal = envValMapper.selectList(queryWrapper2);
-        EnvVal envVal1 = envVal.get(0);
-        return envVal1;
+        if(envVal.size()>0){
+            EnvVal envVal1 = envVal.get(0);
+            return envVal1;
+        }
+        return null;
     }
 }

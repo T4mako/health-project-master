@@ -123,3 +123,9 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# 添加 Celery 配置
+# settings.py
+CELERY_BROKER_URL = 'memory://'  # 使用内存队列
+CELERY_RESULT_BACKEND = 'rpc://'  # 使用 RPC 后端，支持任务结果存储
+

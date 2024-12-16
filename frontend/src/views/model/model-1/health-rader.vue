@@ -1,16 +1,20 @@
 <template>
   <div>
     <!-- 第一个空的 div，用于显示警告文字 -->
-    <div v-if="warnings" style="font-size: 18px;color: rgb(255, 220, 96); margin: 8px;">{{ warnings }}</div>
+    <div v-if="warnings" style="font-size: 18px;color: rgb(255, 220, 96); margin: 8px;">{{ warnings }}
+      &nbsp;
+      <el-tooltip content="使用用户最近数据" placement="top" @click.stop.prevent>
+        <i class="el-icon-warning-outline" />
+      </el-tooltip>
+    </div>
 
-    <Echart id="leftCenter" :options="option" class="left_center_inner" ref="charts" width="600px" height="380px" />
+    <Echart id="leftCenter" :options="option" class="left_center_inner" ref="charts" width="600px" height="360px" />
   </div>
 </template>
 
 <script>
 import axios from "axios";
 import { baseUrl } from "@/api/api";
-
 export default {
   data() {
     return {
@@ -30,12 +34,12 @@ export default {
         },
         radar: {
           indicator: [
-            { name: "呼吸率", max: 50, min: 0 },
-            { name: "收缩压", max: 200, min: 50 },
-            { name: "舒张压", max: 160, min: 30 },
-            { name: "血氧", max: 100, min: 80 },
-            { name: "温度", max: 45, min: 32 },
-            { name: "心率", max: 220, min: 50 },
+            { name: "呼吸率", max: 35, min: 0 },
+            { name: "收缩压", max: 200, min: 0 },
+            { name: "舒张压", max: 160, min: 0 },
+            { name: "血氧", max: 100, min: 0 },
+            { name: "温度", max: 45, min: 0 },
+            { name: "心率", max: 220, min: 0 },
             { name: "血糖", max: 33, min: 0 }
           ],
           splitNumber: 5,
@@ -87,14 +91,14 @@ export default {
         ]
       },
       indicatorMap: {
-      "breath_rate": "呼吸率",
-      "systolic": "收缩压",
-      "diastolic": "舒张压",
-      "blood_oxygen": "血氧",
-      "temperature": "温度",
-      "heart_rate": "心率",
-      "blood_glucose": "血糖"
-    },
+        "breath_rate": "呼吸率",
+        "systolic": "收缩压",
+        "diastolic": "舒张压",
+        "blood_oxygen": "血氧",
+        "temperature": "温度",
+        "heart_rate": "心率",
+        "blood_glucose": "血糖"
+      },
     };
   },
   created() {
@@ -155,7 +159,7 @@ export default {
       });
   },
   methods: {
-    
+
     // 格式化预警信息
     formatWarnings(data) {
       return data
@@ -163,7 +167,7 @@ export default {
         .map(item => {
           const [indicator, level] = item.split(": "); // 拆分指标和级别
           const chineseIndicator = this.indicatorMap[indicator] || indicator; // 转换成中文指标
-          return `${chineseIndicator}处${level}`; // 格式化输出
+          return `${chineseIndicator}${level}`; // 格式化输出
         })
         .join("，"); // 拼接成字符串
     }

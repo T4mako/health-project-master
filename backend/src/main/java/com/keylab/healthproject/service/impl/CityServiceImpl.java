@@ -127,6 +127,7 @@ public class CityServiceImpl implements ICityService {
     }
 
     private String calculateBreathRateLevel(Double breathRate) {
+        if (breathRate == 0) return "error";
         if (breathRate >= 16 && breathRate <= 20) return "L0";
         if (breathRate >= 11 && breathRate < 16) return "L1";
         if (breathRate >= 8 && breathRate < 11) return "L2";
@@ -134,6 +135,7 @@ public class CityServiceImpl implements ICityService {
     }
 
     private String calculateSystolicLevel(Double systolic) {
+        if (systolic == 0) return "error";
         if (systolic >= 90 && systolic < 140) return "L0";
         if (systolic >= 140 && systolic < 160) return "L1";
         if ((systolic >= 160 && systolic < 180) || (systolic >= 80 && systolic < 90)) return "L2";
@@ -141,6 +143,7 @@ public class CityServiceImpl implements ICityService {
     }
 
     private String calculateDiastolicLevel(Double diastolic) {
+        if (diastolic == 0) return "error";
         if (diastolic >= 60 && diastolic < 90) return "L0";
         if (diastolic >= 90 && diastolic < 100) return "L1";
         if (diastolic >= 100 && diastolic < 110) return "L2";
@@ -148,6 +151,7 @@ public class CityServiceImpl implements ICityService {
     }
 
     private String calculateBloodOxygenLevel(Double bloodOxygen) {
+        if (bloodOxygen == 0) return "error";
         if (bloodOxygen >= 95 && bloodOxygen <= 100) return "L0";
         if (bloodOxygen >= 90 && bloodOxygen < 95) return "L1";
         if (bloodOxygen >= 85 && bloodOxygen < 90) return "L2";
@@ -155,12 +159,14 @@ public class CityServiceImpl implements ICityService {
     }
 
     private String calculateTemperatureLevel(Double temperature) {
+        if (temperature == 0) return "error";
         if (temperature >= 36 && temperature <= 37.3) return "L0";
         if (temperature >= 37.4 && temperature < 39) return "L1";
         return "L2"; // ≥39.1
     }
 
     private String calculateHeartRateLevel(Double heartRate) {
+        if (heartRate == 0) return "error";
         if (heartRate >= 50 && heartRate <= 120) return "L0";
         if ((heartRate > 120 && heartRate < 160) || (heartRate >= 45 && heartRate < 50)) return "L1";
         if ((heartRate >= 160 && heartRate < 180) || (heartRate > 35 && heartRate < 45)) return "L2";
@@ -168,6 +174,7 @@ public class CityServiceImpl implements ICityService {
     }
 
     private String calculateBloodGlucoseLevel(Double bloodGlucose) {
+        if (bloodGlucose == 0) return "error";
         if (bloodGlucose >= 4 && bloodGlucose <= 11) return "L0";
         if ((bloodGlucose > 11.1 && bloodGlucose < 19.9) || (bloodGlucose >= 3.5 && bloodGlucose < 3.9)) return "L1";
         if ((bloodGlucose >= 20 && bloodGlucose < 29.9) || (bloodGlucose >= 3 && bloodGlucose < 3.5)) return "L2";
@@ -197,6 +204,7 @@ public class CityServiceImpl implements ICityService {
             levelMap.put("L1", new ArrayList<>());
             levelMap.put("L2", new ArrayList<>());
             levelMap.put("L3", new ArrayList<>());
+            levelMap.put("error", new ArrayList<>());
             Double breathRate = Double.parseDouble(String.valueOf(healthData.get("breath_rate")));
             Double systolic = Double.parseDouble(String.valueOf(healthData.get("systolic")));
             Double diastolic = Double.parseDouble(String.valueOf(healthData.get("diastolic")));
@@ -228,7 +236,7 @@ public class CityServiceImpl implements ICityService {
     @Override
     public List<Map<String, Object>> getDataByCommunityAll(String communityName) {
         List<Map<String, Object>> healthDataList = cityMapper.getDataByCommunityAll(communityName);
-        System.out.println(healthDataList);
+//        System.out.println(healthDataList);
         List<Map<String, Object>> resultList = packagePersonalHealthData(healthDataList);
         return resultList;
     }
@@ -254,12 +262,15 @@ public class CityServiceImpl implements ICityService {
             map = cityMapper.getEnvironmentDataByCity(10);
         else
             return null;
+//        System.out.println(map);
         return map;
     }
+
     @Override
     public Map<String, Object> getCommunityEnvironmentDataByCity(String communityName) {
         return cityMapper.getCommunityEnvironmentDataByCity(communityName);
     }
+
     //根据城市名查询健康数据
     private List<Map<String, Object>> getHealthDataByCity(Integer id) {
         List<Map<String, Object>> fiftyData;

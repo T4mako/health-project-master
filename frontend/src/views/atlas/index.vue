@@ -1,6 +1,16 @@
 <template>
   <ItemWrap style="height: 90%;">
-    <Echart :options="option" class="left_center_inner" v-if="true" ref="charts" />
+    <div style="margin: 30px;">
+      <!-- 下拉框 -->
+      <el-select v-model="currentCity" placeholder="选择城市" @change="updateGraph"
+        style="margin-bottom: 16px; width: 200px;">
+        <el-option label="徐州" value="xuzhou"></el-option>
+        <el-option label="郑州" value="zhengzhou"></el-option>
+        <el-option label="西安" value="xian"></el-option>
+      </el-select>
+    </div>
+
+    <Echart :options="option" class="left_center_inner" v-if="true" ref="charts" :width="chartWidth" :height="chartHeight"/>
   </ItemWrap>
 </template>
 
@@ -14,6 +24,7 @@ export default {
   components: { ScaleScreen },
   data() {
     return {
+      currentCity: "xuzhou", // 默认城市
       timing: null,
       loading: true,
       dateDay: null,
@@ -22,11 +33,13 @@ export default {
       weekday: ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
       input: '',
       path: '',
+      chartWidth: '1800px', // 将 width 和 height 改为 data 属性
+      chartHeight: '850px',
       option: {  // The chart option goes here
         title: {
           text: '建筑环境与老年健康关系图谱',
           left: 'center',
-          top: '5%',
+          top: '0%',
           textStyle: {
             color: '#ffffff', // Set the title text color to white
             fontSize: 24 // Set the font size to 24
@@ -44,8 +57,8 @@ export default {
         legend: {
           data: ['建筑环境指标', '老年健康指标'],
           orient: 'vertical',
-          left: '8%',
-          top: '8%',
+          left: '5%',
+          top: '0%',
           textStyle: {
             color: '#ffffff', // Set legend text color to white
             fontSize: 18
@@ -69,11 +82,10 @@ export default {
             },
             data: [
               // 环境数据节点
-              { name: 'CO2浓度', category: 0, value: 80, symbolSize: 30, x: 290, y: 550 },
-              { name: 'TVOC浓度', category: 0, value: 70, symbolSize: 30, x: 310, y: 600 },
-              { name: '光照强度', category: 0, value: 60, symbolSize: 30, x: 330, y: 650 },
-              { name: 'PM2.5浓度', category: 0, value: 90, symbolSize: 30, x: 350, y: 700 },
-              { name: '噪音', category: 0, value: 60, symbolSize: 30, x: 330, y: 750 },
+              { name: 'PM10', category: 0, value: 70, symbolSize: 30, x: 310, y: 600 },
+              { name: '日照', category: 0, value: 60, symbolSize: 30, x: 330, y: 650 },
+              { name: 'PM2.5', category: 0, value: 90, symbolSize: 30, x: 350, y: 700 },
+              { name: '气压', category: 0, value: 60, symbolSize: 30, x: 330, y: 750 },
               { name: '温度', category: 0, value: 80, symbolSize: 30, x: 310, y: 800 },
               { name: '湿度', category: 0, value: 70, symbolSize: 30, x: 290, y: 850 },
 
@@ -87,48 +99,7 @@ export default {
               { name: '血糖', category: 1, value: 60, symbolSize: 40, x: 150, y: 880 },
               { name: '运动停留时间', category: 1, value: 60, symbolSize: 40, x: -30, y: 880 },
             ],
-            links: [
-              // 建筑环境 → 老年健康指标的关系
-              { source: 'CO2浓度', target: '呼吸率', value: 0.7, lineStyle: { width: 2, color: 'red' }, label: { show: true, formatter: '呼吸率增加', color: 'ffffff', fontSize: 18 } },
-              { source: 'CO2浓度', target: '血氧', value: 0.8, lineStyle: { width: 2, color: 'red' }, label: { show: true, formatter: '血氧下降', color: 'ffffff', fontSize: 18 } },
-              { source: 'CO2浓度', target: '心率', value: 0.6, lineStyle: { width: 2, color: 'red' }, label: { show: true, formatter: '心率加快', color: 'ffffff', fontSize: 18 } },
-
-              { source: 'TVOC浓度', target: '呼吸率', value: 0.6, lineStyle: { width: 2, color: 'red' }, label: { show: true, formatter: '呼吸率增加', color: 'ffffff', fontSize: 18 } },
-              { source: 'TVOC浓度', target: '血氧', value: 0.7, lineStyle: { width: 2, color: 'red' }, label: { show: true, formatter: '血氧下降', color: 'ffffff', fontSize: 18 } },
-              { source: 'TVOC浓度', target: '体温', value: 0.4, lineStyle: { width: 2, color: 'red' }, label: { show: true, formatter: '体温升高', color: 'ffffff', fontSize: 18 } },
-
-              { source: '光照强度', target: '运动停留时间', value: 0.8, lineStyle: { width: 2, color: 'green' }, label: { show: true, formatter: '运动时间增加', color: 'ffffff', fontSize: 18 } },
-              { source: '光照强度', target: '心率', value: 0.6, lineStyle: { width: 2, color: 'green' }, label: { show: true, formatter: '心率稳定', color: 'ffffff', fontSize: 18 } },
-              { source: '光照强度', target: '舒张压', value: 0.5, lineStyle: { width: 2, color: 'green' }, label: { show: true, formatter: '舒张压降低', color: 'ffffff', fontSize: 18 } },
-
-              { source: 'PM2.5浓度', target: '呼吸率', value: 0.9, lineStyle: { width: 2, color: 'red' }, label: { show: true, formatter: '呼吸率增加', color: 'ffffff', fontSize: 18 } },
-              { source: 'PM2.5浓度', target: '血氧', value: 0.85, lineStyle: { width: 2, color: 'red' }, label: { show: true, formatter: '血氧下降', color: 'ffffff', fontSize: 18 } },
-              { source: 'PM2.5浓度', target: '心率', value: 0.7, lineStyle: { width: 2, color: 'red' }, label: { show: true, formatter: '心率加快', color: 'ffffff', fontSize: 18 } },
-
-              { source: '噪音', target: '心率', value: 0.6, lineStyle: { width: 2, color: 'red' }, label: { show: true, formatter: '心率加快', color: 'ffffff', fontSize: 18 } },
-              { source: '噪音', target: '收缩压', value: 0.65, lineStyle: { width: 2, color: 'red' }, label: { show: true, formatter: '血压升高', color: 'ffffff', fontSize: 18 } },
-
-              { source: '温度', target: '体温', value: 0.8, lineStyle: { width: 2, color: 'red' }, label: { show: true, formatter: '体温调节异常', color: 'ffffff', fontSize: 18 } },
-              { source: '温度', target: '收缩压', value: 0.7, lineStyle: { width: 2, color: 'red' }, label: { show: true, formatter: '血压波动', color: 'ffffff', fontSize: 18 } },
-
-              { source: '湿度', target: '呼吸率', value: 0.6, lineStyle: { width: 2, color: 'red' }, label: { show: true, formatter: '呼吸率增加', color: 'ffffff', fontSize: 18 } },
-              { source: '湿度', target: '血氧', value: 0.5, lineStyle: { width: 2, color: 'red' }, label: { show: true, formatter: '血氧下降', color: 'ffffff', fontSize: 18 } },
-
-              // 老年健康指标之间的关系
-              { source: '呼吸率', target: '血氧', value: 0.85, lineStyle: { width: 2, color: 'blue' }, label: { show: true, formatter: '血氧下降', color: 'ffffff', fontSize: 18 } },
-
-              { source: '收缩压', target: '心率', value: 0.7, lineStyle: { width: 2, color: 'blue' }, label: { show: true, formatter: '心率加快', color: 'ffffff', fontSize: 18 } },
-
-              { source: '体温', target: '收缩压', value: 0.6, lineStyle: { width: 2, color: 'blue' }, label: { show: true, formatter: '血压升高', color: 'ffffff', fontSize: 18 } },
-              { source: '体温', target: '舒张压', value: 0.5, lineStyle: { width: 2, color: 'blue' }, label: { show: true, formatter: '血压降低', color: 'ffffff', fontSize: 18 } },
-
-              { source: '血糖', target: '心率', value: 0.6, lineStyle: { width: 2, color: 'blue' }, label: { show: true, formatter: '心率加快', color: 'ffffff', fontSize: 18 } },
-              { source: '血糖', target: '心率', value: 0.7, lineStyle: { width: 2, color: 'blue' }, label: { show: true, formatter: '心率减慢', color: 'ffffff', fontSize: 18 } },
-
-              { source: '收缩压', target: '舒张压', value: 0.8, lineStyle: { width: 2, color: 'blue' }, label: { show: true, formatter: '舒张压升高', color: 'ffffff', fontSize: 18 } },
-
-              { source: '呼吸率', target: '心率', value: 0.75, lineStyle: { width: 2, color: 'blue' }, label: { show: true, formatter: '心率加快', color: 'ffffff', fontSize: 18 } }
-            ],
+            links: [],
             categories: [
               { name: '建筑环境指标' },
               { name: '老年健康指标' }
@@ -164,6 +135,7 @@ export default {
     this.timeFn();
     this.cancelLoading();
     this.initChart();  // Initialize chart on mount
+    this.updateGraph(); // Initialize graph with default city
   },
   beforeDestroy() {
     clearInterval(this.timing);
@@ -172,8 +144,10 @@ export default {
     initChart() {
       // Initialize ECharts instance and set option
       const chart = this.$refs.charts;
-      this.myChart = echarts.init(chart);
-      this.myChart.setOption(this.option);
+      if (chart && chart.$el) {
+        this.myChart = echarts.init(chart.$el);
+        this.myChart.setOption(this.option);
+      }
     },
     timeFn() {
       this.timing = setInterval(() => {
@@ -190,6 +164,78 @@ export default {
     },
     goTo(path) {
       this.$router.push(path);
+    },
+    updateGraph() {
+      const cityWeights = {
+        xuzhou: {
+          'PM2.5': { '血氧': 0.9, '呼吸率': 0.8, '血糖': 0.5 },
+          'PM10': { '血氧': 0.8, '呼吸率': 0.7 },
+          '温度': { '血糖': 0.6, '心率': 0.7, '收缩压': 0.6, '舒张压': 0.5, '体温': 0.7 },
+          '湿度': { '血糖': 0.5, '心率': 0.6, '体温': 0.6, '舒张压': 0.5, '收缩压': 0.6 },
+          '气压': { '血糖': 0.4, '呼吸率': 0.5, '体温': 0.4 },
+          'CO': { '血氧': 0.9, '呼吸率': 0.8 },
+          '日照': { '血糖': 0.7, '心率': 0.7, '舒张压': 0.6, '收缩压': 0.6 }
+        },
+        zhengzhou: {
+          'PM2.5': { '血氧': 0.9, '呼吸率': 0.8, '血糖': 0.5 },
+          'PM10': { '血氧': 0.8, '呼吸率': 0.7 },
+          '温度': { '血糖': 0.6, '心率': 0.7, '收缩压': 0.6, '舒张压': 0.5, '体温': 0.7 },
+          '湿度': { '血糖': 0.5, '心率': 0.6, '体温': 0.6, '舒张压': 0.5, '收缩压': 0.6 },
+          '气压': { '血糖': 0.4, '呼吸率': 0.5, '体温': 0.4 },
+          'CO': { '血氧': 0.9, '呼吸率': 0.8 },
+          '日照': { '血糖': 0.7, '心率': 0.7, '舒张压': 0.6, '收缩压': 0.6 }
+        },
+        xian: {
+          'PM2.5': { '血氧': 0.8, '呼吸率': 0.7, '血糖': 0.4 },
+          'PM10': { '血氧': 0.7, '呼吸率': 0.6 },
+          '温度': { '血糖': 0.7, '心率': 0.6, '收缩压': 0.7, '舒张压': 0.6, '体温': 0.8 },
+          '湿度': { '血糖': 0.5, '心率': 0.7, '体温': 0.7, '舒张压': 0.6, '收缩压': 0.7 },
+          '气压': { '血糖': 0.3, '呼吸率': 0.4, '体温': 0.3 },
+          'CO': { '血氧': 0.9, '呼吸率': 0.8 },
+          '日照': { '血糖': 0.8, '心率': 0.7, '舒张压': 0.7, '收缩压': 0.7 }
+        }
+      };
+
+      const city = this.currentCity;
+      const weights = cityWeights[city];
+
+      const links = [];
+
+      for (const env in weights) {
+        for (const health in weights[env]) {
+          links.push({
+            source: env,
+            target: health,
+            value: weights[env][health],
+            lineStyle: { width: 2, color: 'red' },
+            label: { show: true, formatter: `${health} ${weights[env][health] > 0.5 ? '正相关' : '负相关'}`, color: '#ffffff', fontSize: 18 }
+          });
+        }
+      }
+
+      // 健康指标之间的关系
+      const healthRelations = [
+        { source: '血糖', target: '血氧', value: 0.7, lineStyle: { width: 2, color: 'blue' } },
+        { source: '血糖', target: '呼吸率', value: 0.6, lineStyle: { width: 2, color: 'blue' } },
+        { source: '血糖', target: '体温', value: 0.5, lineStyle: { width: 2, color: 'blue' } },
+        { source: '收缩压', target: '心率', value: 0.8, lineStyle: { width: 2, color: 'blue' } },
+        { source: '舒张压', target: '心率', value: 0.8, lineStyle: { width: 2, color: 'blue' } },
+        { source: '血氧', target: '心率', value: 0.7, lineStyle: { width: 2, color: 'blue' } },
+        { source: '血氧', target: '舒张压', value: 0.6, lineStyle: { width: 2, color: 'blue' } },
+        { source: '血氧', target: '收缩压', value: 0.6, lineStyle: { width: 2, color: 'blue' } },
+        { source: '呼吸率', target: '收缩压', value: 0.5, lineStyle: { width: 2, color: 'blue' } },
+        { source: '呼吸率', target: '舒张压', value: 0.5, lineStyle: { width: 2, color: 'blue' } },
+        { source: '运动停留时间', target: '血糖', value: 0.7, lineStyle: { width: 2, color: 'blue' } },
+        { source: '运动停留时间', target: '血氧', value: 0.6, lineStyle: { width: 2, color: 'blue' } },
+        { source: '运动停留时间', target: '呼吸率', value: 0.6, lineStyle: { width: 2, color: 'blue' } }
+      ];
+
+      links.push(...healthRelations);
+
+      this.option.series[0].links = links;
+      if (this.myChart) {
+        this.myChart.setOption(this.option);
+      }
     }
   },
 };
@@ -215,5 +261,36 @@ export default {
   }
 
   font-size: 24px;
+}
+
+::v-deep .el-input__inner {
+  background-color: transparent !important;
+  //   border-color: rgba(255, 255, 255, 0.5);
+  color: #d9d9d9;
+  height: 40px;
+}
+
+/**修改边框和字体颜色 */
+::v-deep .el-select {
+  position: relative;
+  width: 450px;
+
+  .el-input {
+    input {
+      height: 40px;
+      border-color: rgba(44, 137, 229, 0.5);
+      color: #fff;
+    }
+  }
+}
+
+/**修改下拉图标颜色 */
+::v-deep .el-input__suffix {
+  .el-input__suffix-inner {
+    .el-icon-arrow-up:before {
+      color: rgba(44, 137, 229, 0.5);
+      padding-left: 0.11rem;
+    }
+  }
 }
 </style>

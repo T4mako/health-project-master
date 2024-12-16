@@ -54,7 +54,7 @@
                 <ModleBtn name="摔倒监测报警"></ModleBtn>
               </div>
               <div @click="goTo('/medic')">
-                <ModleBtn name="健康数字人"></ModleBtn>
+                <ModleBtn name="数字健康咨询模型"></ModleBtn>
               </div>
             </div>
           </ItemWrap>

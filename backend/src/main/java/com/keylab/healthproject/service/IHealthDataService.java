@@ -28,4 +28,6 @@ public interface IHealthDataService extends IService<HealthData> {
     List<Map<String, Object>> getAgeIndicator(long id,String indicator);
 
     List<Map<String,Object>> communityAllInfo(long id);
+
+    List<Map<String, Object>> getLatestFullHData(long id);
 }
