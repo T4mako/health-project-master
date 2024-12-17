@@ -290,68 +290,50 @@ public interface CityMapper {
             GROUP BY
                 pd.id, pd.gender, pd.age, pd.dept_name, c.dep_id;
             """)
-//    返回指定小区全员健康数据
     List<Map<String, Object>> getDataByCommunityAll(String communityName);
 
     @Select("""
-            WITH latest_health AS (
-                SELECT
-                    h.researched_person_id,
-                    h.breath_rate,
-                    h.systolic,
-                    h.diastolic,
-                    h.blood_oxygen,
-                    h.temperature,
-                    h.heart_rate,
-                    h.blood_glucose,
-                    h.create_time,
-                    ROW_NUMBER() OVER (PARTITION BY h.researched_person_id ORDER BY h.create_time DESC) AS rn
-                FROM
-                    health_data h
-            ),
-            latest_env AS (
-                SELECT
-                    e.family_user_id,
-                    e.co,
-                    e.pressure,
-                    e.light,
-                    e.pm25,
-                    e.pm10,
-                    e.humidity,
-                    e.temperature,
-                    e.create_time,
-                    ROW_NUMBER() OVER (PARTITION BY e.family_user_id ORDER BY e.create_time DESC) AS rn
-                FROM
-                    env_val e
-            )
             SELECT
                 pd.id,
                 pd.gender,
                 pd.age,
-                pd.dept_id AS community_id,
                 pd.height,
                 pd.weight,
                 pd.bmi,
-                COALESCE(hd.breath_rate, 0) AS breath_rate,
-                COALESCE(hd.systolic, 0) AS systolic,
-                COALESCE(hd.diastolic, 0) AS diastolic,
-                COALESCE(hd.blood_oxygen, 0) AS blood_oxygen,
-                COALESCE(hd.temperature, -999) AS p_temperature,
-                COALESCE(hd.heart_rate, 0) AS heart_rate,
-                COALESCE(hd.blood_glucose, 0) AS blood_glucose,
+                COALESCE(lh.breath_rate, 0) AS breath_rate,
+                COALESCE(lh.systolic, 0) AS systolic,
+                COALESCE(lh.diastolic, 0) AS diastolic,
+                COALESCE(lh.blood_oxygen, 0) AS blood_oxygen,
+                COALESCE(lh.temperature, -999) AS p_temperature,
+                COALESCE(lh.heart_rate, 0) AS heart_rate,
+                COALESCE(lh.blood_glucose, 0) AS blood_glucose,
+                COALESCE(lh.create_time, '0') AS p_create_time,
                 COALESCE(ev.co, 0) AS co,
                 COALESCE(ev.pressure, 0) AS pressure,
-                COALESCE(ev.light, 0) AS light,
+                COALESCE(ev.light, '0') AS light,
                 COALESCE(ev.pm25, 0) AS pm25,
                 COALESCE(ev.pm10, 0) AS pm10,
                 COALESCE(ev.humidity, 0) AS humidity,
                 COALESCE(ev.temperature, -999) AS e_temperature,
-                COALESCE(hd.create_time, '0') AS p_create_time,
                 COALESCE(ev.create_time, '0') AS e_create_time
             FROM
                 person_data pd
-            LEFT JOIN latest_health hd ON pd.id = hd.researched_person_id AND hd.rn = 1
-            LEFT JOIN latest_env ev ON pd.family_user_id = ev.family_user_id AND ev.rn = 1
+            LEFT JOIN
+                latest_health_data_view lh ON pd.id = lh.researched_person_id
+            LEFT JOIN
+                env_val ev ON pd.family_user_id = ev.family_user_id
+                AND ev.create_time = (
+                    SELECT
+                        create_time
+                    FROM
+                        env_val
+                    WHERE
+                        family_user_id = pd.family_user_id
+                        AND ABS(DATEDIFF(ev.create_time, lh.create_time)) <= 7
+                    ORDER BY
+                        ABS(DATEDIFF(ev.create_time, lh.create_time))
+                    LIMIT 1
+                )
             WHERE
                 pd.id = #{id};
             """)
@@ -396,36 +378,36 @@ public interface CityMapper {
 
 
     @Select("""
-           
-            WITH LatestDate AS (
-               SELECT MAX(create_time) AS max_date
-               FROM env_val
-               WHERE dept_id = #{dep_id}
-           )
-           SELECT
-               COALESCE(ROUND(AVG(co), 2), 0) AS co,
-               COALESCE(ROUND(AVG(pressure), 2), 0) AS pressure,
-               COALESCE((
-                   SELECT light
-                   FROM env_val
-                   WHERE dept_id = #{dep_id}
-                   AND create_time >= (SELECT DATE_SUB(max_date, INTERVAL 7 DAY) FROM LatestDate)
-                   AND create_time <= (SELECT max_date FROM LatestDate)
-                   GROUP BY light
-                   ORDER BY COUNT(*) DESC
-                   LIMIT 1
-               ), '0') AS light,
-               COALESCE(ROUND(AVG(pm25), 2), 0) AS pm25,
-               COALESCE(ROUND(AVG(pm10), 2), 0) AS pm10,
-               COALESCE(ROUND(AVG(humidity), 2), 0) AS humidity,
-               COALESCE(ROUND(AVG(temperature), 2), -999) AS temperature,
-               COALESCE(DATE(MAX(create_time)), '0') AS latest_date
-           FROM
-               env_val
-           WHERE
-               dept_id = #{dep_id}
-               AND create_time >= (SELECT DATE_SUB(max_date, INTERVAL 7 DAY) FROM LatestDate)
-               AND create_time <= (SELECT max_date FROM LatestDate);
+            
+             WITH LatestDate AS (
+                SELECT MAX(create_time) AS max_date
+                FROM env_val
+                WHERE dept_id = #{dep_id}
+            )
+            SELECT
+                COALESCE(ROUND(AVG(co), 2), 0) AS co,
+                COALESCE(ROUND(AVG(pressure), 2), 0) AS pressure,
+                COALESCE((
+                    SELECT light
+                    FROM env_val
+                    WHERE dept_id = #{dep_id}
+                    AND create_time >= (SELECT DATE_SUB(max_date, INTERVAL 7 DAY) FROM LatestDate)
+                    AND create_time <= (SELECT max_date FROM LatestDate)
+                    GROUP BY light
+                    ORDER BY COUNT(*) DESC
+                    LIMIT 1
+                ), '0') AS light,
+                COALESCE(ROUND(AVG(pm25), 2), 0) AS pm25,
+                COALESCE(ROUND(AVG(pm10), 2), 0) AS pm10,
+                COALESCE(ROUND(AVG(humidity), 2), 0) AS humidity,
+                COALESCE(ROUND(AVG(temperature), 2), -999) AS temperature,
+                COALESCE(DATE(MAX(create_time)), '0') AS latest_date
+            FROM
+                env_val
+            WHERE
+                dept_id = #{dep_id}
+                AND create_time >= (SELECT DATE_SUB(max_date, INTERVAL 7 DAY) FROM LatestDate)
+                AND create_time <= (SELECT max_date FROM LatestDate);
             """)
     Map<String, Object> getEnvironmentDataByCity(Integer dep_id);
 
