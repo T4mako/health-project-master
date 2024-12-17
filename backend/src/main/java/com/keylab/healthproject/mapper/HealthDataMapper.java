@@ -26,47 +26,64 @@ public interface HealthDataMapper extends BaseMapper<HealthData> {
             "where hd.create_time = '2024-10-31'")
     List<Map<String, Object>> selectAllCompareData(String indicator);
 
-    @Select("SELECT \n" +
-            "    hd.researched_person_id AS id, \n" +
-            "    hd.${indicator}, \n" +
-            "    pd.age \n" +
-            "FROM \n" +
-            "    health_data hd \n" +
-            "RIGHT JOIN \n" +
-            "    person_data pd ON hd.researched_person_id = pd.id\n" +
-            "WHERE \n" +
-            "    hd.create_time = '2024-10-31'\n" +
-            "AND \n" +
-            "    pd.dept_name = (SELECT dept_name FROM person_data WHERE id = #{id});")
+    @Select("""
+        SELECT 
+            hd.researched_person_id AS id,
+            hd.${indicator},
+            pd.age 
+        FROM 
+            health_test.latest_health_data_view hd
+        JOIN 
+            health_test.person_data pd ON hd.researched_person_id = pd.id
+        WHERE 
+            pd.dept_name = (SELECT dept_name FROM health_test.person_data WHERE id = #{id})
+        AND 
+            hd.${indicator} IS NOT NULL
+        """)
     List<Map<String, Object>> selectAllCommunityCompareData(long id, String indicator);
 
 
-    @Select("SELECT\n" +
-            "   hd.researched_person_id AS id, \n" +
-            "   hd.${indicator} , \n" +
-            "   pd.age \n"+
-            "FROM \n" +
-            "   health_data hd \n" +
-            "RIGHT JOIN \n" +
-            "   person_data pd ON hd.researched_person_id = pd.id\n" +
-            "WHERE \n" +
-            "   hd.create_time = '2024-10-31'\n" +
-            "AND \n" +
-            "   pd.dept_name in (\n" +
-            "select name from community where dep_id  " +
-            "in (select dep_id from community c,person_data p where p.dept_id = c.id and p.id = #{id}));")
+    @Select("""
+        SELECT
+            hd.researched_person_id AS id,
+            hd.${indicator},
+            pd.age
+        FROM
+            health_test.latest_health_data_view hd
+        RIGHT JOIN
+            health_test.person_data pd ON hd.researched_person_id = pd.id
+        WHERE
+            pd.dept_name IN (
+                SELECT
+                    name
+                FROM
+                    community
+                WHERE
+                    dep_id IN (
+                        SELECT
+                            dep_id
+                        FROM
+                            community c,
+                            person_data p
+                        WHERE
+                            p.dept_id = c.id
+                            AND p.id = #{id}
+                    )
+            )
+        AND
+            hd.${indicator} IS NOT NULL
+        """)
     List<Map<String, Object>> selectAllProvinceCompareData(long id, String indicator);
 
-    // 暂定时间 10-31
-    @Select("SELECT * FROM health_data WHERE researched_person_id = #{id} AND create_time = '2024-10-31'")
-    HealthData findByResearchedPersonId(long id);
 
-    @Select("select hd.researched_person_id ,hd.${indicator},pd.age  \n" +
-            "from health_data hd \n" +
-            "right join person_data pd \n" +
+
+    @Select("SELECT hd.researched_person_id, hd.${indicator}, pd.age \n" +
+            "FROM health_data hd \n" +
+            "RIGHT JOIN person_data pd \n" +
             "ON hd.researched_person_id = pd.id \n" +
-            "where hd.create_time = '2024-10-31'\n" +
-            "and hd.researched_person_id  = #{id}")
+            "WHERE hd.researched_person_id = #{id} \n" +
+            "ORDER BY hd.create_time DESC \n" +
+            "LIMIT 1")
     List<Map<String, Object>> getAgeIndicator(long id,String indicator);
 
     @Select("SELECT \n" +
@@ -76,22 +93,62 @@ public interface HealthDataMapper extends BaseMapper<HealthData> {
             "    pd.height,\n" +
             "    pd.weight,\n" +
             "    pd.bmi,\n" +
-            "    hd.breath_rate,\n" +
-            "    hd.systolic,\n" +
-            "    hd.diastolic ,\n" +
-            "    hd.blood_oxygen ,\n" +
-            "    hd.temperature ,\n" +
-            "    hd.heart_rate ,\n" +
-            "    hd.blood_glucose \n" +
+            "    lhda.breath_rate,\n" +
+            "    lhda.systolic,\n" +
+            "    lhda.diastolic,\n" +
+            "    lhda.blood_oxygen,\n" +
+            "    lhda.temperature,\n" +
+            "    lhda.heart_rate,\n" +
+            "    lhda.blood_glucose\n" +
             "FROM \n" +
             "    person_data pd\n" +
-            "JOIN \n" +
-            "    health_data hd  \n" +
+            "LEFT JOIN \n" +
+            "    latest_health_data_with_avg lhda\n" +
             "ON \n" +
-            "    pd.id = hd.researched_person_id\n" +
+            "    pd.id = lhda.researched_person_id\n" +
             "WHERE \n" +
-            "    pd.dept_id = (SELECT dept_id FROM person_data WHERE id = #{id}) \n" +
-            "    AND hd.create_time = '2024-10-31'" +
+            "    pd.dept_id = (SELECT dept_id FROM person_data WHERE id = #{id})\n" +
+            "    AND lhda.heart_rate IS NOT NULL\n" +
+            "    AND lhda.blood_glucose IS NOT NULL\n" +
+            "    AND lhda.blood_oxygen IS NOT NULL\n" +
             "LIMIT 20;")
     List<Map<String, Object>> communityAllInfo(long id);
+
+    @Select("SELECT \n" +
+            "    pd.id,\n" +
+            "    pd.gender,\n" +
+            "    pd.age,\n" +
+            "    pd.height,\n" +
+            "    pd.weight,\n" +
+            "    pd.bmi,\n" +
+            "    COALESCE(lhda.breath_rate, (SELECT AVG(breath_rate) FROM health_data hd JOIN person_data pd2 ON hd.researched_person_id = pd2.id WHERE pd2.dept_id = pd.dept_id)) AS breath_rate,\n" +
+            "    COALESCE(lhda.systolic, (SELECT AVG(systolic) FROM health_data hd JOIN person_data pd2 ON hd.researched_person_id = pd2.id WHERE pd2.dept_id = pd.dept_id)) AS systolic,\n" +
+            "    COALESCE(lhda.diastolic, (SELECT AVG(diastolic) FROM health_data hd JOIN person_data pd2 ON hd.researched_person_id = pd2.id WHERE pd2.dept_id = pd.dept_id)) AS diastolic,\n" +
+            "    COALESCE(lhda.blood_oxygen, (SELECT AVG(blood_oxygen) FROM health_data hd JOIN person_data pd2 ON hd.researched_person_id = pd2.id WHERE pd2.dept_id = pd.dept_id)) AS blood_oxygen,\n" +
+            "    COALESCE(lhda.temperature, (SELECT AVG(temperature) FROM health_data hd JOIN person_data pd2 ON hd.researched_person_id = pd2.id WHERE pd2.dept_id = pd.dept_id)) AS temperature,\n" +
+            "    COALESCE(lhda.heart_rate, (SELECT AVG(heart_rate) FROM health_data hd JOIN person_data pd2 ON hd.researched_person_id = pd2.id WHERE pd2.dept_id = pd.dept_id)) AS heart_rate,\n" +
+            "    COALESCE(lhda.blood_glucose, (SELECT AVG(blood_glucose) FROM health_data hd JOIN person_data pd2 ON hd.researched_person_id = pd2.id WHERE pd2.dept_id = pd.dept_id)) AS blood_glucose\n" +
+            "FROM \n" +
+            "    person_data pd\n" +
+            "LEFT JOIN \n" +
+            "    latest_health_data_with_avg lhda ON pd.id = lhda.researched_person_id\n" +
+            "WHERE \n" +
+            "    pd.id = #{id}  -- 替换为实际用户的 ID\n" +
+            "LIMIT 1;\n")
+    List<Map<String, Object>> getLatestFullHData(long id);
+
+    @Select("SELECT \n" +
+            "    researched_person_id,\n" +
+            "    breath_rate,\n" +
+            "    systolic,\n" +
+            "    diastolic,\n" +
+            "    blood_oxygen,\n" +
+            "    temperature,\n" +
+            "    heart_rate,\n" +
+            "    blood_glucose\n" +
+            "FROM \n" +
+            "    health_test.latest_health_data_with_avg\n" +
+            "WHERE \n" +
+            "    researched_person_id = #{id};")
+    List<HealthData> getLatestHData(long id);
 }

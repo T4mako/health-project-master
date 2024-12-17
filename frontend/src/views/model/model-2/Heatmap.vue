@@ -49,8 +49,8 @@ export default {
           left: 'center',
           bottom: '0%',
           textStyle: {
-            color: '#fff',         
-            fontSize: 16          
+            color: '#fff',
+            fontSize: 16
           }
         },
         series: [
@@ -58,7 +58,7 @@ export default {
             type: 'heatmap',
             data: [],
             itemStyle: {
-              color:'#fff'
+              color: '#fff'
             },
             label: {
               show: true
@@ -84,7 +84,7 @@ export default {
         { api: '/api/predict_diabetes', label: 'diabetes_prediction' },
         { api: '/api/predict_stroke', label: 'stroke_prediction' }
       ];
-
+      
       // Make requests to all prediction endpoints
       Promise.all(predictEndpoints.map(endpoint => {
         return axios.post(endpoint.api, data)
@@ -99,6 +99,8 @@ export default {
           });
       }))
         .then(results => {
+          console.log(results);
+          
           // Extract prediction data for each disease
           const heartDiseaseData = results[0]; // Heart disease prediction data
           const diabetesData = results[1]; // Diabetes prediction data
@@ -121,7 +123,7 @@ export default {
               diabetes_probability: (diabetesProbability * 100).toFixed(2)          // Multiply by 100 and round to 2 decimal places
             });
           });
-
+          
           // Process the results into the heatmap option structure
           this.processHeatmapData(res);
         });
@@ -138,23 +140,25 @@ export default {
         }
 
         // Push heatmap data points: [userIndex, diseaseIndex, probability]
-        heatmapData.push([0,userIds.indexOf(item.id), item.heart_disease_probability]); // Heart disease
-        heatmapData.push([1,userIds.indexOf(item.id), item.diabetes_probability]);     // Diabetes
-        heatmapData.push([2,userIds.indexOf(item.id), item.stroke_probability]);       // Stroke
+        heatmapData.push([0, userIds.indexOf(item.id), item.heart_disease_probability]); // Heart disease
+        heatmapData.push([1, userIds.indexOf(item.id), item.diabetes_probability]);     // Diabetes
+        heatmapData.push([2, userIds.indexOf(item.id), item.stroke_probability]);       // Stroke
       });
 
       // Update the heatmap option with the new data
       this.option.yAxis.data = userIds;  // Set user IDs as yAxis labels
       this.option.series[0].data = heatmapData;  // Set the heatmap data
-      
+
     }
   },
   created() {
     this.userId = this.$route.query.id;
     axios.get(`${baseUrl}/user/communityAllInfo`, { params: { id: this.userId } })
       .then(response => {
-        const data = response.data;
-        if (response.code === "200") {
+
+        if (response.code == "200") {
+          const data = response.data;
+
           // Fetch disease predictions
           this.getPredictData(data);
         } else {
