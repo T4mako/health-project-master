@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+    backend:
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        env_file:  # 使用 ./backend 目录下的 .env 文件加载环境变量
+            - ./backend/.env
+        networks:
+            - health-network
+        ports:
+            - 89:8081
+
+    frontend:
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+        networks:
+            - health-network
+        env_file:
+            - ./frontend/.env
+        ports:
+            - 88:80
+
+    models:
+        build:
+            context: ./models
+            dockerfile: Dockerfile
+        env_file:
+            - ./models/.env
+        networks:
+            - health-network
+
+networks:
+    health-network: {}

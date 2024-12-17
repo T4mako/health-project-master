@@ -1,0 +1,15 @@
+# 忽略所有的 .env 文件
+.env
+
+# 忽略根目录下的 out 文件夹
+/out/
+
+# 忽略 frontend 目录下的 nodejs 打包文件 (通常是 node_modules 和打包产物，如 dist, build, 等)
+node_modules/
+/frontend/dist/
+/frontend/build/
+/frontend/.next/
+/frontend/.nuxt/
+/frontend/package-lock.json
+
+# 如果有其他打包文件夹，像 .nuxt 或 .next 等，可以添加到忽略列表中
