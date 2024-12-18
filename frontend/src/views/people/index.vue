@@ -47,9 +47,8 @@
     </div>
 
     <div class="right" >
-      <div style="font-size: 26px;width: 400px;line-height: 40px;margin-bottom: 15px">
-        <div>个人信息测量时间：{{ p_create_time}} </div>
-        <div>环境信息测量时间：{{ e_create_time}} </div>
+      <div style="font-size: 26px;width: 400px;line-height: 40px;margin-bottom: 45px">
+        <div>信息测量时间：{{ p_create_time}} </div>
       </div>
       <div class="leftbox" v-for="data in rightData" :key="data.title">
         <div class="righticon">
@@ -148,11 +147,11 @@ export default {
         },
       ],
       bottomData: [
-        { title: 'CO₂', data: 0, unit: 'ppm' },
-        { title: 'TVOC', data: 0, unit: 'ug/m³' },
+        { title: 'CO', data: 0, unit: 'ppm' },
+        { title: '气压', data: 0, unit: 'ug/m³' },
         { title: '光照', data: 0, unit: 'lx' },
         { title: 'PM2.5', data: 0, unit: 'μg/m³' },
-        { title: '声音', data: 0, unit: '分贝' },
+        { title: 'PM10', data: 0, unit: 'μg/m³' },
         { title: '温度', data: 0, unit: '°C' },
         { title: '湿度', data: 0, unit: '%' }
       ],
@@ -165,6 +164,9 @@ export default {
     // 调用接口获取个人健康数据
     axios.get(`${baseUrl}/city/getPersonalHealthData?id=${this.peopleId}`).then(response => {
           const data = response.data;
+          if (data.p_temperature = '-999'){
+            data.p_temperature = '未测量'
+          }
           // 更新左侧数据
           this.leftData = [
             { icon: require('../../assets/img/people/temperature.jpg'), title: '体温', currentNumber: data.p_temperature, unit: '℃', maxMumber: 42 },
@@ -180,14 +182,17 @@ export default {
             { icon: require('../../assets/img/people/SBP.jpg'), title: '收缩压', unit: 'mmHg', currentNumber: data.systolic },
             { icon: require('../../assets/img/people/DBP.jpg'), title: '舒张压', unit: 'mmHg', currentNumber: data.diastolic },
           ];
+          if (data.e_temperature = '-999'){
+            data.e_temperature = '未测量'
+          }
 
           // 更新底部数据
           this.bottomData = [
-            { title: 'CO₂', data: data.co2, unit: 'ppm' },
-            { title: 'TVOC', data: data.tvoc, unit: 'ug/m³' },
+            { title: 'CO', data: data.co, unit: 'ppm' },
+            { title: '气压', data: data.pressure, unit: 'ug/m³' },
             { title: '光照', data: data.light, unit: 'lx' },
             { title: 'PM2.5', data: data.pm25, unit: 'μg/m³' },
-            { title: '声音', data: data.db, unit: '分贝' },
+            { title: 'PM10', data: data.pm10, unit: '分贝' },
             { title: '温度', data: data.e_temperature, unit: '°C' },
             { title: '湿度', data: data.humidity, unit: '%' }
           ];

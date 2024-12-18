@@ -119,32 +119,31 @@ export default {
       personData:[],
       communityName:'',
       units: {
-        co2: 'ppm',
-        tvoc: 'µg/m³',
-        light: 'lx',
+        co: 'ppm',
+        pressure: 'µg/m³',
+        light: '天',
         pm25: 'µg/m³',
-        db: '分贝',
+        pm10: 'µg/m³',
         temperature: '°C',
         humidity: '%',
         latest_date:'年-月-日'
       }, // 单位信息
       labels: {
-        co2: 'CO₂',
-        tvoc: 'TVOC',
+        co: 'CO',
+        pressure: '气压',
         light: '光照',
         pm25: 'PM2.5',
-        db: '声音',
+        pm10: 'PM10',
         temperature: '温度',
         humidity: '湿度',
-        latest_date:'测量日期'
+        latest_date:'日期'
       } ,// 显示用的中文标签
       analysisResults: '', // 分析结果文本
       thresholds: {
-        co2: { normal: 400, high: 800 }, // CO2阈值
-        tvoc: { normal: 200, high: 600 }, // TVOC阈值
-        light: { normal: 300, high: 700 }, // 光照阈值
+        co: { normal: 400, high: 800 }, // CO阈值
+        pressure: { normal: 500, high: 1500 }, //
         pm25: { normal: 35, high: 75 }, // PM2.5阈值
-        db: { normal: 50, high: 80 }, // 声音阈值
+        pm10: { normal: 50, high: 100 }, //
         temperature: { normal: 22, high: 30 }, // 温度阈值
         humidity: { normal: 40, high: 70 } // 湿度阈值
       }
@@ -354,14 +353,18 @@ export default {
     initRadarChart() {
       // 获取容器
       const radarChart = echarts.init(document.getElementById('radarChart'));
+
+      // 过滤掉 latest_date 字段
+      const filteredKeys = Object.keys(this.environmentData).filter(key => key !== 'latest_date'&&key !== 'light');
+
       // 准备雷达图数据
-      const indicators = Object.keys(this.environmentData)
-          .map(key => ({
+      const indicators = filteredKeys.map(key => ({
         name: this.labels[key] || key,
         max: this.getMaxValue(key) // 动态设置每项的最大值
       }));
-      const dataValues = Object.keys(this.environmentData)
-          .map(key => this.environmentData[key]);
+
+      const dataValues = filteredKeys.map(key => this.environmentData[key]);
+
       // 配置雷达图
       const option = {
         tooltip: {},
@@ -372,7 +375,7 @@ export default {
             textStyle: {
               fontSize: 18, // 调整文字大小
               fontWeight: 'bold', // 文字加粗
-              color:'#ff7f50'
+              color: '#ff7f50'
             }
           }
         },
@@ -383,7 +386,7 @@ export default {
             {
               value: dataValues,
               name: '环境数据',
-              lineStyle:{
+              lineStyle: {
                 color: '#ff7f50', // 线条颜色（例如橙色）
                 width: 3, // 线条宽度
               },
@@ -397,19 +400,21 @@ export default {
           ]
         }]
       };
+
       // 使用配置生成雷达图
       radarChart.setOption(option);
+
       // 监听窗口大小变化，自动调整图表大小
       window.addEventListener('resize', () => radarChart.resize());
     },
+
     // 动态计算每项的最大值
     getMaxValue(key) {
       const predefinedMax = {
-        CO2: 1000,
-        TVOC: 1200,
-        light: 1000,
-        PM25: 500,
-        sound: 100,
+        co: 5,
+        pressure: 1500,
+        pm25: 100,
+        pm10: 100,
         temperature: 50,
         humidity: 100
       };
