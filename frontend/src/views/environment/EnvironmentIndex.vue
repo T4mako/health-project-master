@@ -119,8 +119,8 @@ export default {
       personData:[],
       communityName:'',
       units: {
-        co: 'ppm',
-        pressure: 'µg/m³',
+        co: 'µg/m³',
+        pressure: 'hPa',
         light: '天',
         pm25: 'µg/m³',
         pm10: 'µg/m³',

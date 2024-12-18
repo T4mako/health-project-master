@@ -164,28 +164,28 @@ export default {
     // 调用接口获取个人健康数据
     axios.get(`${baseUrl}/city/getPersonalHealthData?id=${this.peopleId}`).then(response => {
           const data = response.data;
-          if (data.p_temperature === '-999'){
+          if (data.p_temperature === -999){
             data.p_temperature = '未测量'
           }
-          if(data.breath_rate === '0'){
+          if(data.breath_rate === 0){
             data.breath_rate = '未测量'
           }
-          if(data.blood_oxygen === '0'){
+          if(data.blood_oxygen === 0){
             data.blood_oxygen = '未测量'
           }
-          if(data.heart_rate === '0'){
+          if(data.heart_rate === 0){
             data.heart_rate = '未测量'
           }
-          if(data.bmi === '0'){
+          if(data.bmi === 0){
             data.bmi = '未测量'
           }
-          if(data.blood_glucose === '0'){
+          if(data.blood_glucose === 0){
             data.blood_glucose = '未测量'
           }
-          if(data.systolic ==='0'){
+          if(data.systolic ===0){
             data.systolic ='未测量'
           }
-          if(data.diastolic === '0'){
+          if(data.diastolic === 0){
             data.diastolic = '未测量'
           }
           // 更新左侧数据
@@ -203,31 +203,34 @@ export default {
             { icon: require('../../assets/img/people/SBP.jpg'), title: '收缩压', unit: 'mmHg', currentNumber: data.systolic },
             { icon: require('../../assets/img/people/DBP.jpg'), title: '舒张压', unit: 'mmHg', currentNumber: data.diastolic },
           ];
-          if (data.e_temperature === '-999'){
+          if (data.e_temperature === -999){
             data.e_temperature = '未测量'
           }
-          if(data.co === '0'){
+          if(data.co === 0){
             data.co ='未测量'
           }
-          if(data.pm10=== '0'){
+          if(data.pm10=== 0){
             data.pm10 = '未测量'
           }
-          if(data.pm25 === '0'){
+          if(data.pm25 === 0){
             data.pm25 = '未测量'
           }
-          if(data.pressure === '0'){
+          if(data.pressure === 0){
             data.pressure ='未测量'
           }
-          if(data.humidity === '0'){
+          if(data.humidity === 0){
             data.humidity = '未测量'
+          }
+          if (data.light === '0'){
+            data.light = '未测量'
           }
           // 更新底部数据
           this.bottomData = [
-            { title: 'CO', data: data.co, unit: 'ppm' },
-            { title: '气压', data: data.pressure, unit: 'ug/m³' },
-            { title: '光照', data: data.light, unit: 'lx' },
+            { title: 'CO', data: data.co, unit: 'ug/m³' },
+            { title: '气压', data: data.pressure, unit: 'hPa' },
+            { title: '天气', data: data.light, unit: '天' },
             { title: 'PM2.5', data: data.pm25, unit: 'μg/m³' },
-            { title: 'PM10', data: data.pm10, unit: '分贝' },
+            { title: 'PM10', data: data.pm10, unit: 'μg/m³' },
             { title: '温度', data: data.e_temperature, unit: '°C' },
             { title: '湿度', data: data.humidity, unit: '%' }
           ];
