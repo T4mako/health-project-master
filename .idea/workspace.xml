@@ -4,32 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a9893b25-86d0-4bf6-a875-6c226ea1fa5d" name="Changes" comment="修改bug">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_11_15_17_03_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_11_15_17_03__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_11_15_18_01_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_11_15_18_01__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_11_16_20_58_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_11_16_20_58__Changes_.xml" beforeDir="false" />
+    <list default="true" id="a9893b25-86d0-4bf6-a875-6c226ea1fa5d" name="Changes" comment="页面适配">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/environment/EnvironmentIndex.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/environment/EnvironmentIndex.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/environment/envIndex.scss" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/environment/envIndex.scss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/people/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/people/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/common/ResultCodeEnum.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/common/ResultCodeEnum.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/controller/EnvController.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/controller/EnvController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/controller/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/controller/UserController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/controller/cityController.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/controller/cityController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/dao/EnvVal.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/dao/EnvVal.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/mapper/CityMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/mapper/CityMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/mapper/EnvValMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/mapper/EnvValMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/mapper/HealthDataMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/mapper/HealthDataMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/mapper/PersonDataMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/mapper/PersonDataMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/IEnvValService.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/IEnvValService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/IHealthDataService.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/IHealthDataService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/impl/CityServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/impl/CityServiceImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/impl/EnvValServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/impl/EnvValServiceImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/impl/HealthDataServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/impl/HealthDataServiceImpl.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -180,7 +158,8 @@
       <workItem from="1733894742447" duration="4609000" />
       <workItem from="1734416114791" duration="589000" />
       <workItem from="1734418285045" duration="4906000" />
-      <workItem from="1734504407112" duration="309000" />
+      <workItem from="1734504407112" duration="607000" />
+      <workItem from="1734505883131" duration="1532000" />
     </task>
     <task id="LOCAL-00001" summary="center-bottom修改">
       <option name="closed" value="true" />
@@ -222,7 +201,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732263612894</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="页面适配">
+      <option name="closed" value="true" />
+      <created>1734504998254</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1734504998254</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -244,6 +231,7 @@
     <MESSAGE value="EnvironmentIndex.vue" />
     <MESSAGE value="大模型调试" />
     <MESSAGE value="修改bug" />
-    <option name="LAST_COMMIT_MESSAGE" value="修改bug" />
+    <MESSAGE value="页面适配" />
+    <option name="LAST_COMMIT_MESSAGE" value="页面适配" />
   </component>
 </project>
