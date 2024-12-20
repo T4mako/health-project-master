@@ -4,15 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a9893b25-86d0-4bf6-a875-6c226ea1fa5d" name="Changes" comment="大模型调试">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_11_13_9_21_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2024_11_13_9_21__Changes_.xml" beforeDir="false" />
+    <list default="true" id="a9893b25-86d0-4bf6-a875-6c226ea1fa5d" name="Changes" comment="页面适配">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/api/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/city/Two.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/city/Two.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/indexs/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/indexs/index.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/indexs/left-top.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/indexs/left-top.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/environment/envIndex.scss" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/environment/envIndex.scss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/people/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/people/index.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -159,7 +153,13 @@
       <workItem from="1731926526975" duration="5727000" />
       <workItem from="1731939907139" duration="9116000" />
       <workItem from="1732004119589" duration="145000" />
-      <workItem from="1732258536739" duration="3601000" />
+      <workItem from="1732258536739" duration="4784000" />
+      <workItem from="1733837784128" duration="9000" />
+      <workItem from="1733894742447" duration="4609000" />
+      <workItem from="1734416114791" duration="589000" />
+      <workItem from="1734418285045" duration="4906000" />
+      <workItem from="1734504407112" duration="607000" />
+      <workItem from="1734505883131" duration="1532000" />
     </task>
     <task id="LOCAL-00001" summary="center-bottom修改">
       <option name="closed" value="true" />
@@ -193,7 +193,23 @@
       <option name="project" value="LOCAL" />
       <updated>1731992740550</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="修改bug">
+      <option name="closed" value="true" />
+      <created>1732263612894</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1732263612894</updated>
+    </task>
+    <task id="LOCAL-00006" summary="页面适配">
+      <option name="closed" value="true" />
+      <created>1734504998254</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1734504998254</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -214,6 +230,8 @@
     <MESSAGE value="center-bottom修改" />
     <MESSAGE value="EnvironmentIndex.vue" />
     <MESSAGE value="大模型调试" />
-    <option name="LAST_COMMIT_MESSAGE" value="大模型调试" />
+    <MESSAGE value="修改bug" />
+    <MESSAGE value="页面适配" />
+    <option name="LAST_COMMIT_MESSAGE" value="页面适配" />
   </component>
 </project>
