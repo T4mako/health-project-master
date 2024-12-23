@@ -54,7 +54,7 @@
                 <ModleBtn name="摔倒监测报警"></ModleBtn>
               </div>
               <div @click="goTo('/medic')">
-                <ModleBtn name="数字健康咨询模型"></ModleBtn>
+                <ModleBtn name="数字健康大模型"></ModleBtn>
               </div>
             </div>
           </ItemWrap>
@@ -147,6 +147,10 @@ export default {
       }
     },
     goTo(path) {
+      if(path == '/medic'){
+        this.$router.push(path);
+        return;
+      }
       if (!this.userid) {
         this.$Message.warning("请选择用户");
         return;

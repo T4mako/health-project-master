@@ -33,8 +33,10 @@
 import * as THREE from 'three';
 import Statistic from "@/components/Statistic";
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-
+import axios from "axios";
+import { baseUrl } from "@/api/api";
 export default {
   components: { Statistic },
   data() {
@@ -61,102 +63,169 @@ export default {
       scene: null,
       camera: null,
       renderer: null,
-      mesh: null, // 线框网格
+      mixer: null,
+      controls: null,
+      userId: 302,
     };
   },
   mounted() {
     this.init();
+    this.animate(); // 调用 animate 方法
   },
   methods: {
     init() {
       this.createScene(); // 创建场景
-      this.loadSTL(); // 加载STL模型
+      this.loadRoom(); // 加载房间模型
+      this.loadTask(); // 加载人物模型
       this.createCamera(); // 创建相机
       this.createRender(); // 创建渲染器
       this.createLight(); // 创建光源
       this.createControls(); // 创建控制器
-      this.render(); // 渲染
     },
     createScene() {
       this.scene = new THREE.Scene();
+      // this.scene.background = new THREE.Color();
     },
-    // 加载STL模型
-    loadSTL() {
-      const THIS = this;
-      const loader = new STLLoader();
-      loader.load(
-        `${THIS.publicPath}models/isometric room2.stl`, // STL 文件路径
+    loadRoom() {
+      const stlLoader = new STLLoader();
+      stlLoader.load(
+        `${this.publicPath}models/isometric room.stl`, // 房间STL文件路径
         (geometry) => {
           // 创建线框材质
           const material = new THREE.MeshBasicMaterial({
             color: 0x00ffff, // 线框颜色
             wireframe: true, // 启用线框模式
-            wireframeLinewidth: 2, // 线宽
           });
 
-          // 创建线框网格
-          this.mesh = new THREE.Mesh(geometry, material);
+          const roomMesh = new THREE.Mesh(geometry, material);
 
-          // 调整模型位置与缩放
-          this.mesh.rotation.x = -Math.PI / 2; // 沿 X 轴旋转 90 度
-          this.mesh.scale.set(35, 35, 35); // 缩放模型
-          geometry.center(); // 居中模型
+          // 调整房间尺寸和位置
+          roomMesh.scale.set(100, 100, 100);
+          roomMesh.position.set(0, 0, 0);
+          roomMesh.rotation.x = -Math.PI / 2;
 
-          // 添加到场景
-          this.scene.add(this.mesh);
+          this.scene.add(roomMesh);
         },
-        undefined,
+        (xhr) => {
+          console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        },
         (error) => {
-          console.error('STL 文件加载失败:', error);
+          console.error('STL加载出错:', error);
         }
       );
     },
-    // 创建光源
-    createLight() {
-      // 环境光
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.1); // 创建环境光
-      this.scene.add(ambientLight); // 将环境光添加到场景
+    loadTask() {
+      const fbxLoader = new FBXLoader();
+      fbxLoader.load(
+        `${this.publicPath}models/Walk In Circle.fbx`, // 人物FBX文件路径
+        (object) => {
+          this.mixer = new THREE.AnimationMixer(object);
 
-      // 聚光灯
-      const spotLight = new THREE.SpotLight(0xffffff); // 创建聚光灯
-      spotLight.position.set(150, 150, 150);
-      spotLight.castShadow = true;
-      this.scene.add(spotLight);
+          if (object.animations.length > 0) {
+            const action = this.mixer.clipAction(object.animations[0]);
+            action.timeScale = 0.5; // 减慢动画速度
+            action.play();
+          }
+
+          // 将人物模型的所有子对象改为线框风格
+          object.traverse((child) => {
+            if (child.isMesh) {
+              child.material = new THREE.MeshBasicMaterial({
+                color: 0x0000ff, // 线框颜色
+                wireframe: true, // 启用线框模式
+              });
+            }
+          });
+
+          // 调整人物模型的尺寸和位置
+          object.scale.set(1.8, 1.8, 1.8);
+          object.position.set(350, 0, 200);
+          object.rotation.y = Math.PI;
+
+          this.scene.add(object);
+        },
+        (xhr) => {
+          console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        },
+        (error) => {
+          console.error('FBX加载出错:', error);
+        }
+      );
     },
-    // 创建相机
+    createLight() {
+      const hemiLight = new THREE.HemisphereLight(0x00ffff, 0x00ffff);
+      hemiLight.position.set(0, 200, 0);
+      this.scene.add(hemiLight);
+
+      const dirLight = new THREE.DirectionalLight(0x00ffff);
+      dirLight.position.set(0, 200, 100);
+      dirLight.castShadow = true;
+      this.scene.add(dirLight);
+    },
     createCamera() {
       const container = this.$refs.centerContainer;
-      const width = container.clientWidth; // 窗口宽度
-      const height = container.clientHeight; // 窗口高度
-      const k = width / height; // 窗口宽高比
+      const width = container.clientWidth;
+      const height = container.clientHeight;
 
-      // PerspectiveCamera( fov, aspect, near, far )
-      this.camera = new THREE.PerspectiveCamera(30, k, 0.4, 2500);
-      this.camera.position.set(500, 100, 300); // 设置相机位置
-      this.camera.lookAt(new THREE.Vector3(0, 0, 0)); // 设置相机方向
-      this.scene.add(this.camera);
+      this.camera = new THREE.PerspectiveCamera(35, width / height, 1, 5000);
+      this.camera.position.set(1000, 1000, 1000);
+      this.camera.lookAt(0, 100, 0);
     },
-    // 创建渲染器
     createRender() {
       const container = this.$refs.centerContainer;
       this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      this.renderer.setClearAlpha(0.2);
-      this.renderer.setSize(container.clientWidth, container.clientHeight); // 设置渲染区域尺寸
-      this.renderer.shadowMap.enabled = true; // 显示阴影
-      this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-      this.renderer.setClearColor(0x3f3f3f, 0); // 设置背景颜色
+      this.renderer.setSize(container.clientWidth, container.clientHeight);
+      this.renderer.shadowMap.enabled = true;
       container.appendChild(this.renderer.domElement);
     },
-    // 渲染循环
-    render() {
-      this.renderer.render(this.scene, this.camera);
-      requestAnimationFrame(this.render);
-    },
-    // 创建控件对象
     createControls() {
       this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+      this.controls.target.set(0, 100, 0);
+      this.controls.update();
     },
+    animate() {
+      requestAnimationFrame(this.animate);
+
+      if (this.mixer) {
+        this.mixer.update(0.01);
+      }
+
+      this.controls.update();
+      this.renderer.render(this.scene, this.camera);
+    },
+
   },
+  created() {
+    this.userId = this.$route.params.peopleId;    
+    axios.get(`${baseUrl}/hData/personLatestHData`, { params: { id: this.userId } })
+      .then(response => {
+        if (response.code === "200") {
+          const data = response.data;
+          console.log(data);
+          this.leftData = [
+          { label: "体温", value: `${data.temperature}°C` },
+          { label: "呼吸", value: `${data.breath_rate}` },
+          { label: "血糖", value: `${data.blood_glucose}` },
+          { label: "心率", value: `${data.heart_rate}` },
+          { label: "血氧", value: `${data.blood_oxygen}%` },
+          { label: "收缩压", value: `${data.systolic}` },
+          { label: "舒张压", value: `${data.diastolic}` },
+        ];
+      } else {
+        this.$Message({
+          text: response.data.msg,
+          type: 'warning'
+        });
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      this.$Message({
+        text: '获取数据失败',
+        type: 'error'
+      });
+    });
+  }
 };
 </script>
 
@@ -176,13 +245,13 @@ export default {
   align-items: center;
   padding: 10px;
   box-sizing: border-box;
-  flex-grow: 1; /* 使得左侧和右侧区域填满剩余空间 */
+  flex-grow: 1;
 }
 
 .section-title {
   font-size: 20px;
   color: white;
-  text-align: center; /* Ensures title is centered */
+  text-align: center;
   margin-bottom: 20px;
 }
 

@@ -23,3 +23,9 @@ mybatis-plus:
   configuration:
     #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
     map-underscore-to-camel-case: true
+
+
+health:
+  api:
+    url: http://www.pahealthsys.cn/device/deviceData/getDataByType
+    token: 83e60402-b255-4f7d-87ac-139c6564f250

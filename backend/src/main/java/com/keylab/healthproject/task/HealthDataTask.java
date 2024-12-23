@@ -1,22 +1,8 @@
 package com.keylab.healthproject.task;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-import java.io.IOException;
-import java.util.*;
-
-/**
- * @author T4mako
- * @date 2024/12/20 9:39
- */
-
+import com.keylab.healthproject.service.impl.HealthDataServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -34,20 +20,21 @@ import java.util.*;
 
 @Component
 @EnableScheduling
-public class HealthDataTasks {
+public class HealthDataTask {
 
+    private static final Logger log = LoggerFactory.getLogger(HealthDataTask.class);
+    private final HealthDataServiceImpl healthDataServiceImpl;
     @Value("${health.api.url}")
     private String apiUrl;
 
     @Value("${health.api.token}")
     private String apiToken;
 
-    private final DatabaseService databaseService;
     private final ObjectMapper objectMapper;
 
-    public ScheduledTasks(DatabaseService databaseService, ObjectMapper objectMapper) {
-        this.databaseService = databaseService;
+    public HealthDataTask( ObjectMapper objectMapper, HealthDataServiceImpl healthDataServiceImpl) {
         this.objectMapper = objectMapper;
+        this.healthDataServiceImpl = healthDataServiceImpl;
     }
 
     @Scheduled(cron = "0 0 0 * * ?")
@@ -96,18 +83,18 @@ public class HealthDataTasks {
         }
     }
 
-    @Scheduled(cron = "0 0 1 * * ?")
+    @Scheduled(cron = "0 1 0 * * ?")
     public void insertDataTask() {
         File jsonFile = new File("all_records.json");
 
         if (!jsonFile.exists()) {
-            System.err.println("JSON file not found.");
+            log.error("找不到文件 all_records.json");
             return;
         }
 
         try {
             List<Map<String, Object>> records = objectMapper.readValue(jsonFile, List.class);
-            databaseService.upsertHealthData(records);
+            healthDataServiceImpl.upsertHealthData(records);
         } catch (IOException e) {
             System.err.println("Error reading data from JSON file: " + e.getMessage());
         }
