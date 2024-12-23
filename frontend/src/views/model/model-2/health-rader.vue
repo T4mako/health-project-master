@@ -32,13 +32,13 @@ export default {
             // { name: '温度', max: 45, min: 32 },
             // { name: '心率', max: 220, min: 50 },
             // { name: '血糖', max: 20, min: 0 }
-            { name: "呼吸率", max: 35, min: 0 },
-            { name: "收缩压", max: 200, min: 0 },
-            { name: "舒张压", max: 160, min: 0 },
-            { name: "血氧", max: 100, min: 0 },
-            { name: "温度", max: 45, min: 0 },
-            { name: "心率", max: 220, min: 0 },
-            { name: "血糖", max: 33, min: 0 }
+            { name: "呼吸率（次每分钟）", max: 35, min: 0 },
+            { name: "收缩压（mm Hg）", max: 200, min: 0 },
+            { name: "舒张压（mm Hg）", max: 160, min: 0 },
+            { name: "血氧（百分比）", max: 100, min: 0 },
+            { name: "温度（摄氏度）", max: 45, min: 0 },
+            { name: "心率（Bpm）", max: 220, min: 0 },
+            { name: "血糖（mmol/L）", max: 33, min: 0 }
           ],
           splitNumber: 5,
           axisName: {
