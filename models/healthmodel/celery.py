@@ -20,7 +20,7 @@ from celery.schedules import crontab
 app.conf.beat_schedule = {
     'fetch_health_data_daily': {
         'task': 'healthmodel.tasks.fetch_health_data',
-        'schedule': crontab(minute=0, hour=0),  # 每天0点执行
+        'schedule': crontab(minute='*'),  # 每天0点执行
     },
     'upsert_health_data_daily': {
         'task': 'healthmodel.tasks.upsert_health_data',

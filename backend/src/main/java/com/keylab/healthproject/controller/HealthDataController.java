@@ -37,4 +37,9 @@ public class HealthDataController {
         }
         return Result.error(ResultCodeEnum.PARAM_ERROR);
     }
+    @GetMapping("/personLatestHData")
+    public Result getPersonLatestHData(@RequestParam long id) {
+        HealthData healthData = iHealthDataService.personLatestHData(id);
+        return Result.success(healthData);
+    }
 }
