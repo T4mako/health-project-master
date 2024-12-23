@@ -30,13 +30,13 @@ export default {
         },
         radar: {
           indicator: [
-            { name: 'CO', max: 2, min: 0 },
-            { name: '气压', max: 2000, min: 0 },
+            { name: 'CO（mg/m³）', max: 2, min: 0 },
+            { name: '气压（hPa）', max: 2000, min: 0 },
             { name: '天气', max: 60000, min: 0 },
-            { name: 'PM2.5', max: 100, min: 0 },
-            { name: 'PM10', max: 500, min: 0 },
-            { name: '温度', max: 50, min: -20 },
-            { name: '湿度', max: 100, min: 0 },
+            { name: 'PM2.5（µg/m³）', max: 100, min: 0 },
+            { name: 'PM10（µg/m³）', max: 500, min: 0 },
+            { name: '温度（摄氏度）', max: 50, min: -20 },
+            { name: '湿度（百分比）', max: 100, min: 0 },
           ],
           splitNumber: 5,
           axisName: {
