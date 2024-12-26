@@ -22,7 +22,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
 
         String token = request.getHeader("Authorization");
-        if (token != null && JwtUtils.verifyToken(token)) {
+        if (token != null && !"null".equals(token) && JwtUtils.verifyToken(token)) {
             JWT jwt = JwtUtils.parseToken(token);
             String userId = (String) jwt.getPayload("userId");
             ThreadLocalUtil.setCurrentUser(userId);
@@ -33,7 +33,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             // 设置响应内容类型为 JSON
             response.setContentType("application/json;charset=UTF-8");
             // 将 Result 对象转换为 JSON 字符串
-            String jsonResult = "{\"code\":401,\"message\":\"未授权，请先登录\",\"data\":null}";
+            String jsonResult = "{\"code\":401,\"msg\":\"未授权，请先登录\",\"data\":null}";
             // 写入响应
             PrintWriter writer = response.getWriter();
             writer.write(jsonResult);

@@ -5,6 +5,7 @@
  */
 import axios from 'axios';
 import UtilVar from "@/config/UtilVar";
+import router from '@/router';
 
 let baseUrl = UtilVar.baseUrl
 const CancelToken = axios.CancelToken;
@@ -15,7 +16,8 @@ axios.interceptors.request.use(function (config) {
     // 在发送请求之前做些什么 传token
     let token = localStorage.getItem("token");
     config.headers.common['Content-Type'] = "application/json;charset=utf-8";
-    config.headers.common['token'] = token;  //Authorization
+    // config.headers.common['token'] = token;  //Authorization
+    config.headers.common['Authorization'] = token;  //Authorization
     return config;
 }, function (error) {
     // 对请求错误做些什么
@@ -33,8 +35,9 @@ axios.interceptors.response.use(response => {
       /**
      * @code 登录过期 token验证失败 根据后端调 
      */
+    
     if (response.data.code == UtilVar.code) {
-        // router.push("/login")
+        router.push("/login")
     }
     return response.data
 }, error => {
