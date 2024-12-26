@@ -77,13 +77,14 @@ public interface HealthDataMapper extends BaseMapper<HealthData> {
 
 
 
-    @Select("SELECT hd.researched_person_id, hd.${indicator}, pd.age \n" +
-            "FROM health_data hd \n" +
-            "RIGHT JOIN person_data pd \n" +
-            "ON hd.researched_person_id = pd.id \n" +
-            "WHERE hd.researched_person_id = #{id} \n" +
-            "ORDER BY hd.create_time DESC \n" +
-            "LIMIT 1")
+    @Select("SELECT hd.researched_person_id, hd.${indicator}, pd.age\n" +
+            "FROM health_data hd\n" +
+            "RIGHT JOIN person_data pd\n" +
+            "ON hd.researched_person_id = pd.id\n" +
+            "WHERE hd.researched_person_id = #{id}\n" +
+            "AND hd.${indicator} IS NOT NULL\n" +
+            "ORDER BY hd.create_time DESC\n" +
+            "LIMIT 1;")
     List<Map<String, Object>> getAgeIndicator(long id,String indicator);
 
     @Select("SELECT \n" +
