@@ -6,8 +6,16 @@
   <component name="ChangeListManager">
     <list default="true" id="a9893b25-86d0-4bf6-a875-6c226ea1fa5d" name="Changes" comment="页面适配">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/environment/envIndex.scss" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/environment/envIndex.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/people/index.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/people/index.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/router/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/router/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/BackendApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/BackendApplication.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/controller/HealthDataController.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/controller/HealthDataController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/mapper/HealthDataMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/mapper/HealthDataMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/IEnvValService.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/IEnvValService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/IHealthDataService.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/IHealthDataService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/impl/EnvValServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/impl/EnvValServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/impl/HealthDataServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/health-project-master/com/keylab/healthproject/service/impl/HealthDataServiceImpl.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -159,7 +167,8 @@
       <workItem from="1734416114791" duration="589000" />
       <workItem from="1734418285045" duration="4906000" />
       <workItem from="1734504407112" duration="607000" />
-      <workItem from="1734505883131" duration="1532000" />
+      <workItem from="1734505883131" duration="3711000" />
+      <workItem from="1735208260845" duration="5768000" />
     </task>
     <task id="LOCAL-00001" summary="center-bottom修改">
       <option name="closed" value="true" />
@@ -209,7 +218,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734504998254</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="页面适配">
+      <option name="closed" value="true" />
+      <created>1734507483978</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1734507483978</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
