@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * @author T4mako
@@ -27,7 +28,17 @@ public class LoginInterceptor implements HandlerInterceptor {
             ThreadLocalUtil.setCurrentUser(userId);
             return true;
         } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            // 设置响应状态码
+            response.setStatus(HttpServletResponse.SC_OK);
+            // 设置响应内容类型为 JSON
+            response.setContentType("application/json;charset=UTF-8");
+            // 将 Result 对象转换为 JSON 字符串
+            String jsonResult = "{\"code\":401,\"message\":\"未授权，请先登录\",\"data\":null}";
+            // 写入响应
+            PrintWriter writer = response.getWriter();
+            writer.write(jsonResult);
+            writer.flush();
+            writer.close();
             return false;
         }
     }
