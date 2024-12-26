@@ -1,7 +1,7 @@
 <template>
   <ScaleScreen :width="1920" :height="1080" class="scale-wrap">
     <div class="bg">
-      <dv-loading v-if="loading">Loading...</dv-loading>
+      <dv-loading v-if="loading">数据量大，正在加载中...</dv-loading>
       <div v-else class="host-body">
         <!-- 头部 s -->
         <div class="d-flex jc-center title_wrap" style="z-index: 999">
@@ -10,7 +10,7 @@
           <div class="guang"></div>
           <div class="d-flex jc-center">
             <div class="title">
-              <span class="title-text" v-on:click="() => { this.$router.push({ path: '/' }) }">数字健康家庭服务城市平台</span>
+              <span class="title-text" v-on:click="() => { this.$router.push({ path: '/homeIndex' }) }">数字健康家庭服务城市平台</span>
             </div>
           </div>
           <div class="timers">
@@ -100,7 +100,7 @@ export default {
   },
   mounted() {
     this.timeFn();
-    this.cancelLoading();
+    // this.cancelLoading();
   },
   beforeDestroy() {
     clearInterval(this.timing);

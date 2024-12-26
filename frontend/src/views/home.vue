@@ -22,7 +22,7 @@
           <div class="guang"></div>
           <div class="d-flex jc-center">
             <div class="title">
-              <span class="title-text"v-on:click="()=>{this.$router.push({path:'/'})}">数字健康家庭服务城市平台</span>
+              <span class="title-text"v-on:click="()=>{this.$router.push({path:'/homeIndex'})}">数字健康家庭服务城市平台</span>
             </div>
           </div>
           <div class="timers">
