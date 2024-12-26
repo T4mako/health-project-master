@@ -35,7 +35,7 @@ public class cityController {
         } else {
             long num = indexService.getNumByCityName(cityName);
             if (num == 0)
-                return Result.error(ResultCodeEnum.PARAM_ERROR);
+                return Result.error(ResultCodeEnum.Non_Demonstration_Cities);
             return Result.success(num);
         }
     }
@@ -56,7 +56,7 @@ public class cityController {
         } else {
             list = indexService.getSexCountByCity(cityName);
             if (list == null)
-                return Result.error(ResultCodeEnum.PARAM_ERROR);
+                return Result.error(ResultCodeEnum.Non_Demonstration_Cities);
         }
         return Result.success(list);
     }
@@ -79,7 +79,7 @@ public class cityController {
         } else {
             List<Map<String, Object>> list = indexService.getHealthStatusByCity(cityName);
             if (list == null) {
-                return Result.error(ResultCodeEnum.PARAM_ERROR);
+                return Result.error(ResultCodeEnum.Non_Demonstration_Cities);
             }
             return Result.success(list);
         }
@@ -103,7 +103,7 @@ public class cityController {
         } else {
             List<Map<String, Object>> list = indexService.getHealthLevelByCity(cityName);
             if (list == null) {
-                return Result.error(ResultCodeEnum.PARAM_ERROR);
+                return Result.error(ResultCodeEnum.Non_Demonstration_Cities);
             }
             return Result.success(list);
         }
@@ -117,7 +117,7 @@ public class cityController {
         } else {
             Map<String, Object> map = indexService.getHealthDataByCommunity(communityName);
             if (map == null) {
-                return Result.error(ResultCodeEnum.PARAM_ERROR);
+                return Result.error(ResultCodeEnum.Non_Demonstration_Cities);
             }
             return Result.success(map);
         }
@@ -131,7 +131,7 @@ public class cityController {
         } else {
             List<Map<String, Object>> list = indexService.getDataByCommunityAll(communityName);
             if (list.isEmpty()) {
-                return Result.error(ResultCodeEnum.PARAM_ERROR);
+                return Result.error(ResultCodeEnum.Non_Demonstration_Cities);
             }
             return Result.success(list);
         }
@@ -169,7 +169,7 @@ public class cityController {
         } else {
             Map<String, Object> map = indexService.getEnvironmentDataByCity(cityName);
             if (map == null) {
-                return Result.error(ResultCodeEnum.PARAM_ERROR);
+                return Result.error(ResultCodeEnum.Non_Demonstration_Cities);
             }
             return Result.success(map);
         }
@@ -190,7 +190,7 @@ public class cityController {
     public Result getHealthDataAllByCityName(@RequestParam String cityName) {
         List<Map<String, Object>> list = indexService.getHealthDataAllByCityName(cityName);
         if (list == null)
-            return Result.error(ResultCodeEnum.PARAM_ERROR);
+            return Result.error(ResultCodeEnum.Non_Demonstration_Cities);
         return Result.success(list);
     }
 
@@ -199,7 +199,7 @@ public class cityController {
     public Result getHealthDataAll() {
         List<Map<String, Object>> list = indexService.getHealthDataAll();
         if (list == null)
-            return Result.error(ResultCodeEnum.PARAM_ERROR);
+            return Result.error(ResultCodeEnum.Non_Demonstration_Cities);
         return Result.success(list);
     }
 
@@ -210,7 +210,7 @@ public class cityController {
             return Result.error(ResultCodeEnum.PARAM_ERROR);
         Map<String, Object> map = indexService.getEnviromentByUserId(Id);
         if (map == null)
-            return Result.error(ResultCodeEnum.Environmental_Data_Not_Bound);
+            return Result.error(ResultCodeEnum.Non_Demonstration_Cities);
         return Result.success(map);
     }
 }
