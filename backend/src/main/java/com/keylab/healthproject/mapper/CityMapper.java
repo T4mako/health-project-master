@@ -298,12 +298,12 @@ public interface CityMapper {
                 IF(
                     ABS(TIMESTAMPDIFF(DAY, lhdv.create_time, ev.create_time)) > 7,
                     0,
-                    ev.co 
+                    ROUND(ev.co, 2) 
                 ) AS co,
                 IF(
                     ABS(TIMESTAMPDIFF(DAY, lhdv.create_time, ev.create_time)) > 7,
                     0,
-                    ev.pressure
+                    ROUND(ev.pressure, 2)
                 ) AS pressure,
                 IF(
                     ABS(TIMESTAMPDIFF(DAY, lhdv.create_time, ev.create_time)) > 7,
@@ -313,22 +313,22 @@ public interface CityMapper {
                 IF(
                     ABS(TIMESTAMPDIFF(DAY, lhdv.create_time, ev.create_time)) > 7,
                     0,
-                    ev.pm25
+                    ROUND(ev.pm25, 2)
                 ) AS pm25,
                 IF(
                     ABS(TIMESTAMPDIFF(DAY, lhdv.create_time, ev.create_time)) > 7,
                     0,
-                    ev.pm10
+                    ROUND(ev.pm10, 2)
                 ) AS pm10,
                 IF(
                     ABS(TIMESTAMPDIFF(DAY, lhdv.create_time, ev.create_time)) > 7,
                     0,
-                    ev.humidity
+                    ROUND(ev.humidity, 2)
                 ) AS humidity,
                 IF(
                     ABS(TIMESTAMPDIFF(DAY, lhdv.create_time, ev.create_time)) > 7,
                     -999,
-                    ev.temperature
+                    ROUND(ev.temperature, 2)
                 ) AS e_temperature,
                 DATE(ev.create_time) AS e_create_time
             FROM

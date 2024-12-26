@@ -14,6 +14,7 @@ public enum ResultCodeEnum {
     SYSTEM_ERROR("500", "系统异常"),
     CITYNAME_LOST_ERROR("4002","城市名称缺失"),
     Environmental_Data_Not_Bound("4003","环境数据未绑定"),
+    Non_Demonstration_Cities("4004","非示范城市"),
     ;
 
     public String code;
