@@ -61,13 +61,13 @@ export default {
           }
         },
         series: [
-          { name: '呼吸率（次每分钟）', type: 'line', smooth: true, data: [] },
-          { name: '收缩压（mm Hg）', type: 'line', smooth: true, data: [] },
-          { name: '舒张压（mm Hg）', type: 'line', smooth: true, data: [] },
-          { name: '血氧（百分比）', type: 'line', smooth: true, data: [] },
-          { name: '温度（摄氏度）', type: 'line', smooth: true, data: [] },
-          { name: '心率（Bpm）', type: 'line', smooth: true, data: [] },
-          { name: '血糖（mmol/L）', type: 'line', smooth: true, data: [] }
+          { name: '呼吸率', type: 'line', smooth: true, data: [] },
+          { name: '收缩压', type: 'line', smooth: true, data: [] },
+          { name: '舒张压', type: 'line', smooth: true, data: [] },
+          { name: '血氧', type: 'line', smooth: true, data: [] },
+          { name: '温度', type: 'line', smooth: true, data: [] },
+          { name: '心率', type: 'line', smooth: true, data: [] },
+          { name: '血糖', type: 'line', smooth: true, data: [] }
         ]
       },
       timeOptions: [

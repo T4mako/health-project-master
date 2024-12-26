@@ -81,10 +81,12 @@ public class HealthDataTask {
         } catch (IOException e) {
             System.err.println("Error saving data to file: " + e.getMessage());
         }
+        log.info("健康数据已查询");
     }
 
     @Scheduled(cron = "0 1 0 * * ?")
     public void insertDataTask() {
+        log.info("健康数据插入...");
         File jsonFile = new File("all_records.json");
 
         if (!jsonFile.exists()) {
@@ -98,5 +100,6 @@ public class HealthDataTask {
         } catch (IOException e) {
             System.err.println("Error reading data from JSON file: " + e.getMessage());
         }
+        log.info("健康数据已插入");
     }
 }

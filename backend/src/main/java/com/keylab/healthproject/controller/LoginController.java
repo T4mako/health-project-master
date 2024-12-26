@@ -46,16 +46,16 @@ public class LoginController {
         return Result.success("登出成功");
     }
 
-    @PostMapping("/register")
-    public Result register(@RequestBody User user) {
-        if(user.getUsername() != null && user.getPassword() != null) {
-            userService.register(user.getUsername(), user.getPassword());
-            Map<String, Object> res = new HashMap<>();
-            res.put("message", "User registered successfully");
-            return Result.success(res);
-        }else {
-            return Result.error(ResultCodeEnum.PARAM_ERROR);
-        }
-
-    }
+//    @PostMapping("/register")
+//    public Result register(@RequestBody User user) {
+//        if(user.getUsername() != null && user.getPassword() != null) {
+//            userService.register(user.getUsername(), user.getPassword());
+//            Map<String, Object> res = new HashMap<>();
+//            res.put("message", "User registered successfully");
+//            return Result.success(res);
+//        }else {
+//            return Result.error(ResultCodeEnum.PARAM_ERROR);
+//        }
+//
+//    }
 }
