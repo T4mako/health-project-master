@@ -2,7 +2,7 @@
   <div class="model-query">
     <!-- 对话内容展示区域 -->
     <div class="dialogue-container">
-      <div class="titletext">健康服务AI 模型问答</div>
+      <div class="titletext">数字健康大模型</div>
       <div v-for="(message, index) in dialogue" :key="index" class="message" :class="message.sender">
         <img :src="message.avatar" alt="avatar" class="avatar" />
         <div class="content">

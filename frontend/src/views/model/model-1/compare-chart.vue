@@ -7,7 +7,7 @@
         </el-option>
       </el-select>
       <span style="font-size: 18px; margin-left: 50px;">健康指标：</span>
-      <el-select v-model="indicatorChoose" placeholder="请选择" @change="fetchData">
+      <el-select v-model="indicatorChoose" placeholder="请选择" @change="fetchData" style="width: 200px;">
         <el-option v-for="item in indicatorOptions" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
@@ -67,13 +67,12 @@ export default {
       ],
       areaChoose: 'community',
       indicatorOptions: [
-        { value: 'breath_rate', label: '呼吸率' },
-        { value: 'systolic', label: '收缩压' },
-        { value: 'diastolic', label: '舒张压' },
-        { value: 'blood_oxygen', label: '血氧' },
-        // { value: 'temperature', label: '温度' },
-        { value: 'heart_rate', label: '心率' },
-        { value: 'blood_glucose', label: '血糖' }
+        { value: 'breath_rate', label: '呼吸率（次每分钟）' },
+        { value: 'systolic', label: '收缩压（mm Hg）' },
+        { value: 'diastolic', label: '舒张压（mm Hg）' },
+        { value: 'blood_oxygen', label: '血氧（百分比）' },
+        { value: 'heart_rate', label: '心率（Bpm）' },
+        { value: 'blood_glucose', label: '血糖（mmol/L）' }
       ],
       indicatorChoose: 'systolic'
     };

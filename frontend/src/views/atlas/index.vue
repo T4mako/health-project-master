@@ -1,14 +1,33 @@
 <template>
   <ItemWrap style="height: 90%;">
     <div style="margin: 30px;">
-      <!-- 下拉框 -->
-      <el-select v-model="currentCity" placeholder="选择城市" @change="updateGraph"
-        style="margin-bottom: 16px; width: 200px;">
-        <el-option label="徐州" value="xuzhou"></el-option>
-        <el-option label="郑州" value="zhengzhou"></el-option>
-        <el-option label="西安" value="xian"></el-option>
+  <!-- 下拉框 -->
+  <el-select 
+        v-model="currentCity" 
+        placeholder="选择城市" 
+        @change="updateGraph"
+        class="custom-select">
+        <el-option 
+          label="徐州" 
+          value="xuzhou" 
+          class="custom-option"
+          style="font-size: 22px;">
+        </el-option>
+        <el-option 
+          label="郑州" 
+          value="zhengzhou" 
+          class="custom-option"
+          style="font-size: 22px;"
+          >
+        </el-option>
+        <el-option 
+          label="西安" 
+          value="xian" 
+          class="custom-option"
+          style="font-size: 22px;">
+        </el-option>
       </el-select>
-    </div>
+</div>
 
     <Echart :options="option" class="left_center_inner" v-if="true" ref="charts" :width="chartWidth" :height="chartHeight"/>
   </ItemWrap>
@@ -274,7 +293,6 @@ export default {
 ::v-deep .el-select {
   position: relative;
   width: 450px;
-
   .el-input {
     input {
       height: 40px;
@@ -292,5 +310,14 @@ export default {
       padding-left: 0.11rem;
     }
   }
+}
+::v-deep .custom-select {
+  .el-input__inner {
+    font-size: 26px; /* 选择框的字体大小 */
+  }
+}
+
+::v-deep .custom-option {
+  font-size: 22px; /* 选项的字体大小 */
 }
 </style>

@@ -30,4 +30,8 @@ public interface IHealthDataService extends IService<HealthData> {
     List<Map<String,Object>> communityAllInfo(long id);
 
     List<Map<String, Object>> getLatestFullHData(long id);
+
+    void upsertHealthData(List<Map<String, Object>> records);
+
+    HealthData personLatestHData(long id);
 }

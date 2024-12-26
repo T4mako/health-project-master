@@ -32,11 +32,11 @@ public interface HealthDataMapper extends BaseMapper<HealthData> {
             hd.${indicator},
             pd.age 
         FROM 
-            health_test.latest_health_data_view hd
+            health.latest_health_data_view hd
         JOIN 
-            health_test.person_data pd ON hd.researched_person_id = pd.id
+            health.person_data pd ON hd.researched_person_id = pd.id
         WHERE 
-            pd.dept_name = (SELECT dept_name FROM health_test.person_data WHERE id = #{id})
+            pd.dept_name = (SELECT dept_name FROM health.person_data WHERE id = #{id})
         AND 
             hd.${indicator} IS NOT NULL
         """)
@@ -49,9 +49,9 @@ public interface HealthDataMapper extends BaseMapper<HealthData> {
             hd.${indicator},
             pd.age
         FROM
-            health_test.latest_health_data_view hd
+            health.latest_health_data_view hd
         RIGHT JOIN
-            health_test.person_data pd ON hd.researched_person_id = pd.id
+            health.person_data pd ON hd.researched_person_id = pd.id
         WHERE
             pd.dept_name IN (
                 SELECT
@@ -147,7 +147,7 @@ public interface HealthDataMapper extends BaseMapper<HealthData> {
             "    heart_rate,\n" +
             "    blood_glucose\n" +
             "FROM \n" +
-            "    health_test.latest_health_data_with_avg\n" +
+            "    health.latest_health_data_with_avg\n" +
             "WHERE \n" +
             "    researched_person_id = #{id};")
     List<HealthData> getLatestHData(long id);
