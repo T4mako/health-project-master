@@ -3,6 +3,7 @@ package com.keylab.healthproject.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -256,86 +257,95 @@ public interface CityMapper {
     Map<String, Object> getHealthDataByCommunity(String communityName);
 
     @Select("""
-            WITH LatestDate AS (
-                SELECT MAX(hd.create_time) AS max_date
-                FROM health_data hd
-                JOIN person_data pd ON hd.researched_person_id = pd.id
-                JOIN community c ON pd.dept_id = c.id
-                WHERE c.name = #{communityName}
-            )
-            
             SELECT
+                c.dep_id AS dep_id,
                 pd.id AS person_id,
                 pd.gender,
                 pd.age,
                 pd.dept_name,
-                c.dep_id,
-                COALESCE(FORMAT(AVG(hd.breath_rate), 1), 0) AS breath_rate,
-                COALESCE(FORMAT(AVG(hd.systolic), 1), 0) AS systolic,
-                COALESCE(FORMAT(AVG(hd.diastolic), 1), 0) AS diastolic,
-                COALESCE(FORMAT(AVG(hd.blood_oxygen), 1), 0) AS blood_oxygen,
-                COALESCE(FORMAT(AVG(hd.temperature), 1), 0) AS temperature,
-                COALESCE(FORMAT(AVG(hd.heart_rate), 1), 0) AS heart_rate,
-                COALESCE(FORMAT(AVG(hd.blood_glucose), 1), 0) AS blood_glucose
-            FROM
-                community c
-            JOIN
-                person_data pd ON c.id = pd.dept_id
-            LEFT JOIN
-                health_data hd ON pd.id = hd.researched_person_id
-            WHERE
-                c.name = #{communityName}
-                AND hd.create_time >= DATE_SUB((SELECT max_date FROM LatestDate), INTERVAL 1 MONTH)
-                AND hd.create_time < (SELECT max_date FROM LatestDate)
-            GROUP BY
-                pd.id, pd.gender, pd.age, pd.dept_name, c.dep_id;
+                COALESCE(lhv.breath_rate, 0) AS breath_rate,
+                COALESCE(lhv.systolic, 0) AS systolic,
+                COALESCE(lhv.diastolic, 0) AS diastolic,
+                COALESCE(lhv.blood_oxygen, 0) AS blood_oxygen,
+                COALESCE(lhv.temperature, 0) AS temperature,
+                COALESCE(lhv.heart_rate, 0) AS heart_rate,
+                COALESCE(lhv.blood_glucose, 0) AS blood_glucose
+            FROM person_data pd
+            JOIN community c ON pd.dept_name = c.name
+            LEFT JOIN latest_health_data_view lhv ON pd.id = lhv.researched_person_id
+            WHERE c.name = #{communityName}
             """)
     List<Map<String, Object>> getDataByCommunityAll(String communityName);
 
     @Select("""
             SELECT
-                pd.id,
+                IFNULL(lhdv.breath_rate, 0) AS breath_rate,
+                IFNULL(lhdv.systolic, 0) AS systolic,
+                IFNULL(lhdv.diastolic, 0) AS diastolic,
+                IFNULL(lhdv.blood_oxygen, 0) AS blood_oxygen,
+                IFNULL(lhdv.temperature, -999) AS p_temperature, 
+                IFNULL(lhdv.heart_rate, 0) AS heart_rate,
+                IFNULL(lhdv.blood_glucose, 0) AS blood_glucose,
+                lhdv.create_time AS p_create_time,
                 pd.gender,
                 pd.age,
                 pd.height,
                 pd.weight,
                 pd.bmi,
-                COALESCE(lh.breath_rate, 0) AS breath_rate,
-                COALESCE(lh.systolic, 0) AS systolic,
-                COALESCE(lh.diastolic, 0) AS diastolic,
-                COALESCE(lh.blood_oxygen, 0) AS blood_oxygen,
-                COALESCE(lh.temperature, -999) AS p_temperature,
-                COALESCE(lh.heart_rate, 0) AS heart_rate,
-                COALESCE(lh.blood_glucose, 0) AS blood_glucose,
-                COALESCE(lh.create_time, '0') AS p_create_time,
-                COALESCE(ev.co, 0) AS co,
-                COALESCE(ev.pressure, 0) AS pressure,
-                COALESCE(ev.light, '0') AS light,
-                COALESCE(ev.pm25, 0) AS pm25,
-                COALESCE(ev.pm10, 0) AS pm10,
-                COALESCE(ev.humidity, 0) AS humidity,
-                COALESCE(ev.temperature, -999) AS e_temperature,
-                COALESCE(ev.create_time, '0') AS e_create_time
+                pd.id,
+                pd.dept_id,
+                c.dep_id AS dep_id,
+                IF(
+                    ABS(TIMESTAMPDIFF(DAY, lhdv.create_time, ev.create_time)) > 7,
+                    0,
+                    ev.co 
+                ) AS co,
+                IF(
+                    ABS(TIMESTAMPDIFF(DAY, lhdv.create_time, ev.create_time)) > 7,
+                    0,
+                    ev.pressure
+                ) AS pressure,
+                IF(
+                    ABS(TIMESTAMPDIFF(DAY, lhdv.create_time, ev.create_time)) > 7,
+                    0,
+                    ev.light
+                ) AS light,
+                IF(
+                    ABS(TIMESTAMPDIFF(DAY, lhdv.create_time, ev.create_time)) > 7,
+                    0,
+                    ev.pm25
+                ) AS pm25,
+                IF(
+                    ABS(TIMESTAMPDIFF(DAY, lhdv.create_time, ev.create_time)) > 7,
+                    0,
+                    ev.pm10
+                ) AS pm10,
+                IF(
+                    ABS(TIMESTAMPDIFF(DAY, lhdv.create_time, ev.create_time)) > 7,
+                    0,
+                    ev.humidity
+                ) AS humidity,
+                IF(
+                    ABS(TIMESTAMPDIFF(DAY, lhdv.create_time, ev.create_time)) > 7,
+                    -999,
+                    ev.temperature
+                ) AS e_temperature,
+                DATE(ev.create_time) AS e_create_time
             FROM
-                person_data pd
-            LEFT JOIN
-                latest_health_data_view lh ON pd.id = lh.researched_person_id
-            LEFT JOIN
-                env_val ev ON pd.family_user_id = ev.family_user_id
-                AND ev.create_time = (
-                    SELECT
-                        create_time
-                    FROM
-                        env_val
-                    WHERE
-                        family_user_id = pd.family_user_id
-                        AND ABS(DATEDIFF(ev.create_time, lh.create_time)) <= 7
-                    ORDER BY
-                        ABS(DATEDIFF(ev.create_time, lh.create_time))
-                    LIMIT 1
-                )
+                latest_health_data_view lhdv
+            JOIN
+                person_data pd ON pd.id = lhdv.researched_person_id
+            JOIN
+                community c ON c.id = pd.dept_id
+            JOIN
+                env_val ev ON ev.dept_id = c.dep_id
             WHERE
-                pd.id = #{id};
+                lhdv.researched_person_id = #{id}
+                AND pd.id = #{id}
+            ORDER BY
+                ABS(TIMESTAMPDIFF(SECOND, lhdv.create_time, ev.create_time))
+            LIMIT 1;
+            
             """)
     Map<String, Object> getPersonalHealthData(Integer id);
 
@@ -378,8 +388,7 @@ public interface CityMapper {
 
 
     @Select("""
-            
-             WITH LatestDate AS (
+            WITH LatestDate AS (
                 SELECT MAX(create_time) AS max_date
                 FROM env_val
                 WHERE dept_id = #{dep_id}
@@ -412,135 +421,142 @@ public interface CityMapper {
     Map<String, Object> getEnvironmentDataByCity(Integer dep_id);
 
     @Select("""
-            WITH latest_data AS (
+            WITH DeptID AS (
+                SELECT dep_id
+                FROM community
+                WHERE name = #{cityName}
+            ),
+            RecentData AS (
                 SELECT
-                    e.*,
-                    ROW_NUMBER() OVER (PARTITION BY e.family_user_id ORDER BY e.create_time DESC) AS rn
-                FROM
-                    env_val e
-                INNER JOIN
-                    person_data p ON e.family_user_id = p.family_user_id
-                WHERE
-                    p.dept_name IN (SELECT dept_name FROM person_data WHERE dept_name = #{cityName})
-                    AND e.create_time >= DATE_SUB((SELECT MAX(create_time) FROM env_val), INTERVAL 7 DAY)
+                    ev.co,
+                    ev.pressure,
+                    ev.light,
+                    ev.pm10,
+                    ev.pm25,
+                    ev.humidity,
+                    ev.temperature,
+                    ev.create_time
+                FROM env_val AS ev
+                JOIN DeptID AS d ON ev.dept_id = d.dep_id
+                WHERE ev.create_time >= CURDATE() - INTERVAL 1 WEEK
+            ),
+            AggregatedData AS (
+                SELECT
+                    ROUND(AVG(co), 2) AS avg_co,
+                    ROUND(AVG(pressure), 2) AS avg_pressure,
+                    ROUND(AVG(pm10), 2) AS avg_pm10,
+                    ROUND(AVG(pm25), 2) AS avg_pm25,
+                    ROUND(AVG(humidity), 2) AS avg_humidity,
+                    ROUND(AVG(temperature), 2) AS avg_temperature,
+                    light
+                FROM RecentData
+                GROUP BY light
+            ),
+            MostFrequentLight AS (
+                SELECT light
+                FROM RecentData
+                GROUP BY light
+                ORDER BY COUNT(*) DESC
+                LIMIT 1
             )
             SELECT
-                CASE WHEN COUNT(*) > 0 THEN ROUND(AVG(co), 2) ELSE NULL END AS co,
-                CASE WHEN COUNT(*) > 0 THEN ROUND(AVG(pressure), 2) ELSE NULL END AS pressure,
-                CASE WHEN COUNT(*) > 0 THEN ROUND(AVG(pm25), 2) ELSE NULL END AS pm25,
-                CASE WHEN COUNT(*) > 0 THEN ROUND(AVG(pm10), 2) ELSE NULL END AS pm10,
-                CASE WHEN COUNT(*) > 0 THEN ROUND(AVG(humidity), 2) ELSE NULL END AS humidity,
-                CASE WHEN COUNT(*) > 0 THEN ROUND(AVG(temperature), 2) ELSE NULL END AS temperature,
-                (SELECT light FROM (
-                    SELECT light, COUNT(*) AS cnt
-                    FROM latest_data
-                    GROUP BY light
-                    ORDER BY cnt DESC
-                    LIMIT 1
-                ) AS light_freq) AS light
-            FROM
-                latest_data
-            WHERE
-                rn = 1;
+                ad.avg_co AS co,
+                ad.avg_pressure AS pressure,
+                mfl.light AS light,
+                ad.avg_pm10 AS pm10,
+                ad.avg_pm25 AS pm25,
+                ad.avg_humidity AS humidity,
+                ad.avg_temperature AS temperature
+            FROM AggregatedData AS ad
+            JOIN MostFrequentLight AS mfl
+            LIMIT 1;
             """)
     Map<String, Object> getCommunityEnvironmentDataByCity(String cityName);
 
     @Select("""
-            WITH LatestDate AS (
-                SELECT MAX(hd.create_time) AS max_date
-                FROM health_data hd
+            WITH selected_persons AS (
+                SELECT id, gender, age, dept_name
+                FROM person_data
+                ORDER BY RAND()
+                LIMIT 50
+            ),
+            dept_mapping AS (
+                SELECT sp.id, sp.gender, sp.age, sp.dept_name, c.dep_id
+                FROM selected_persons sp
+                JOIN community c ON sp.dept_name = c.name
             )
-            
             SELECT
-                pd.id AS person_id,
-                pd.gender,
-                pd.age,
-                pd.dept_name,
-                c.dep_id,
-                FORMAT(COALESCE(AVG(hd.breath_rate), 0), 1) AS breath_rate,
-                FORMAT(COALESCE(AVG(hd.systolic), 0), 1) AS systolic,
-                FORMAT(COALESCE(AVG(hd.diastolic), 0), 1) AS diastolic,
-                FORMAT(COALESCE(AVG(hd.blood_oxygen), 0), 1) AS blood_oxygen,
-                FORMAT(COALESCE(AVG(hd.temperature), 0), 1) AS temperature,
-                FORMAT(COALESCE(AVG(hd.heart_rate), 0), 1) AS heart_rate,
-                FORMAT(COALESCE(AVG(hd.blood_glucose), 0), 1) AS blood_glucose
-            FROM
-                community c
-            JOIN
-                person_data pd ON c.id = pd.dept_id
-            LEFT JOIN
-                health_data hd ON pd.id = hd.researched_person_id
-            WHERE
-                hd.create_time >= DATE_SUB((SELECT max_date FROM LatestDate), INTERVAL 1 MONTH)
-                AND hd.create_time < (SELECT max_date FROM LatestDate)
-            GROUP BY
-                pd.id, pd.gender, pd.age, pd.dept_name, c.dep_id
-            ORDER BY
-                RAND()
-            LIMIT 50;
+                d.id AS person_id,
+                d.gender,
+                d.age,
+                d.dept_name,
+                d.dep_id,
+                COALESCE(lhv.breath_rate, 0) AS breath_rate,
+                COALESCE(lhv.systolic, 0) AS systolic,
+                COALESCE(lhv.diastolic, 0) AS diastolic,
+                COALESCE(lhv.blood_oxygen, 0) AS blood_oxygen,
+                COALESCE(lhv.temperature, -999) AS temperature,
+                COALESCE(lhv.heart_rate, 0) AS heart_rate,
+                COALESCE(lhv.blood_glucose, 0) AS blood_glucose
+            FROM dept_mapping d
+            LEFT JOIN latest_health_data_view lhv ON d.id = lhv.researched_person_id;
             """)
     List<Map<String, Object>> getHealthDataRandomFifty();
 
     @Select("""
-            WITH LatestDate AS (
-                SELECT MAX(hd.create_time) AS max_date
-                FROM health_data hd
-                JOIN person_data pd ON hd.researched_person_id = pd.id
-                JOIN community c ON pd.dept_id = c.id
-                WHERE c.dep_id = #{id}
-            ),
-            RandomIDs AS (
-                SELECT pd.id
-                FROM person_data pd
-                JOIN community c ON c.id = pd.dept_id
-                WHERE c.dep_id = #{id}
-                LIMIT 50
-            )
             SELECT
-                pd.id AS person_id,
-                pd.gender,
-                pd.age,
-                pd.dept_name,
-                c.dep_id,
-                FORMAT(COALESCE(AVG(hd.breath_rate), 0), 1) AS breath_rate,
-                FORMAT(COALESCE(AVG(hd.systolic), 0), 1) AS systolic,
-                FORMAT(COALESCE(AVG(hd.diastolic), 0), 1) AS diastolic,
-                FORMAT(COALESCE(AVG(hd.blood_oxygen), 0), 1) AS blood_oxygen,
-                FORMAT(COALESCE(AVG(hd.temperature), 0), 1) AS temperature,
-                FORMAT(COALESCE(AVG(hd.heart_rate), 0), 1) AS heart_rate,
-                FORMAT(COALESCE(AVG(hd.blood_glucose), 0), 1) AS blood_glucose
-            FROM
-                RandomIDs ri
-            JOIN person_data pd ON ri.id = pd.id
-            LEFT JOIN health_data hd ON pd.id = hd.researched_person_id
-            LEFT JOIN community c ON c.id = pd.dept_id
-            WHERE
-                hd.create_time >= DATE_SUB((SELECT max_date FROM LatestDate), INTERVAL 1 MONTH)
-                AND hd.create_time < (SELECT max_date FROM LatestDate)
-            GROUP BY
-                pd.id, pd.gender, pd.age, pd.dept_name, c.dep_id;
+                #{id} AS dep_id,
+                sp.id AS person_id,
+                sp.gender,
+                sp.age,
+                sp.dept_name,
+                COALESCE(lhv.breath_rate, 0) AS breath_rate,
+                COALESCE(lhv.systolic, 0) AS systolic,
+                COALESCE(lhv.diastolic, 0) AS diastolic,
+                COALESCE(lhv.blood_oxygen, 0) AS blood_oxygen,
+                COALESCE(lhv.temperature, 0) AS temperature,
+                COALESCE(lhv.heart_rate, 0) AS heart_rate,
+                COALESCE(lhv.blood_glucose, 0) AS blood_glucose
+            FROM (
+                SELECT id, gender, age, dept_name
+                FROM person_data
+                WHERE dept_name IN (
+                    SELECT name
+                    FROM community
+                    WHERE dep_id = #{id}
+                )
+                ORDER BY RAND()
+                LIMIT 50
+            ) AS sp
+            LEFT JOIN latest_health_data_view lhv ON sp.id = lhv.researched_person_id;
             """)
     List<Map<String, Object>> getHealthDataRandomFiftyByCity(Integer id);
 
     @Select("""
             SELECT
-                COALESCE(e.co, 0) AS co,
-                COALESCE(e.pressure, 0) AS pressure,
-                COALESCE(e.light, '0') AS light,
-                COALESCE(e.pm25, 0) AS pm25,
-                COALESCE(e.pm10, 0) AS pm10,
-                COALESCE(e.humidity, 0) AS humidity,
-                COALESCE(e.temperature, -999) AS temperature,
-                DATE_FORMAT(COALESCE(e.create_time, NOW()), '%Y-%m-%d') AS latest_date
-            FROM
-                env_val e
-            JOIN
-                person_data p ON e.family_user_id = p.family_user_id
-            WHERE
-                p.id = #{id}
-            ORDER BY
-                e.create_time DESC
+              ev.co,
+              ev.pressure,
+              ev.light,
+              ev.pm10,
+              ev.pm25,
+              ev.humidity,
+              ev.temperature,
+              DATE(ev.create_time) AS latest_date
+            FROM env_val AS ev
+            WHERE dept_id IN (
+                SELECT dep_id
+                FROM community
+                WHERE id IN (
+                    SELECT dept_id
+                    FROM person_data
+                    WHERE id = #{id}
+                )
+            )
+            ORDER BY create_time DESC
             LIMIT 1;
+            
             """)
     Map<String, Object> getEnviromentByUserId(Integer id);
+
+
 }
