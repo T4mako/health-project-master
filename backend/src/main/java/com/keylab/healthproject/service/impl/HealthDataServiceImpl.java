@@ -287,6 +287,8 @@ public class HealthDataServiceImpl extends ServiceImpl<HealthDataMapper, HealthD
                 healthDataMapper.insert(insertData);
             }
         }
+        // 将 0 的值设置为 null
+        healthDataMapper.zeroToNull();
     }
 
     @Override
