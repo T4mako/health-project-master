@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -241,7 +243,7 @@ public class CityServiceImpl implements ICityService {
 
     @Override
     public Map<String, Object> getPersonalHealthData(Integer id) {
-        return cityMapper.getPersonalHealthData(id);
+       return cityMapper.getPersonalHealthData(id);
     }
 
     @Override
