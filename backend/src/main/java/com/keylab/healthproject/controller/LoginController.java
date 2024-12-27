@@ -26,7 +26,9 @@ public class LoginController {
     public Result login(@RequestBody User user) {
         if (user.getUsername() != null && user.getPassword() != null) {
             String token = userService.login(user.getUsername(), user.getPassword());
-
+            if ("登录失败".equals(token)){
+                return Result.error(ResultCodeEnum.PARAM_ERROR);
+            }
             // 存储 Token 到 ThreadLocalUtil
             ThreadLocalUtil.setCurrentUser(String.valueOf(user.getId()));
             Map<String, Object> res = new HashMap<>();
