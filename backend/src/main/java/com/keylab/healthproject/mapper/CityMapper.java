@@ -286,7 +286,7 @@ public interface CityMapper {
                 IFNULL(lhdv.temperature, -999) AS p_temperature, 
                 IFNULL(lhdv.heart_rate, 0) AS heart_rate,
                 IFNULL(lhdv.blood_glucose, 0) AS blood_glucose,
-                lhdv.create_time AS p_create_time,
+                IFNULL(lhdv.create_time, 0) AS p_create_time,
                 pd.gender,
                 pd.age,
                 pd.height,
