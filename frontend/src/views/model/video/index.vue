@@ -37,6 +37,8 @@ export default {
     } else {
       console.error('未能获取到 video-player 实例');
     }
+    console.log(process.env.VUE_APP_VIDEO_URL);
+
   },
 };
 </script>
