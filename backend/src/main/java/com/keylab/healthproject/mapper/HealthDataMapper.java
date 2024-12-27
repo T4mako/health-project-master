@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.keylab.healthproject.dao.HealthData;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 import java.util.Map;
@@ -77,13 +78,14 @@ public interface HealthDataMapper extends BaseMapper<HealthData> {
 
 
 
-    @Select("SELECT hd.researched_person_id, hd.${indicator}, pd.age \n" +
-            "FROM health_data hd \n" +
-            "RIGHT JOIN person_data pd \n" +
-            "ON hd.researched_person_id = pd.id \n" +
-            "WHERE hd.researched_person_id = #{id} \n" +
-            "ORDER BY hd.create_time DESC \n" +
-            "LIMIT 1")
+    @Select("SELECT hd.researched_person_id, hd.${indicator}, pd.age\n" +
+            "FROM health_data hd\n" +
+            "RIGHT JOIN person_data pd\n" +
+            "ON hd.researched_person_id = pd.id\n" +
+            "WHERE hd.researched_person_id = #{id}\n" +
+            "AND hd.${indicator} IS NOT NULL\n" +
+            "ORDER BY hd.create_time DESC\n" +
+            "LIMIT 1;")
     List<Map<String, Object>> getAgeIndicator(long id,String indicator);
 
     @Select("SELECT \n" +
@@ -151,4 +153,23 @@ public interface HealthDataMapper extends BaseMapper<HealthData> {
             "WHERE \n" +
             "    researched_person_id = #{id};")
     List<HealthData> getLatestHData(long id);
+
+    @Update("UPDATE health_data\n" +
+            "SET \n" +
+            "    temperature = NULLIF(temperature, 0),\n" +
+            "    heart_rate = NULLIF(heart_rate, 0),\n" +
+            "    breath_rate = NULLIF(breath_rate, 0),\n" +
+            "    blood_oxygen = NULLIF(blood_oxygen, 0),\n" +
+            "    blood_glucose = NULLIF(blood_glucose, 0),\n" +
+            "    systolic = NULLIF(systolic, 0),\n" +
+            "    diastolic = NULLIF(diastolic, 0)\n" +
+            "WHERE \n" +
+            "    temperature = 0 OR\n" +
+            "    heart_rate = 0 OR\n" +
+            "    breath_rate = 0 OR\n" +
+            "    blood_oxygen = 0 OR\n" +
+            "    blood_glucose = 0 OR\n" +
+            "    systolic = 0 OR\n" +
+            "    diastolic = 0;")
+    void zeroToNull();
 }

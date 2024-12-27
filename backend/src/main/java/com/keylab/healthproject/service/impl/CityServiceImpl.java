@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -73,7 +75,6 @@ public class CityServiceImpl implements ICityService {
         if (femaleCount != 0) {
             ratio = maleCount.doubleValue() / femaleCount.doubleValue();
         }
-        // 将比例添加到结果中
         Map<String, Object> ratioMap = new HashMap<>();
         ratioMap.put("男", maleCount);
         ratioMap.put("女", femaleCount);
@@ -236,14 +237,13 @@ public class CityServiceImpl implements ICityService {
     @Override
     public List<Map<String, Object>> getDataByCommunityAll(String communityName) {
         List<Map<String, Object>> healthDataList = cityMapper.getDataByCommunityAll(communityName);
-//        System.out.println(healthDataList);
         List<Map<String, Object>> resultList = packagePersonalHealthData(healthDataList);
         return resultList;
     }
 
     @Override
     public Map<String, Object> getPersonalHealthData(Integer id) {
-        return cityMapper.getPersonalHealthData(id);
+       return cityMapper.getPersonalHealthData(id);
     }
 
     @Override
@@ -262,7 +262,6 @@ public class CityServiceImpl implements ICityService {
             map = cityMapper.getEnvironmentDataByCity(10);
         else
             return null;
-//        System.out.println(map);
         return map;
     }
 

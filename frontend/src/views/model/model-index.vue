@@ -1,7 +1,7 @@
 <template>
   <ScaleScreen :width="1920" :height="1080" class="scale-wrap">
     <div class="bg">
-      <dv-loading v-if="loading">Loading...</dv-loading>
+      <dv-loading v-if="loading">数据量大，正在加载中...</dv-loading>
       <div v-else class="host-body">
         <!-- 头部 s -->
         <div class="d-flex jc-center title_wrap" style="z-index: 999">
@@ -10,7 +10,7 @@
           <div class="guang"></div>
           <div class="d-flex jc-center">
             <div class="title">
-              <span class="title-text" v-on:click="() => { this.$router.push({ path: '/' }) }">数字健康家庭服务城市平台</span>
+              <span class="title-text" v-on:click="() => { this.$router.push({ path: '/homeIndex' }) }">数字健康家庭服务城市平台</span>
             </div>
           </div>
           <div class="timers">
@@ -23,7 +23,7 @@
           <ItemWrap class="wrap" title="老年人信息">
             <div style="padding: 10px;">
               <el-table ref="singleTable" :data="tableData" highlight-current-row @current-change="handleCurrentChange"
-                style="width: 100%" size="medium" :lazy="true"
+                style="width: 100%" size="medium" :lazy="true" v-loading="loading"
                 :header-cell-style="{ background: 'rgb(0,0,0,0)', color: '#fff' }" height="875">
                 <el-table-column type="index" width="60">
                 </el-table-column>
@@ -54,7 +54,7 @@
                 <ModleBtn name="摔倒监测报警"></ModleBtn>
               </div>
               <div @click="goTo('/medic')">
-                <ModleBtn name="数字健康咨询模型"></ModleBtn>
+                <ModleBtn name="数字健康大模型"></ModleBtn>
               </div>
             </div>
           </ItemWrap>
@@ -86,43 +86,21 @@ export default {
       input: '',
       path: '',
       tableData: [
-        { id: 98, gender: '女', age: '59', family_user_id: '211', dept_name: '永安社区', city: '徐州' },
-        { id: 99, gender: '女', age: '59', family_user_id: '211', dept_name: '永安社区', city: '徐州' },
-        { id: 100, gender: '女', age: '59', family_user_id: '211', dept_name: '永安社区', city: '徐州' },
-        { id: 101, gender: '女', age: '59', family_user_id: '211', dept_name: '永安社区', city: '徐州' }
+        // { id: 98, gender: '女', age: '59', family_user_id: '211', dept_name: '永安社区', city: '徐州' },
+        // { id: 99, gender: '女', age: '59', family_user_id: '211', dept_name: '永安社区', city: '徐州' },
+        // { id: 100, gender: '女', age: '59', family_user_id: '211', dept_name: '永安社区', city: '徐州' },
+        // { id: 101, gender: '女', age: '59', family_user_id: '211', dept_name: '永安社区', city: '徐州' }
       ],
       currentRow: null,
       userid: null,
     };
   },
   created() {
-    this.path = this.$route.path;
-    axios.get(`${baseUrl}/user/allUserBaseInfo`).then(response => {
-
-      if (response.code === "200") {
-        const data = response.data;
-        this.tableData = data
-
-      } else {
-        this.pageflag = false;
-        this.$Message({
-          text: response.data.msg,
-          type: 'warning'
-        });
-      }
-    })
-      .catch(error => {
-        console.error(error);
-        this.pageflag = false;
-        this.$Message({
-          text: '获取数据失败',
-          type: 'error'
-        });
-      });
+    this.fetchData();
   },
   mounted() {
     this.timeFn();
-    this.cancelLoading();
+    // this.cancelLoading();
   },
   beforeDestroy() {
     clearInterval(this.timing);
@@ -141,17 +119,48 @@ export default {
         clearTimeout(timer);
       }, 500);
     },
-    goTo(path) {
-      if (this.userid) {
-        this.$router.push(path);
-      } else {
-        this.$Message.warning("请选择用户")
-      }
-    },
+    // goTo(path) {
+    //   if (this.userid) {
+    //     this.$router.push(path);
+    //   } else {
+    //     this.$Message.warning("请选择用户")
+    //   }
+    // },
     handleCurrentChange(row) {
       this.userid = row.id; // Update userid with selected user's id
 
+    },
+    async fetchData() {
+      this.loading = true; // 显示加载动画
+      try {
+        const response = await axios.get(`${baseUrl}/user/allUserBaseInfo`);
+        if (response.code === "200") {
+          this.tableData = response.data;
+        } else {
+          this.$Message.warning(response.data.msg);
+        }
+      } catch (error) {
+        console.error(error);
+        this.$Message.error("获取数据失败");
+      } finally {
+        this.loading = false; // 关闭加载动画
+      }
+    },
+    goTo(path) {
+      if(path == '/medic'){
+        this.$router.push(path);
+        return;
+      }
+      if (!this.userid) {
+        this.$Message.warning("请选择用户");
+        return;
+      }
+      this.$router.push(path);
+    },
+    handleCurrentChange(row) {
+      this.userid = row.id; // 更新用户 ID
     }
+
   }
 };
 </script>

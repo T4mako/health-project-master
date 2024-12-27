@@ -15,4 +15,7 @@ import java.util.List;
  */
 public interface IEnvValService extends IService<EnvVal> {
     EnvVal getTodayEnvDataByUserId(long id);
+
+    // 插入环境数据
+    void saveEnvVal(EnvVal envVal);
 }
