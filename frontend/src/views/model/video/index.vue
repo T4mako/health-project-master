@@ -13,7 +13,7 @@ export default {
         // 视频设置
         sources: [
           {
-            src: 'http://localhost:8979/live/STREAM_NAME/index.m3u8', // 视频文件地址
+            src: process.env.VUE_APP_VIDEO_URL, // 视频文件地址
             type: 'application/x-mpegURL', // 视频类型
           },
         ],
@@ -37,6 +37,8 @@ export default {
     } else {
       console.error('未能获取到 video-player 实例');
     }
+    console.log(process.env.VUE_APP_VIDEO_URL);
+
   },
 };
 </script>
