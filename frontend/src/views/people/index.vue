@@ -244,7 +244,12 @@ export default {
           this.height = data.height;
           this.weight = data.weight;
           this.e_create_time = data.e_create_time ? data.e_create_time.split(' ')[0] : '';
-          this.p_create_time = data.p_create_time;
+          //创建时间如果接受为0，则显示未测量
+          if (data.p_create_time === '0') {
+            this.p_create_time = '未测量'
+          }else {
+            this.p_create_time = data.p_create_time;
+          }
         })
         .catch(error => {
           console.error("获取个人健康数据失败:", error);
