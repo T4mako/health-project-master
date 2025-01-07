@@ -1,44 +1,42 @@
 package com.keylab.healthproject.task;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.keylab.healthproject.service.impl.HealthDataServiceImpl;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
-@Component
-@EnableScheduling
-public class HealthDataTask {
+/**
+ * @author T4mako
+ * @date 2025/1/5 18:00
+ */
+public class FetchDataJob implements Job {
 
-    private static final Logger log = LoggerFactory.getLogger(HealthDataTask.class);
-    private final HealthDataServiceImpl healthDataServiceImpl;
+    private static final Logger log = LoggerFactory.getLogger(FetchDataJob.class);
+
     @Value("${health.api.url}")
     private String apiUrl;
 
     @Value("${health.api.token}")
     private String apiToken;
 
-    private final ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    public HealthDataTask( ObjectMapper objectMapper, HealthDataServiceImpl healthDataServiceImpl) {
-        this.objectMapper = objectMapper;
-        this.healthDataServiceImpl = healthDataServiceImpl;
-    }
-
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void fetchDataTask() {
+    @Override
+    public void execute(JobExecutionContext context) throws JobExecutionException {
         List<String> types = Arrays.asList("temperature", "heartRate", "breathRate", "bloodOxygen", "bloodGlucose", "bloodPressure");
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -1);
@@ -82,24 +80,5 @@ public class HealthDataTask {
             System.err.println("Error saving data to file: " + e.getMessage());
         }
         log.info("健康数据已查询");
-    }
-
-    @Scheduled(cron = "0 1 0 * * ?")
-    public void insertDataTask() {
-        log.info("健康数据插入...");
-        File jsonFile = new File("all_records.json");
-
-        if (!jsonFile.exists()) {
-            log.error("找不到文件 all_records.json");
-            return;
-        }
-
-        try {
-            List<Map<String, Object>> records = objectMapper.readValue(jsonFile, List.class);
-            healthDataServiceImpl.upsertHealthData(records);
-        } catch (IOException e) {
-            System.err.println("Error reading data from JSON file: " + e.getMessage());
-        }
-        log.info("健康数据已插入");
     }
 }

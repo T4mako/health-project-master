@@ -1,28 +1,28 @@
 package com.keylab.healthproject.task;
 
+/**
+ * @author T4mako
+ * @date 2025/1/5 18:06
+ */
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import com.keylab.healthproject.dao.EnvVal;
 import com.keylab.healthproject.service.IEnvValService;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-/**
- * 定时任务：采集空气质量数据
- * 每小时执行一次并将数据保存到数据库
- */
 @Slf4j
 @Component
-@EnableScheduling
-public class AirQualityTask {
+public class AirQualityJob implements Job {
 
     @Autowired
     private IEnvValService envValService;
@@ -39,8 +39,8 @@ public class AirQualityTask {
             Map.of("cityId", "101110101", "cityName", "西安", "deptId", 12)
     );
 
-    @Scheduled(cron = "0 0 * * * ?") // 每小时执行一次
-    public void fetchAndInsertData() {
+    @Override
+    public void execute(JobExecutionContext context) throws JobExecutionException {
         log.info("开始采集空气质量数据...");
 
         for (Map<String, Object> city : CITIES) {

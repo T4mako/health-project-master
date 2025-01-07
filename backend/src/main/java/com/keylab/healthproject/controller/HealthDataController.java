@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author T4mako
@@ -41,5 +42,11 @@ public class HealthDataController {
     public Result getPersonLatestHData(@RequestParam long id) {
         HealthData healthData = iHealthDataService.personLatestHData(id);
         return Result.success(healthData);
+    }
+
+    @GetMapping("/allHealthAndEnvData")
+    public Result getAllHealthAndEnvData(@RequestParam long id) {
+        List<Map<String, Object>> res = iHealthDataService.getAllHealthAndEnvData(id);
+        return Result.success(res);
     }
 }
