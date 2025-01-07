@@ -180,8 +180,13 @@ export default {
           // 创建方框
           const boxGeometry = new THREE.BoxGeometry(135, 350, 135); // 自定义尺寸
           const edges = new THREE.EdgesGeometry(boxGeometry); // 创建边界几何体
-          const lineMaterial = new THREE.LineBasicMaterial({ color: 0xfad700 }); // 黄色
+          const lineMaterial = new THREE.LineDashedMaterial({
+            color: 0xfad700,
+            dashSize: 3,
+            gapSize: 5
+          }); // 黄色虚线
           this.boundingBox = new THREE.LineSegments(edges, lineMaterial); // 用 LineSegments 表示边框
+          this.boundingBox.computeLineDistances(); // 计算虚线间距
           this.scene.add(this.boundingBox); // 添加到场景
         },
         (xhr) => {
@@ -208,9 +213,18 @@ export default {
             this.boundingBox.position.copy(position);
             this.boundingBox.rotation.copy(position);
 
+            const healthPosition = [
+              { x: -70, y: 150, z: -70 },
+              { x: 70, y: 150, z: 70 },
+              { x: -70, y: -50, z: 70 },
+              { x: 70, y: 150, z: -70 },
+              { x: 70, y: -50, z: 70 },
+              { x: -70, y: -50, z: -70 },
+              { x: 70, y: -50, z: -70 },
+            ]
             // 更新健康数据标签的位置
             this.healthLabels.forEach((label, index) => {
-              label.position.set(position.x - 150, position.y + index * 20, position.z);
+              label.position.set(position.x + healthPosition[index].x, position.y + healthPosition[index].y, position.z + healthPosition[index].z);
             });
           }
         });
@@ -296,7 +310,7 @@ export default {
         healthLabel.element.style.fontWeight = 'bold';
         healthLabel.element.style.backgroundColor = 'rgba(0, 0, 0, 0)';
         healthLabel.element.style.padding = '5px';
-        healthLabel.position.set(0, 0, 0); // 初始位置设置为 (0, 0, 0)
+        healthLabel.position.set(350 + 150, 0 + index * 20, 200); // 放置在黄色虚线框旁边
         this.scene.add(healthLabel);
         this.healthLabels.push(healthLabel);
       });
@@ -305,12 +319,22 @@ export default {
       const environmentFields = [
         { label: 'CO', field: 'ev_co', unit: ' mg/m³' },
         { label: '气压', field: 'ev_pressure', unit: ' hPa' },
-        { label: '天气', field: 'ev_light', unit: '' },
+        { label: '光照', field: 'ev_light', unit: '' },
         { label: 'PM2.5', field: 'ev_pm25', unit: ' μg/m³' },
         { label: 'PM10', field: 'ev_pm10', unit: ' μg/m³' },
         { label: '温度', field: 'ev_temperature', unit: ' °C' },
         { label: '湿度', field: 'ev_humidity', unit: ' %' },
       ];
+
+      const environmentPosition = [
+        { x: -500, y: 520, z: 700 },
+        { x: -500, y: 520, z: 0 },
+        { x: -500, y: 520, z: -800 },
+        { x: 150, y: 520, z: -800 },
+        { x: 800, y: 520, z: 700 },
+        { x: 800, y: 520, z: 0 },
+        { x: 800, y: 520, z: -800 },
+      ]
 
       environmentFields.forEach((item, index) => {
         const environmentLabel = new CSS2DObject(document.createElement('div'));
@@ -321,7 +345,10 @@ export default {
         environmentLabel.element.style.fontWeight = 'bold';
         environmentLabel.element.style.backgroundColor = 'rgba(0, 0, 0, 0)';
         environmentLabel.element.style.padding = '5px';
-        environmentLabel.position.set(-500, 300 - index * 30, 400); // 初始位置设置为建筑方框旁边
+
+        // 放置在环境数据标签的位置
+        environmentLabel.position.set(environmentPosition[index].x, environmentPosition[index].y, environmentPosition[index].z);
+
         this.scene.add(environmentLabel);
         this.environmentLabels.push(environmentLabel);
       });
@@ -348,7 +375,7 @@ export default {
       // 更新环境数据标签
       this.environmentLabels[0].element.textContent = `CO: ${currentData.ev_co || '未测量'} `;
       this.environmentLabels[1].element.textContent = `气压: ${currentData.ev_pressure || '未测量'}hPa`;
-      this.environmentLabels[2].element.textContent = `天气: ${currentData.ev_light || '未测量'}`;
+      this.environmentLabels[2].element.textContent = `光照: ${currentData.ev_light || '未测量'}`;
       this.environmentLabels[3].element.textContent = `PM2.5: ${currentData.ev_pm25 || '未测量'}μg/m³`;
       this.environmentLabels[4].element.textContent = `PM10: ${currentData.ev_pm10 || '未测量'}μg/m³`;
       this.environmentLabels[5].element.textContent = `温度: ${currentData.ev_temperature || '未测量'}°C`;
@@ -392,6 +419,7 @@ export default {
 
 .center {
   width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
