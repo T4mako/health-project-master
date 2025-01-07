@@ -122,8 +122,12 @@ export default {
         .then(response => {
           if (response.code === "200") {
             const data = response.data;
+            console.log(data);
+            
             if(data[0]){
               this.option.series[1].data = [[data[0].age,data[0][this.indicatorChoose]]]
+            }else{
+              this.option.series[1].data = []
             }
           } else {
             this.$Message({

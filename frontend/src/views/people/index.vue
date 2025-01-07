@@ -10,9 +10,9 @@
           <div>身高：{{ height}} </div>
           <div>体重：{{ weight}} </div>
         </div>
-        <!-- <div style="margin-top: 150px;">
+        <div style="margin-top: 150px;">
           <el-button type="primary" @click="goRoom()">房间数字孪生</el-button>
-        </div> -->
+        </div>
       </div>
       <div style="margin-top: 90px"><div class="leftbox" v-for="data in leftData" >
         <div class="lefticon">

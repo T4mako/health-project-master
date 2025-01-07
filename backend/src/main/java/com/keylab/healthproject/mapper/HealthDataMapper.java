@@ -172,4 +172,46 @@ public interface HealthDataMapper extends BaseMapper<HealthData> {
             "    systolic = 0 OR\n" +
             "    diastolic = 0;")
     void zeroToNull();
+
+    @Select("SELECT \n" +
+            "    ev.co AS ev_co, \n" +
+            "    ev.pressure AS ev_pressure, \n" +
+            "    ev.light AS ev_light, \n" +
+            "    ev.pm25 AS ev_pm25, \n" +
+            "    ev.pm10 AS ev_pm10, \n" +
+            "    ev.humidity AS ev_humidity, \n" +
+            "    ev.temperature AS ev_temperature, \n" +
+            "    ev.researched_person_id AS ev_researched_person_id, \n" +
+            "    ev.create_time AS ev_create_time, \n" +
+            "    hd.id AS hd_id, \n" +
+            "    hd.breath_rate AS hd_breath_rate, \n" +
+            "    hd.systolic AS hd_systolic, \n" +
+            "    hd.diastolic AS hd_diastolic, \n" +
+            "    hd.create_time AS hd_create_time, \n" +
+            "    hd.blood_oxygen AS hd_blood_oxygen, \n" +
+            "    hd.temperature AS hd_temperature, \n" +
+            "    hd.researched_person_id AS hd_researched_person_id, \n" +
+            "    hd.heart_rate AS hd_heart_rate, \n" +
+            "    hd.blood_glucose AS hd_blood_glucose \n" +
+            "FROM \n" +
+            "    env_val ev\n" +
+            "LEFT JOIN \n" +
+            "    health_data hd\n" +
+            "ON \n" +
+            "    hd.researched_person_id = #{researchedPersonId}\n" +
+            "    AND hd.create_time = (\n" +
+            "        SELECT \n" +
+            "            MAX(hd2.create_time)\n" +
+            "        FROM \n" +
+            "            health_data hd2\n" +
+            "        WHERE \n" +
+            "            hd2.researched_person_id = #{researchedPersonId}\n" +
+            "            AND hd2.create_time <= STR_TO_DATE(ev.create_time, '%Y-%m-%d')\n" +
+            "    )\n" +
+            "WHERE \n" +
+            "    ev.dept_id = #{deptId}\n" +
+            "ORDER BY \n" +
+            "    ev.create_time\n" +
+            "LIMIT 300;")
+    List<Map<String, Object>> getAllHealthAndEnvData(long researchedPersonId, int deptId);
 }

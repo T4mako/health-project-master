@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.keylab.healthproject.dao.EnvVal;
 import com.keylab.healthproject.dao.HealthData;
 import com.keylab.healthproject.dao.PersonData;
 import com.keylab.healthproject.mapper.HealthDataMapper;
@@ -372,6 +373,26 @@ public class HealthDataServiceImpl extends ServiceImpl<HealthDataMapper, HealthD
             res.setBloodGlucose(bloodGlucoseData.getBloodGlucose());
         }
 
+        return res;
+    }
+
+    @Override
+    public List<Map<String, Object>> getAllHealthAndEnvData(long id) {
+        List<Map<String, Object>> res = new ArrayList<>();
+        LambdaQueryWrapper<PersonData> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(PersonData::getId, id);
+        PersonData personData = personDataMapper.selectOne(queryWrapper);
+        long deptId = personData.getDeptId();
+        // 徐州
+        if(deptId == 13 || deptId == 26 || deptId == 27 || deptId == 28) {
+            res = healthDataMapper.getAllHealthAndEnvData(id,10);
+        }else if(deptId == 16 || deptId == 17 || deptId == 18 || deptId == 19){
+            // 郑州
+            res = healthDataMapper.getAllHealthAndEnvData(id,11);
+        }else {
+            // 西安
+            res = healthDataMapper.getAllHealthAndEnvData(id,12);
+        }
         return res;
     }
 
