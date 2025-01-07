@@ -131,7 +131,7 @@ export default {
       labels: {
         co: 'CO',
         pressure: '气压',
-        light: '天气',
+        light: '光照',
         pm25: 'PM2.5',
         pm10: 'PM10',
         temperature: '温度',
