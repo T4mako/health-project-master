@@ -11,7 +11,7 @@
           <div>体重：{{ weight}} </div>
         </div>
         <div style="margin-top: 150px;">
-          <el-button type="primary" @click="goRoom()">房间数字孪生</el-button>
+          <el-button type="primary" @click="goRoom()">数字孪生</el-button>
         </div>
       </div>
       <div style="margin-top: 90px"><div class="leftbox" v-for="data in leftData" >
@@ -231,7 +231,7 @@ export default {
           this.bottomData = [
             { title: 'CO', data: data.co, unit: 'ug/m³' },
             { title: '气压', data: data.pressure, unit: 'hPa' },
-            { title: '天气', data: data.light, unit: '天' },
+            { title: '光照', data: data.light, unit: '天' },
             { title: 'PM2.5', data: data.pm25, unit: 'μg/m³' },
             { title: 'PM10', data: data.pm10, unit: 'μg/m³' },
             { title: '温度', data: data.e_temperature, unit: '°C' },

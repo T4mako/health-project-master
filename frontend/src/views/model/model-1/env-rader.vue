@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 第一个空的 div，用于显示警告文字 -->
-    <div style="font-size: 18px;color: rgb(255, 220, 96); margin: 8px;">天气：{{ this.wealth }}
+    <div style="font-size: 18px;color: rgb(255, 220, 96); margin: 8px;">光照：{{ this.wealth }}
     </div>
     <Echart id="leftCenter" :options="option" class="left_center_inner" v-if="true" ref="charts" width="600px"
       height="360px" />
@@ -32,7 +32,7 @@ export default {
           indicator: [
             { name: 'CO（mg/m³）', max: 2, min: 0 },
             { name: '气压（hPa）', max: 2000, min: 0 },
-            { name: '天气', max: 60000, min: 0 },
+            { name: '光照', max: 60000, min: 0 },
             { name: 'PM2.5（µg/m³）', max: 100, min: 0 },
             { name: 'PM10（µg/m³）', max: 500, min: 0 },
             { name: '温度（摄氏度）', max: 50, min: -20 },
