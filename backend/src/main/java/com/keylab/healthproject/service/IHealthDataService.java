@@ -34,4 +34,6 @@ public interface IHealthDataService extends IService<HealthData> {
     void upsertHealthData(List<Map<String, Object>> records);
 
     HealthData personLatestHData(long id);
+
+    List<Map<String, Object>> getAllHealthAndEnvData(long id);
 }

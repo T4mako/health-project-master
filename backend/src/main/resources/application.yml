@@ -17,6 +17,17 @@ spring:
   servlet:
     multipart:
       enabled: true
+  quartz:
+    job-store-type: memory # 使用内存存储（生产环境可以使用 JDBC）
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: QuartzScheduler
+          threadPool:
+            threadCount: 10 # 线程池大小
+          jobStore:
+            misfireThreshold: 60000 # 超时设置
 
 
 mybatis-plus:
