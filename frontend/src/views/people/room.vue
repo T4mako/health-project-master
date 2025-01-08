@@ -180,13 +180,11 @@ export default {
           // 创建方框
           const boxGeometry = new THREE.BoxGeometry(135, 350, 135); // 自定义尺寸
           const edges = new THREE.EdgesGeometry(boxGeometry); // 创建边界几何体
-          const lineMaterial = new THREE.LineDashedMaterial({
-            color: 0xfad700,
-            dashSize: 3,
-            gapSize: 5
-          }); // 黄色虚线
+          const lineMaterial = new THREE.LineBasicMaterial({
+            color: 0xfad700 // 黄色实线
+          });
+
           this.boundingBox = new THREE.LineSegments(edges, lineMaterial); // 用 LineSegments 表示边框
-          this.boundingBox.computeLineDistances(); // 计算虚线间距
           this.scene.add(this.boundingBox); // 添加到场景
         },
         (xhr) => {
@@ -214,13 +212,13 @@ export default {
             this.boundingBox.rotation.copy(position);
 
             const healthPosition = [
-              { x: -70, y: 150, z: -70 },
-              { x: 70, y: 150, z: 70 },
-              { x: -70, y: -50, z: 70 },
-              { x: 70, y: 150, z: -70 },
-              { x: 70, y: -50, z: 70 },
-              { x: -70, y: -50, z: -70 },
-              { x: 70, y: -50, z: -70 },
+              { x: -80, y: 150, z: -80 },
+              { x: 80, y: 150, z: 80 },
+              { x: -80, y: -50, z: 80 },
+              { x: 80, y: 150, z: -80 },
+              { x: 80, y: -50, z: 80 },
+              { x: -80, y: -50, z: -80 },
+              { x: 80, y: -50, z: -80 },
             ]
             // 更新健康数据标签的位置
             this.healthLabels.forEach((label, index) => {
@@ -306,7 +304,7 @@ export default {
         healthLabel.element.className = 'label';
         healthLabel.element.textContent = `${item.label}: ${this.healthData[item.field] || '未测量'}${item.unit}`;
         healthLabel.element.style.color = '#fad700';
-        healthLabel.element.style.fontSize = '12px';
+        healthLabel.element.style.fontSize = '18px';
         healthLabel.element.style.fontWeight = 'bold';
         healthLabel.element.style.backgroundColor = 'rgba(0, 0, 0, 0)';
         healthLabel.element.style.padding = '5px';
@@ -341,7 +339,7 @@ export default {
         environmentLabel.element.className = 'label';
         environmentLabel.element.textContent = `${item.label}: ${this.environmentData[item.field] || '未测量'}${item.unit}`;
         environmentLabel.element.style.color = '#00ff00';
-        environmentLabel.element.style.fontSize = '12px';
+        environmentLabel.element.style.fontSize = '18px';
         environmentLabel.element.style.fontWeight = 'bold';
         environmentLabel.element.style.backgroundColor = 'rgba(0, 0, 0, 0)';
         environmentLabel.element.style.padding = '5px';
