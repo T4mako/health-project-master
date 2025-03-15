@@ -211,7 +211,7 @@ public interface HealthDataMapper extends BaseMapper<HealthData> {
             "WHERE \n" +
             "    ev.dept_id = #{deptId}\n" +
             "ORDER BY \n" +
-            "    ev.create_time\n" +
+            "    ev.create_time DESC \n" +
             "LIMIT 300;")
     List<Map<String, Object>> getAllHealthAndEnvData(long researchedPersonId, int deptId);
 }
